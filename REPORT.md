@@ -153,7 +153,6 @@ The prototype is not a mock-up: every button works in the browser.
 | Postcard with own photos (stay in browser), decorative QR, referral link | Working |
 | Impact page: Gantt, budget, live payback model with 3 sliders | Working |
 | Mobile (375 px), dark mode, larger text, keyboard access | Working |
-
 | Concierge in a slide-in drawer on every page, conversation kept across pages | Working |
 | Phone tab bar, sticky "Book" bar, tours filters and sorting, sticky section tabs | Working |
 | Interactive route map (real coordinates, tappable pins) | Working |

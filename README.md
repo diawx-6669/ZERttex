@@ -24,6 +24,7 @@ DISCOVER → PLAN → VERIFY → BOOK → TRAVEL → SHARE ─┐
 | Type-check only | `npm run typecheck` |
 | Acceptance test (needs Playwright + Chromium) | `npm run test:e2e` → writes `screenshots/` |
 | Download real destination photos (needs network to Wikimedia) | `npm run photos` (then `npm run build`) |
+| Rebuild the Word report from `REPORT.md` | `npm run report:docx` → `docs/Saryarqa_Go_Report.docx` |
 
 Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/ask`, `#/trust`, `#/book`, `#/trip`, `#/postcard`, `#/impact`, `#/about`.
 
@@ -99,6 +100,7 @@ src/
 dist/index.html   single-file build
 screenshots/      screens captured by the automated acceptance run
 scripts/fetch-photos.mjs · scripts/photos.config.json   photo download pipeline
+docs/Saryarqa_Go_Report.docx · .pdf   the report as Word / PDF with screenshots (docs/img)
 PLAN.md · REPORT.md · REPORT_NOTES.md
 ```
 
