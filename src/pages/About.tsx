@@ -3,6 +3,7 @@ import { PageHead, Section } from '../components/Layout';
 import { Tag } from '../components/Tag';
 import { caseFacts, evidence, methodNote } from '../data/facts';
 import { ui } from '../data/i18n';
+import { allPhotos } from '../data/photos';
 import { useApp } from '../state';
 
 export default function About() {
@@ -77,6 +78,32 @@ export default function About() {
           ))}
         </ul>
         <p className="mt-4 text-sm text-muted">{t(ui.common.prototype)}</p>
+      </Section>
+
+      <Section
+        title={t({ en: 'Photo credits', zh: '图片来源' })}
+        sub={t({ en: 'Destination photos are freely licensed images from Wikimedia Commons, shown with their authors and licences. They show the places, not Saryarqa Routes tours.', zh: '目的地照片来自维基共享资源的自由授权图片，并注明作者和许可。照片展示的是地点，而非 Saryarqa Routes 的线路。' })}
+      >
+        <ul className="grid gap-x-8 gap-y-2 text-sm md:grid-cols-2" id="photo-credits">
+          {allPhotos.map((p) => (
+            <li key={p.file} className="border-b border-line py-2">
+              <a href={p.credit.source} target="_blank" rel="noreferrer" className="font-medium hover:text-teal hover:underline">
+                {p.credit.title ?? p.file}
+              </a>
+              <span className="text-muted">
+                {' '}
+                {t({ en: 'by', zh: '作者' })} {p.credit.author},{' '}
+                {p.credit.licenseUrl ? (
+                  <a href={p.credit.licenseUrl} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                    {p.credit.license}
+                  </a>
+                ) : (
+                  p.credit.license
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
       </Section>
     </>
   );

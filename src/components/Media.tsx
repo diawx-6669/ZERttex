@@ -29,10 +29,12 @@ export function Media({ tour, index = 0, className = '', title, credit = true, e
   const { t } = useApp();
   const photos = photosFor(tour);
   const photo = photos.length ? photos[index % photos.length] : undefined;
-  if (!photo) return <Scene id={tour} className={className} title={title} />;
+  const [failed, setFailed] = useState(false);
+  if (!photo || failed) return <Scene id={tour} className={className} title={title} />;
   return (
-    <div className="relative h-full w-full">
+    <div className="relative h-full w-full bg-surface2">
       <img
+        onError={() => setFailed(true)}
         src={photo.src}
         alt={photo.credit.alt ? t(photo.credit.alt) : title ?? ''}
         loading={eager ? 'eager' : 'lazy'}
@@ -151,7 +153,7 @@ export function Gallery({ tour }: { tour: TourId }) {
             className="group relative aspect-[4/3] w-[78%] shrink-0 snap-start overflow-hidden rounded-2xl sm:w-auto"
             aria-label={`${t({ en: 'Open photo', zh: '打开照片' })} ${i + 1}`}
           >
-            <img src={p.src} alt={p.credit.alt ? t(p.credit.alt) : ''} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+            <img src={p.src} alt={p.credit.alt ? t(p.credit.alt) : ''} loading="lazy" onError={(e) => ((e.currentTarget.closest('button') as HTMLElement).hidden = true)} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
             <span className="pointer-events-none absolute bottom-1.5 right-1.5">
               <span className="rounded bg-black/45 px-1.5 py-0.5 text-[10px] text-white/90">© {p.credit.author}</span>
             </span>

@@ -23,7 +23,7 @@ const ok = (name, cond, info = '') => {
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  page.on('console', (m) => m.type() === 'error' && !/fonts|ERR_FAILED/.test(m.text()) && errors.push(m.text()));
+  page.on('console', (m) => m.type() === 'error' && !/fonts|ERR_FAILED|net::ERR_/.test(m.text()) && errors.push(m.text()));
 
   const go = async (h) => {
     await page.goto(URL + '#' + h);
