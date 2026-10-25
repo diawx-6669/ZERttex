@@ -1,145 +1,86 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"></head><body>
 <h1>Saryarqa Go</h1>
 <p class="subtitle">ZERTTEX Hackathon 2026, Stage 1. Case 1: Technology Product<br>Team: ____________________</p>
+<p>Saryarqa Routes wants 30% of its travelers to come from abroad within 24 months, but today about 96% of its 3,400 travelers are from Kazakhstan (case data). We propose Saryarqa Go, a booking platform in English and Chinese for independent travelers from China. It shows exactly what each tour includes, lets travelers meet their guide before paying, and accepts foreign cards. The first version can be built in 12 weeks within the 20 million KZT budget.</p>
 
-<h2>1. Summary</h2>
-<p>Saryarqa Routes is a tour company from Astana. In 2025 it had 3,400 travelers, but about 96% of them were from Kazakhstan, and the company wants 30% of its travelers to come from abroad within 24 months (case data). We think the main reason foreigners do not book is simple: they cannot easily see what a trip includes, they cannot pay with their own card, and they have no way to check that the company is real.</p>
-<p>Our answer is Saryarqa Go, a booking website and app in English and Chinese. We start with independent travelers from China. The first version can be built in 12 weeks within the 20 million KZT budget from the case. With our assumptions it pays back in month 32, or in month 44 if we get 30% fewer travelers than planned.</p>
-
-<h2>2. The problem</h2>
-<p>Today the company sells tours through Instagram messages, WhatsApp and phone calls. Customers pay by Kaspi transfer or cash, and the website is one page in Russian (case data). This works for local customers, but not for a tourist from Shanghai or Berlin. The case lists four things foreign guests said, and each of them stops a booking before the payment:</p>
+<h2>1. Problem and market</h2>
+<h4>Target market: independent travelers from mainland China</h4>
+<p>According to the Ministry of Tourism and Sports, about 655,000 people from China visited Kazakhstan in 2024, 78% more than in 2023 [1][2]. Since November 2023 the two countries have a visa-free regime: up to 30 days per visit and up to 90 days in any 180 days [1]. In 2024 China was the largest source of tourists outside the neighbouring countries [3]. Overall, Kazakhstan counted 15.3 million foreign visitors for tourism in 2024 [3] and 15.7 million in the first nine months of 2025 [5]. An analyst estimate gives 241,700 Chinese visitors in 2025 [4], but it is counted in a different way from the Ministry figure, so we do not compare the two. The tours fit what independent travelers look for: nature and photography (Charyn, Kolsai, Burabay) and Silk Road history (Turkestan). This last point is our own judgement.</p>
+<h4>What stops them from booking today</h4>
+<p>The company sells through Instagram messages, WhatsApp and phone calls, takes payment by Kaspi transfer or cash, and has a one-page website in Russian (case data). Foreign guests named four problems:</p>
 <table>
 <tr><th>What guests said (case data)</th><th>When the booking fails</th><th>Why it happens now</th></tr>
 <tr><td>"It is unclear how to book."</td><td>Before the first message</td><td>Sales only through chats; Russian-only website</td></tr>
-<tr><td>"I am not sure the company is trustworthy."</td><td>Before sending money abroad</td><td>Nothing on the website proves the company is real</td></tr>
+<tr><td>"I am not sure the company is trustworthy."</td><td>Before sending money abroad</td><td>Nothing proves the company is real</td></tr>
 <tr><td>"My foreign card does not work."</td><td>At the payment</td><td>Only Kaspi transfer or cash</td></tr>
 <tr><td>"I do not know what is included."</td><td>Before deciding</td><td>No clear list of what the price covers</td></tr>
 </table>
+<p>About 4% of 3,400 travelers (roughly 136) are foreign today. If the company keeps its 3,264 local travelers, 30% foreign means about 4,663 travelers in total and about 1,399 foreigners. So the company needs around 1,263 additional foreign travelers per year, about 105 per month.</p>
 
-<h2>3. Why we start with travelers from China</h2>
-<p>According to the Ministry of Tourism and Sports, about 655,000 people from China visited Kazakhstan in 2024, 78% more than in 2023 [1][2]. Since November 2023 the two countries have a visa-free regime: up to 30 days per visit and up to 90 days in any 180 days [1]. In 2024 China was the largest source of tourists outside the neighbouring countries [3]. Overall Kazakhstan counted 15.3 million foreign visitors for tourism in 2024 [3], and 15.7 million in the first nine months of 2025 alone [5].</p>
-<p>We are careful with these numbers. An analyst estimate gives 241,700 Chinese visitors in 2025 [4], which is much lower than the Ministry figure for 2024, but the two are counted in different ways, so we do not compare them. World Bank data [6] only counts overnight arrivals, which is again a different definition.</p>
-<p>Because there is no visa barrier, the decision for a Chinese traveler mostly depends on trust, clear information and payment, which are exactly the four complaints above. The tours also fit what independent travelers look for: nature and photography (Charyn, Kolsai, Burabay) and Silk Road history (Turkestan). This last point is our own judgement, not a statistic.</p>
-<h4>How many more foreign travelers are needed</h4>
-<p>About 4% of 3,400 travelers are foreign today, so roughly 136 people. If the company keeps its 3,264 local travelers, foreigners have to be 30% of about 4,663 travelers in total, which is about 1,399 people. That means around 1,263 additional foreign travelers per year, or about 105 per month. Fixing only one complaint will not be enough to get there.</p>
+<h2>2. Existing solutions</h2>
+<p>Big booking platforms already sell tours to this region. Trip.com, for example, lists one-day tours from Almaty to Charyn Canyon, Kolsai Lake and Lake Kaindy [8]. These platforms solve the payment problem and work in many languages. But for Saryarqa Routes they have three weak points. First, they take a large commission: GetYourGuide says it charges suppliers 20-30% depending on the country [9], which is most of a small company's margin. Second, the tour becomes one listing among many similar day trips, so the company cannot show its own guides or build trust in its brand. Third, the customer relationship belongs to the platform, so it is hard to sell longer trips or get repeat and referral customers.</p>
+<p>The company's current tools (Instagram, WhatsApp, phone) keep the relationship but fail all four complaints above. Saryarqa Go keeps the direct relationship and the full margin, and adds what the platforms do not: the "not yet confirmed" list, meeting the guide before paying, and help in Chinese. Later we can still list on Trip.com as an extra channel.</p>
 
-<h2>4. Our solution: Saryarqa Go</h2>
-<p>Saryarqa Go covers the whole trip, not only the booking form. We built it around six steps. The last step (sharing a postcard) brings the next traveler back to the first one.</p>
-<table>
-<tr><th>Step</th><th>What the traveler gets</th><th>Which complaint it solves</th></tr>
-<tr><td>Discover</td><td>Tour pages in English and Chinese. Each tour shows four lists: included, optional extras, not included, and not yet confirmed.</td><td>"I do not know what is included"</td></tr>
-<tr><td>Plan</td><td>A trip builder that puts tours, transfers between Almaty, Turkestan and Astana, and free days into the number of days the traveler has.</td><td>"It is unclear how to book"</td></tr>
-<tr><td>Check</td><td>A trust page with a short video from the guide, a 5-minute video call before paying, refund rules and an honest list of what is verified. A chat in English and Chinese that passes hard questions to a manager.</td><td>"I am not sure the company is trustworthy"</td></tr>
-<tr><td>Book</td><td>Booking in three steps. Payment with a foreign card on the payment provider's page. Alipay and WeChat Pay later, after the providers approve us. Prices in KZT with USD or CNY next to them.</td><td>"My foreign card does not work"</td></tr>
-<tr><td>Travel</td><td>A trip page with daily check-ins, optional updates for family at home, and free rescheduling if a mountain road is closed.</td><td>Trust during the trip</td></tr>
-<tr><td>Share</td><td>A postcard sized for Xiaohongshu and WeChat Moments with a link for friends.</td><td>Cheap way to find new travelers</td></tr>
-</table>
-<img src="/home/user/ZERttex/docs/img/complaints.png" style="width:100%">
-<p class="caption">Figure 1. Our prototype: each complaint from the case is linked to a feature.</p>
+<h2>3. Our product</h2>
+<p>Saryarqa Go is a web platform (also usable as a mobile app) built around one path: discover, plan, check, book, travel and share. The last step brings new travelers back to the first. It has five main features:</p>
+<ol>
+<li><b>Clear tour pages in English and Chinese.</b> Every tour shows four lists: included, optional extras, not included, and not yet confirmed (for example park fees or the 4x4 transfer at Kaindy). The company confirms the last list in writing before the trip.</li>
+<li><b>Booking and payment in three steps.</b> Tour and date, lead traveler (no passport needed), payment. Foreign cards are paid on the payment provider's own page; Alipay and WeChat Pay are added after the providers approve us. Prices are in KZT with CNY or USD next to them.</li>
+<li><b>Trust page.</b> A short video from each guide, a 5-minute video call before paying, refund rules, and an honest list of which company documents are already shown and which are still coming.</li>
+<li><b>Chat assistant in English and Chinese.</b> It answers only from checked tour information and passes anything it is not sure about (dates, discounts) to a manager.</li>
+<li><b>Trip page and postcard.</b> Daily check-ins, optional updates for family at home, free rescheduling if a mountain road is closed, and a postcard for Xiaohongshu and WeChat Moments with a link for friends.</li>
+</ol>
+<p><b>Technology:</b> React and TypeScript web app, a database with an admin page for managers, and the payment provider's hosted payment page, so card data never touches our servers. <b>What makes it unique:</b> it is honest about what is still unknown, it lets the traveler meet the person who will guide them, and every shared trip brings a new customer at almost no cost.</p>
+<img src="/home/user/ZERttex/docs/img/complaints.png" style="width:88%">
+<p class="caption">Figure 1. Our clickable prototype: each complaint from the case is linked to a feature.</p>
 
-<h2>5. What makes it different</h2>
-<p>Most travel sites hide what is still unknown. We do the opposite. Park fees, exact guesthouse names, the 4x4 transfer at Kaindy and the availability of a Chinese-speaking guide are shown in a separate "not yet confirmed" list, and the company confirms them in writing before the trip. We think being open about this builds more trust than a perfect-looking page.</p>
-<p>For someone traveling to a new country, the guide is the company. That is why the traveler can watch a short video of the guide and book a 5-minute call before paying. The chat answers in the traveler's language, but only from checked tour information. If it does not know something, for example whether there are free places on a date, it says so and passes the question to a person.</p>
-<p>Two smaller ideas are also important for Chinese travelers and their families. Family members can follow the trip status (not the exact location) if the traveler turns it on, and it stops automatically after the trip. The postcard at the end is something people want to post anyway, so it becomes free advertising.</p>
-<p>In the prototype every number and claim has a small label: case data, checked source, our proposal, demo data, or "needs confirmation". We did this so that judges and future customers can see what is a fact and what is still a plan.</p>
-
-<h2>6. A realistic 12-week MVP</h2>
+<h2>4. MVP and implementation</h2>
+<p>The MVP includes the tour pages, the inclusion lists, booking with foreign card payment, the trust page, a simple scripted chat with hand-off to a manager, and the trip page. Things that depend on another company's approval or on live data come later: Alipay and WeChat Pay, a smarter AI chat, live weather data, and listing on Trip.com.</p>
 <table>
 <tr><th>Weeks</th><th>What we do</th><th>We know it is done when</th></tr>
 <tr><td>1-2</td><td>Interviews and research; apply to payment providers</td><td>At least 10 interviews with Chinese travelers; applications sent</td></tr>
 <tr><td>3-4</td><td>Design and tour pages in English and Chinese</td><td>4 tour pages checked by 3 or more target users</td></tr>
 <tr><td>5-7</td><td>Booking, inclusion lists, chat, trust page</td><td>A full test booking works in the payment test mode</td></tr>
-<tr><td>8-9</td><td>Trip builder, real payment page, rescheduling</td><td>Staff make a first real test payment</td></tr>
+<tr><td>8-9</td><td>Trip page, real payment page, rescheduling</td><td>Staff make a first real test payment</td></tr>
 <tr><td>10-11</td><td>Usability tests and payment checks</td><td>5-8 test sessions with no blocking problems left</td></tr>
 <tr><td>12</td><td>Pilot with real travelers</td><td>Pilot results collected</td></tr>
 </table>
-<p>Everything that depends on another company's approval or on live data comes later: Alipay and WeChat Pay, a smarter AI chat, live weather and road data, GPS sharing, offline audio, and listing on Trip.com or Klook. This way the MVP does not get stuck waiting for someone else.</p>
-<p>The app would be built with React and TypeScript, a database with an admin page for the managers, and the payment provider's own payment page, so card data never touches our servers. We plan a small hired team: a designer, two developers and a Chinese translator, with one person from Saryarqa Routes as the product owner (our proposal).</p>
-<p>We already have a working clickable prototype that shows the whole path from choosing a tour to the postcard. Payments in it are only simulated and it collects no card or passport data. It was built with the help of an AI coding assistant; see our AI Declaration.</p>
+<p><b>Team:</b> a hired designer, two developers and a Chinese translator, with one person from Saryarqa Routes as product owner (our proposal). <b>How we test it:</b> 5-8 usability sessions with Chinese-speaking travelers, then a pilot where we measure how many people who start a booking finish it, how often the chat has to hand off to a manager, and how many postcards lead to new bookings. We already built a working clickable prototype of the whole path; payments in it are simulated.</p>
+<img src="/home/user/ZERttex/submission/html/flow.png" style="width:100%">
+<p class="caption">Figure 2. User flow from search to payment. Dashed boxes are optional.</p>
 
-<h2>7. Costs, payback and impact</h2>
-<p>The year-1 budget is exactly 20,000,000 KZT: 12 million for building the product and 8 million for launch, marketing, support and a reserve. The company earns its normal margin on every additional foreign traveler. We assume a 30% margin on the average price of 44,000 KZT, so 13,200 KZT per traveler (our assumption). The company needs about 1,516 additional travelers in total to earn back 20 million. With our ramp-up plan the money comes back in month 32. If demand is 30% lower, it comes back in month 44. The full calculation is in the separate financial document.</p>
-<p>If it works, the company gets a second source of income next to local customers. Travelers get clear prices, a way to pay with their own card, and a guide they have already met. For Kazakhstan, every positive trip that is shared on Chinese social media is a small advertisement for the country, and it brings tourists to regions outside Almaty and Astana.</p>
-
-<h2>8. Risks</h2>
+<h2>5. Costs, payback and impact</h2>
 <table>
-<tr><th>Risk</th><th>What we do about it</th></tr>
-<tr><td>Alipay or WeChat Pay approval takes long or is refused</td><td>Start with foreign cards on the provider's page; apply in week 1; a manager can help with payment as a backup</td></tr>
-<tr><td>The chat gives a wrong answer</td><td>It only uses checked tour information, says "I don't know" when unsure and passes the question to a person; we read the chat logs every week</td></tr>
-<tr><td>Not enough demand from China</td><td>Talk to travelers before building; run a small pilot; test Xiaohongshu posts and postcards before paying for ads</td></tr>
-<tr><td>Data and privacy rules</td><td>Collect only what we need (no passport, no card numbers); get a legal check; family sharing is off by default</td></tr>
-<tr><td>Guides do not speak enough Chinese</td><td>Test the guides; work with interpreters; show Chinese guides as "not yet confirmed" until checked; offer the audio guide in Chinese</td></tr>
+<tr><th>Part</th><th>Item</th><th class="r">KZT</th></tr>
+<tr><td>Development (one-time)</td><td>Design and development 8.0M; translation 1.5M; payment integration 1.5M; guide videos and photos 1.0M</td><td class="r">12,000,000</td></tr>
+<tr><td>Launch (year 1)</td><td>Marketing on Xiaohongshu and WeChat 4.5M; pilot and support 1.0M</td><td class="r">5,500,000</td></tr>
+<tr><td>Running costs (year 1)</td><td>Hosting, AI usage, maintenance</td><td class="r">1,500,000</td></tr>
+<tr><td>Reserve</td><td>Contingency</td><td class="r">1,000,000</td></tr>
+<tr><td colspan="2"><b>Total year 1</b> (case limit 20,000,000)</td><td class="r"><b>20,000,000</b></td></tr>
 </table>
-<p>Before launch we still need to confirm the company's registration, licence and insurance documents, the park and site fees, the payment provider's terms, and whether the 30% margin matches the company's real costs.</p>
-<p>[[PAGEBREAK]]</p>
-<h1>Financial calculations and business model</h1>
-<p class="subtitle">Saryarqa Go. All amounts in KZT.</p>
-
-<h2>1. Business model</h2>
-<p>The traveler pays Saryarqa Routes for the tour, the same way local customers do now. Saryarqa Go itself is not sold to anyone. It is the new sales channel that lets foreign travelers find, understand and pay for the tours.</p>
-<p>In our calculation we count only one source of income: the margin on additional foreign travelers. The average price is 44,000 KZT (case data). We assume that 30% of it is left after paying guides, transport, accommodation and payment fees, so 13,200 KZT per traveler (our assumption). We do not count three other possible sources, so the result is on the careful side:</p>
-<ul>
-<li>optional extras sold on the tour page, like horse riding, boats or a single room;</li>
-<li>longer trips, because the trip builder makes it easy to combine two or three tours;</li>
-<li>new travelers who come through postcard links, which cost almost nothing to get.</li>
-</ul>
-<p class="small">Note: 150,000,000 / 3,400 = 44,118 KZT, which is a little higher than the 44,000 KZT average price given in the case. We use 44,000 KZT.</p>
-
-<h2>2. Budget</h2>
+<p>From year 2 running costs are 300,000 KZT per month (our estimate). <b>How it earns money:</b> the company keeps its margin on every additional foreign traveler. We assume 30% of the 44,000 KZT average price (case data) is left after guides, transport, hotels and payment fees, so 13,200 KZT per traveler (our assumption). We do not count extras, longer trips or referrals, so the result is careful. Travelers start in month 4 and grow step by step to 1,263 per year by month 24.</p>
+<img src="/home/user/ZERttex/submission/html/chart.png" style="width:92%">
+<p class="caption">Figure 3. Cumulative cash flow. Red line: results 30% worse than planned.</p>
 <table>
-<tr><th>Part</th><th>Item</th><th>When</th><th class="r">KZT</th></tr>
-<tr><td>Development</td><td>Design and development</td><td>one-time</td><td class="r">8,000,000</td></tr>
-<tr><td>Development</td><td>Translation and localization (English, Chinese)</td><td>one-time</td><td class="r">1,500,000</td></tr>
-<tr><td>Development</td><td>Payment integration and testing</td><td>one-time</td><td class="r">1,500,000</td></tr>
-<tr><td>Development</td><td>Guide videos and photos</td><td>one-time</td><td class="r">1,000,000</td></tr>
-<tr><td>Launch</td><td>Marketing (Xiaohongshu, WeChat, partners)</td><td>year 1</td><td class="r">4,500,000</td></tr>
-<tr><td>Launch</td><td>Pilot and customer support</td><td>year 1</td><td class="r">1,000,000</td></tr>
-<tr><td>Maintenance</td><td>Hosting, AI usage, maintenance</td><td>year 1</td><td class="r">1,500,000</td></tr>
-<tr><td>Reserve</td><td>Contingency</td><td>year 1</td><td class="r">1,000,000</td></tr>
-<tr><td colspan="3"><b>Total year 1</b> (the case allows up to 20,000,000)</td><td class="r"><b>20,000,000</b></td></tr>
-</table>
-<p>From year 2 we expect running costs of 300,000 KZT per month, or 3,600,000 KZT per year, for hosting, support and keeping the content up to date. All budget numbers are our planning estimates and should be checked with real quotes.</p>
-
-<h2>3. How many travelers we expect</h2>
-<p>To reach 30% foreign travelers the company needs about 1,263 additional foreign travelers per year (see section 3 of the main report). We launch in month 4 and expect the number to grow step by step until it reaches the full level in month 24 (in month m we get (m - 3) / 21 of the full level). After that we keep it flat, which is also a careful choice.</p>
-
-<h2>4. Payback</h2>
-<p>Each month we calculate: additional travelers x 13,200 KZT, minus costs. The 12 million one-time costs are spread over months 1-3, the other 8 million over months 1-12, and from month 13 the cost is 300,000 KZT per month. The payback month is the first month when the total since the start is no longer negative. For the pessimistic (downside) scenario we use 30% fewer travelers and keep everything else the same.</p>
-<img src="/home/user/ZERttex/submission/html/chart.png" style="width:100%">
-<p class="caption">Figure 1. Cumulative cash flow for the base case and the downside case.</p>
-<table>
-<tr><th>Year</th><th class="r">Additional travelers</th><th class="r">Margin earned</th><th class="r">Costs</th><th class="r">Result of the year</th><th class="r">Total so far (base)</th><th class="r">Total so far (downside)</th></tr>
-<tr><td>1</td><td class="r">226</td><td class="r">3.0M</td><td class="r">20.0M</td><td class="r">-17.0M</td><td class="r">-17.0M</td><td class="r">-17.9M</td></tr><tr><td>2</td><td class="r">932</td><td class="r">12.3M</td><td class="r">3.6M</td><td class="r">8.7M</td><td class="r">-8.3M</td><td class="r">-12.9M</td></tr><tr><td>3</td><td class="r">1,263</td><td class="r">16.7M</td><td class="r">3.6M</td><td class="r">13.1M</td><td class="r">4.8M</td><td class="r">-4.8M</td></tr><tr><td>4</td><td class="r">1,263</td><td class="r">16.7M</td><td class="r">3.6M</td><td class="r">13.1M</td><td class="r">17.8M</td><td class="r">3.2M</td></tr>
-</table>
-<table>
-<tr><th>Result</th><th class="r">Base case</th><th class="r">Downside (x 0.7)</th></tr>
+<tr><th>Result</th><th class="r">Base case</th><th class="r">30% worse</th></tr>
 <tr><td>Lowest point (month 12)</td><td class="r">-17.0M</td><td class="r">-17.9M</td></tr>
-<tr><td>Total after 24 months</td><td class="r">-8.3M</td><td class="r">-12.9M</td></tr>
 <tr><td><b>Payback month</b></td><td class="r"><b>32</b></td><td class="r"><b>44</b></td></tr>
 <tr><td>Total after 48 months</td><td class="r">17.8M</td><td class="r">3.2M</td></tr>
-<tr><td>Travelers needed to earn back 20M (20,000,000 / 13,200)</td><td class="r">1,516</td><td class="r">1,516</td></tr>
+<tr><td>Payback if the margin is 20% / 40%</td><td class="r">month 46 / 27</td><td class="r">after 48 / month 34</td></tr>
 </table>
-
-<h4>What if our margin is wrong?</h4>
-<p>The 30% margin is our biggest assumption, so we checked how the payback changes:</p>
+<p>If results are 30% worse, the project still pays back, but in month 44 instead of 32, and only if the margin is about 30% or more. In that case we would move marketing to free channels (postcards, our own Xiaohongshu posts), delay paid ads and keep running costs at the minimum. <b>Scalability:</b> the same platform can add Korean or English-speaking markets with new translations, and new tours can be added by managers without developers.</p>
+<p><b>Impact.</b> The company gets a second source of income next to local customers and stops losing foreign guests at the payment step. Travelers get clear prices, their own payment method and a guide they have already met. For Kazakhstan, every good trip shared on Chinese social media is free advertising, and it brings tourists to regions outside Almaty and Astana.</p>
 <table>
-<tr><th>Margin</th><th class="r">20%</th><th class="r">25%</th><th class="r">30%</th><th class="r">35%</th><th class="r">40%</th></tr>
-<tr><td>Payback, base case</td><td class="r">month 46</td><td class="r">month 37</td><td class="r">month 32</td><td class="r">month 29</td><td class="r">month 27</td></tr>
-<tr><td>Payback, downside</td><td class="r">after 48</td><td class="r">after 48</td><td class="r">month 44</td><td class="r">month 38</td><td class="r">month 34</td></tr>
+<tr><th>Biggest risks</th><th>What we do about it</th></tr>
+<tr><td>Alipay or WeChat Pay approval is slow</td><td>Start with foreign cards; apply in week 1; a manager can help with payment</td></tr>
+<tr><td>The chat gives a wrong answer</td><td>Only checked information; it says "I don't know" and passes to a person</td></tr>
+<tr><td>Not enough demand from China</td><td>Interviews first; small pilot; test free posts before paid ads</td></tr>
+<tr><td>Data privacy and payments</td><td>No passport and no card data stored; legal check; family sharing off by default</td></tr>
+<tr><td>Guides' Chinese is weak</td><td>Test guides; interpreters; Chinese audio guide as backup</td></tr>
 </table>
-<p>In the base case the project pays back within four years even with a 20% margin. In the downside case it needs a margin of about 30% or more. So the first thing we would check with the company is its real cost per traveler. If the pilot shows lower demand, we would move more of the marketing to free channels (postcards and our own Xiaohongshu posts), delay paid ads, and keep running costs at 300,000 KZT per month.</p>
-<p>[[PAGEBREAK]]</p>
-<h1>User flow</h1>
-<p class="subtitle">How a foreign traveler goes from search to payment in Saryarqa Go</p>
-<img src="/home/user/ZERttex/submission/html/flow.png" style="width:100%">
-<p class="caption">Figure 1. User flow. Dashed boxes are optional and can be used in any order.</p>
-<p>A traveler usually finds us through a Xiaohongshu post, a search, or a postcard from a friend. On the home page they choose English or Chinese and open a tour. The tour page shows what is included and what is not, and the price in KZT and CNY. Before booking, they can use the trip builder, ask the chat, or open the trust page with the guide's video. None of these steps is required.</p>
-<p>Booking has three steps: the tour and date, the lead traveler (no passport needed), and the payment method. Payment happens on the payment provider's page. If the card is declined, the traveler can try again, choose another method, or write to a manager. After a successful payment they get a booking code by email, and the money is held until the tour starts. During the trip they use the trip page, and at the end they can share a postcard. A friend who opens the postcard link starts again at step 1.</p>
 
-<h3 class="pb">Wireframes: screens from our prototype</h3>
-<div class="two"><div><img src="/home/user/ZERttex/docs/img/inclusions.png"><p class="caption">Tour page with the four lists.</p></div><div><img src="/home/user/ZERttex/docs/img/chat-zh.png"><p class="caption">Chat answering in Chinese.</p></div></div>
-<div class="two"><div><img src="/home/user/ZERttex/docs/img/booking.png"><p class="caption">Booking, step 3: payment method.</p></div><div><img src="/home/user/ZERttex/docs/img/confirmed.png"><p class="caption">Booking confirmed.</p></div></div>
-<p class="small">Tour prices and guide profiles in the prototype are demo data. Payments are simulated.</p>
+<h2>6. Conclusion</h2>
+<p>Foreign travelers do not book Saryarqa Routes because they cannot see what is included, cannot pay with their card and cannot check the company. Saryarqa Go fixes all four problems in one product, starting with Chinese travelers who can already visit without a visa. It fits the 20 million KZT budget and pays back in month 32, or month 44 if results are 30% worse. Our next steps: interview at least 10 Chinese travelers, check the real margin with the company, and apply to payment providers in the first week.</p>
 <p>[[PAGEBREAK]]</p>
 <h1>References</h1>
 <p class="small">Accessed 25 October 2026.</p>
@@ -151,6 +92,8 @@
 <li>The Astana Times. (2026, February). Kazakhstan reports tourism growth surge as visitor numbers and revenues climb in 2025. <a href="https://astanatimes.com/2026/02/kazakhstan-reports-tourism-growth-surge-as-visitor-numbers-and-revenues-climb-in-2025/">https://astanatimes.com/2026/02/kazakhstan-reports-tourism-growth-surge-as-visitor-numbers-and-revenues-climb-in-2025/</a></li>
 <li>World Bank. International tourism, number of arrivals (ST.INT.ARVL), Kazakhstan [data from UN Tourism]. <a href="https://data.worldbank.org/indicator/ST.INT.ARVL?locations=KZ">https://data.worldbank.org/indicator/ST.INT.ARVL?locations=KZ</a></li>
 <li>Bureau of National Statistics of the Agency for Strategic Planning and Reforms of the Republic of Kazakhstan. Tourism statistics, dynamic tables. <a href="https://stat.gov.kz/en/industries/businessstatistics/stat-tourism/dynamic-tables/">https://stat.gov.kz/en/industries/businessstatistics/stat-tourism/dynamic-tables/</a></li>
+<li>Trip.com. 1-day tour to Charyn Canyon + Kolsai Lake + Lake Kaindy from Almaty, Kazakhstan [tour listing]. <a href="https://uk.trip.com/things-to-do/detail/97639672">https://uk.trip.com/things-to-do/detail/97639672</a></li>
+<li>GetYourGuide Supply. What commission fee does GetYourGuide charge supply partners? <a href="https://www.getyourguide.supply/join/how-much-does-getyourguide-charge">https://www.getyourguide.supply/join/how-much-does-getyourguide-charge</a></li>
 <li>ZERTTEX Hackathon 2026. Stage 1, Case 1 "Technology Product": Saryarqa Routes (case description).</li>
 </ol>
 <p class="small">Saryarqa Routes is a fictional company from the case. Tour prices, guide profiles and weather data in our prototype are demo data and are marked as such.</p>
