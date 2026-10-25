@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ui } from '../data/i18n';
+import { interestText, ui } from '../data/i18n';
 import { hubName } from '../data/tours';
 import type { InclusionItem, Tour } from '../data/types';
 import { indicative, kzt } from '../lib/format';
@@ -7,15 +7,27 @@ import { href } from '../lib/router';
 import { speak, stopSpeaking } from '../lib/speech';
 import { useApp } from '../state';
 import { Icon } from './Icon';
-import { Scene } from './Scene';
+import { Media } from './Media';
 import { Tag } from './Tag';
 
 export function TourCard({ tour }: { tour: Tour }) {
   const { t, lang } = useApp();
   return (
     <article className="card group flex flex-col overflow-hidden">
-      <a href={href(`/tour/${tour.id}`)} className="block aspect-[16/10] overflow-hidden" tabIndex={-1} aria-hidden>
-        <Scene id={tour.id} className="transition duration-500 group-hover:scale-[1.03]" />
+      <a href={href(`/tour/${tour.id}`)} className="grain relative block aspect-[16/10] overflow-hidden" tabIndex={-1} aria-hidden>
+        <div className="h-full w-full transition duration-700 group-hover:scale-[1.05]">
+          <Media tour={tour.id} credit={false} />
+        </div>
+        <span className="absolute left-3 top-3 z-[2] rounded-full bg-night/80 px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-wide text-nightInk backdrop-blur">
+          {tour.days} {t(ui.tour.days)}
+        </span>
+        <span className="absolute right-3 top-3 z-[2] flex gap-1">
+          {tour.bestFor.slice(0, 2).map((b) => (
+            <span key={b} className="rounded-full bg-white/85 px-2 py-0.5 text-[10.5px] font-semibold text-night">
+              {t(interestText[b])}
+            </span>
+          ))}
+        </span>
       </a>
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-muted">

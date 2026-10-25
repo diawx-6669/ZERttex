@@ -1,0 +1,32 @@
+{
+  "slots": [
+    {
+      "tour": "charyn",
+      "name": { "en": "Charyn Canyon", "zh": "查伦大峡谷" },
+      "count": 3,
+      "pinned": [],
+      "queries": ["Charyn Canyon", "Valley of Castles Charyn", "Charyn River canyon Kazakhstan"]
+    },
+    {
+      "tour": "kolsai",
+      "name": { "en": "Kolsai Lakes & Kaindy", "zh": "科尔赛湖与凯恩迪湖" },
+      "count": 3,
+      "pinned": [],
+      "queries": ["Kolsai lake", "Kolsay lakes Kazakhstan", "Kaindy lake"]
+    },
+    {
+      "tour": "turkestan",
+      "name": { "en": "Turkestan", "zh": "突厥斯坦" },
+      "count": 3,
+      "pinned": [],
+      "queries": ["Mausoleum of Khoja Ahmed Yasawi", "Arystan Bab mausoleum", "Otrar Kazakhstan"]
+    },
+    {
+      "tour": "burabay",
+      "name": { "en": "Burabay", "zh": "布拉拜" },
+      "count": 3,
+      "pinned": [],
+      "queries": ["Burabay lake", "Okzhetpes", "Borovoe Kazakhstan lake"]
+    }
+  ]
+}

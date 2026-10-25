@@ -1,17 +1,66 @@
+import { useEffect, useState } from 'react';
+import { tourQuestion, useChat } from '../components/Chat';
 import { Icon } from '../components/Icon';
 import { LoopStrip } from '../components/Layout';
-import { Scene } from '../components/Scene';
+import { Gallery, Media } from '../components/Media';
 import { Tag } from '../components/Tag';
-import { AudioGuide, Inclusions, Itinerary, PackingList } from '../components/TourParts';
-import { ui } from '../data/i18n';
+import { AudioGuide, Inclusions, Itinerary, PackingList, TourCard } from '../components/TourParts';
+import { interestText, ui } from '../data/i18n';
 import type { L } from '../data/types';
-import { hubName, tourById } from '../data/tours';
+import { hubName, tourById, tours } from '../data/tours';
 import { indicative, kzt } from '../lib/format';
 import { href } from '../lib/router';
 import { useApp } from '../state';
 
+const sections: { id: string; label: L }[] = [
+  { id: 'inc', label: ui.tour.whatsIncluded },
+  { id: 'days', label: ui.tour.itinerary },
+  { id: 'audio', label: ui.audio.title },
+  { id: 'pack', label: ui.tour.packing },
+];
+
+/** Sticky in-page tabs that follow the scroll position. */
+function SectionTabs() {
+  const { t } = useApp();
+  const [active, setActive] = useState('inc');
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return;
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: '-35% 0px -60% 0px' },
+    );
+    sections.forEach((s) => {
+      const el = document.getElementById(s.id);
+      if (el) io.observe(el);
+    });
+    return () => io.disconnect();
+  }, []);
+  return (
+    <nav aria-label={t({ en: 'On this page', zh: '本页内容' })} className="sticky top-16 z-20 -mx-4 border-b border-line bg-bg/90 px-4 backdrop-blur-md sm:mx-0 sm:rounded-2xl sm:border sm:px-2">
+      <ul className="flex gap-1 overflow-x-auto py-2 no-scrollbar">
+        {sections.map((s) => (
+          <li key={s.id} className="shrink-0">
+            <a
+              href={`#/${location.hash.split('/').slice(1, 3).join('/')}`}
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+              aria-current={active === s.id ? 'true' : undefined}
+              className={`block rounded-full px-3.5 py-2 text-sm font-semibold transition ${active === s.id ? 'bg-night text-nightInk' : 'text-muted hover:bg-surface2 hover:text-ink'}`}
+            >
+              {t(s.label)}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 export default function TourDetail({ id }: { id?: string }) {
   const { t, lang } = useApp();
+  const { openChat } = useChat();
   const tour = tourById(id);
   if (!tour)
     return (
@@ -21,20 +70,32 @@ export default function TourDetail({ id }: { id?: string }) {
       </div>
     );
 
+  const askAbout = () => openChat(tourQuestion(tour.id, lang));
+  const others = tours.filter((x) => x.id !== tour.id).slice(0, 3);
+
   return (
     <>
       <div className="container-x pt-6">
         <LoopStrip compact current={0} />
       </div>
       <section className="container-x mt-5">
-        <div className="relative overflow-hidden rounded-[1.75rem] bg-night">
-          <div className="aspect-[4/3] sm:aspect-[21/9]">
-            <Scene id={tour.id} title={t(tour.name)} />
+        <div className="grain relative overflow-hidden rounded-[1.75rem] bg-night">
+          <div className="aspect-[4/3] overflow-hidden sm:aspect-[21/9]">
+            <div className="kenburns h-full w-full">
+              <Media tour={tour.id} title={t(tour.name)} eager credit={false} />
+            </div>
           </div>
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-night/95 via-night/60 to-transparent p-5 pt-16 text-nightInk sm:p-8">
-            <a href={href('/tours')} className="mb-3 inline-flex items-center gap-1 text-sm text-nightInk/80 hover:text-nightInk">
+          <div className="absolute inset-x-0 bottom-0 z-[2] bg-gradient-to-t from-night/95 via-night/60 to-transparent p-5 pt-16 text-nightInk sm:p-8">
+            <a href={href('/tours')} className="mb-3 inline-flex items-center gap-1 rounded-full bg-night/50 px-3 py-1 text-sm text-nightInk/90 backdrop-blur hover:text-nightInk">
               <Icon name="arrowLeft" size={14} /> {t(ui.tour.allTours)}
             </a>
+            <div className="mb-2 flex flex-wrap gap-1.5">
+              {tour.bestFor.map((b) => (
+                <span key={b} className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
+                  {t(interestText[b])}
+                </span>
+              ))}
+            </div>
             <h1 className="text-3xl font-extrabold sm:text-5xl">{t(tour.name)}</h1>
             <p className="mt-2 max-w-2xl text-nightInk/85 sm:text-lg">{t(tour.tagline)}</p>
           </div>
@@ -46,15 +107,17 @@ export default function TourDetail({ id }: { id?: string }) {
           <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {(
               [
-                [{ en: 'Duration', zh: '时长' }, `${tour.days} ${t(ui.tour.days)}`],
-                [ui.tour.starts, t(hubName[tour.hub])],
-                [{ en: 'Region', zh: '地区' }, t(tour.region)],
-                [ui.tour.difficulty, t(tour.difficulty)],
-              ] as [L, string][]
-            ).map(([k, v], i) => (
-              <div key={i} className="rounded-xl border border-line bg-surface p-3">
-                <dt className="font-mono text-[10.5px] uppercase tracking-wide text-muted">{t(k)}</dt>
-                <dd className="mt-0.5 text-sm font-semibold">{v}</dd>
+                [{ en: 'Duration', zh: '时长' }, `${tour.days} ${t(ui.tour.days)}`, 'clock'],
+                [ui.tour.starts, t(hubName[tour.hub]), 'pin'],
+                [{ en: 'Region', zh: '地区' }, t(tour.region), 'map'],
+                [ui.tour.difficulty, t(tour.difficulty), 'route'],
+              ] as [L, string, 'clock' | 'pin' | 'map' | 'route'][]
+            ).map(([k, v, ic], i) => (
+              <div key={i} className="rounded-2xl border border-line bg-surface p-3">
+                <dt className="flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-wide text-muted">
+                  <Icon name={ic} size={13} className="text-teal" /> {t(k)}
+                </dt>
+                <dd className="mt-1 text-sm font-semibold">{v}</dd>
               </div>
             ))}
           </dl>
@@ -63,7 +126,7 @@ export default function TourDetail({ id }: { id?: string }) {
             <h2 className="mb-3 text-xl font-bold">{t(ui.tour.highlights)}</h2>
             <ul className="grid gap-2 sm:grid-cols-3">
               {tour.highlights.map((h, i) => (
-                <li key={i} className="flex items-start gap-2 rounded-xl bg-surface2 p-3 text-sm font-medium">
+                <li key={i} className="flex items-start gap-2 rounded-2xl bg-surface2 p-3 text-sm font-medium">
                   <Icon name="sparkle" size={16} className="mt-0.5 text-gold" />
                   {t(h)}
                 </li>
@@ -71,32 +134,36 @@ export default function TourDetail({ id }: { id?: string }) {
             </ul>
           </section>
 
-          <section aria-labelledby="inc">
+          <Gallery tour={tour.id} />
+
+          <SectionTabs />
+
+          <section id="inc" aria-labelledby="inc-h" className="scroll-mt-32">
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <h2 id="inc" className="text-xl font-bold">{t(ui.tour.whatsIncluded)}</h2>
+              <h2 id="inc-h" className="text-xl font-bold">{t(ui.tour.whatsIncluded)}</h2>
               <Tag kind="demo" />
             </div>
             <Inclusions tour={tour} />
           </section>
 
-          <section>
+          <section id="days" className="scroll-mt-32">
             <h2 className="mb-3 text-xl font-bold">{t(ui.tour.itinerary)}</h2>
             <Itinerary tour={tour} />
           </section>
 
-          <section>
-            <h2 className="mb-3 text-xl font-bold">{t(ui.audio.title)}</h2>
+          <section id="audio" className="scroll-mt-32">
+            <h2 className="mb-1 text-xl font-bold">{t(ui.audio.title)}</h2>
             <p className="mb-3 text-sm text-muted">{t(ui.audio.sub)}</p>
             <AudioGuide tour={tour} />
           </section>
 
-          <section>
+          <section id="pack" className="scroll-mt-32">
             <h2 className="mb-3 text-xl font-bold">{t(ui.tour.packing)}</h2>
             <PackingList tour={tour} />
           </section>
         </div>
 
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
           <div className="card space-y-4 p-5">
             <div>
               <div className="font-mono text-[11px] uppercase tracking-wide text-muted">{t(ui.tour.from)}</div>
@@ -105,23 +172,45 @@ export default function TourDetail({ id }: { id?: string }) {
                 {t(ui.tour.perPerson)} · <span className="num">{indicative(tour.priceKzt, lang)}</span> <Tag kind="demo" />
               </div>
             </div>
-            <p className="text-sm text-muted">{t(ui.tour.priceNote)}</p>
+            <ul className="space-y-1.5 text-sm">
+              {[
+                { en: 'Pay with a foreign card', zh: '可用外国银行卡支付' },
+                { en: 'Money held until the tour starts', zh: '款项托管至行程开始' },
+                { en: 'Free reschedule for road closure', zh: '道路封闭可免费改期' },
+              ].map((x, i) => (
+                <li key={i} className="flex items-center gap-2">
+                  <Icon name="check" size={15} className="text-teal" /> {t(x)}
+                </li>
+              ))}
+            </ul>
             <a href={href(`/book?tour=${tour.id}`)} className="btn-primary w-full text-base">
               {t(ui.tour.book)} <Icon name="arrow" />
             </a>
-            <a href={href(`/ask?tour=${tour.id}`)} className="btn-ghost w-full">
+            <button type="button" onClick={askAbout} className="btn-ghost w-full">
               <Icon name="chat" /> {t(ui.tour.ask)}
-            </a>
+            </button>
             <a href={href('/trust')} className="flex items-center gap-2 rounded-xl bg-surface2 p-3 text-sm hover:text-teal">
               <Icon name="video" className="text-teal" />
               {t(ui.trust.callTitle)}
             </a>
+            <p className="text-xs text-muted">{t(ui.tour.priceNote)} <Tag kind="proposal" /></p>
           </div>
         </aside>
       </div>
 
-      {/* Mobile: keep price and the booking action one tap away. */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/95 px-4 py-3 backdrop-blur lg:hidden">
+      <section className="container-x mt-16" data-reveal>
+        <h2 className="mb-5 text-2xl font-extrabold">{t({ en: 'Combine with', zh: '可以搭配' })}</h2>
+        <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-3 sm:px-0">
+          {others.map((o) => (
+            <div key={o.id} className="w-[80%] shrink-0 snap-start sm:w-auto">
+              <TourCard tour={o} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Phones: price and booking always one tap away, above the tab bar. */}
+      <div className="fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-30 border-t border-line bg-bg/95 px-4 py-2.5 backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="num whitespace-nowrap font-semibold">{kzt(tour.priceKzt)}</div>
@@ -130,9 +219,9 @@ export default function TourDetail({ id }: { id?: string }) {
             </div>
           </div>
           <div className="flex gap-2">
-            <a href={href(`/ask?tour=${tour.id}`)} className="btn-ghost btn-sm !px-3" aria-label={t(ui.tour.ask)}>
+            <button type="button" onClick={askAbout} className="btn-ghost btn-sm !px-3" aria-label={t(ui.tour.ask)}>
               <Icon name="chat" />
-            </a>
+            </button>
             <a href={href(`/book?tour=${tour.id}`)} className="btn-primary btn-sm">
               {t(ui.tour.book)}
             </a>

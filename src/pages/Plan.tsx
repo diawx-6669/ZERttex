@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Icon } from '../components/Icon';
 import { PageHead, Stepper } from '../components/Layout';
-import { Scene } from '../components/Scene';
+import { Media } from '../components/Media';
+import { RouteMap } from '../components/RouteMap';
 import { Tag } from '../components/Tag';
 import { interestText, ui } from '../data/i18n';
 import { hubName, tours } from '../data/tours';
@@ -70,7 +71,7 @@ export default function Plan() {
                   <label key={tt.id} className={`relative cursor-pointer overflow-hidden rounded-xl border-2 ${on ? 'border-teal' : 'border-transparent'}`}>
                     <input type="checkbox" className="peer sr-only" checked={on} onChange={() => setSel(toggle(sel, tt.id))} />
                     <div className="aspect-[4/3]">
-                      <Scene id={tt.id} />
+                      <Media tour={tt.id} credit={false} />
                     </div>
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-night/90 to-transparent p-2 pt-6 text-xs font-semibold leading-tight text-white">
                       {t(tt.name)}
@@ -162,11 +163,11 @@ export default function Plan() {
 
         <section id="plan-result" className="min-w-0 scroll-mt-24" aria-live="polite">
           {!result && (
-            <div className="card grid min-h-[320px] place-items-center p-8 text-center text-muted">
-              <div>
-                <Icon name="route" size={40} className="mx-auto mb-3 text-teal" />
-                <p>{t(ui.plan.sub)}</p>
-              </div>
+            <div className="space-y-3">
+              <p className="flex items-center gap-2 text-sm text-muted">
+                <Icon name="route" className="text-teal" /> {t({ en: 'Your selected places light up on the map. Press "Build my itinerary" when ready.', zh: '所选地点会在地图上亮起。准备好后点击"生成行程"。' })}
+              </p>
+              <RouteMap highlight={sel} className="mx-auto max-w-xl" />
             </div>
           )}
           {result && !result.ok && (

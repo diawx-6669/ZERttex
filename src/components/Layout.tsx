@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { tagExplain, tagText, ui } from '../data/i18n';
 import { href } from '../lib/router';
 import { useApp } from '../state';
+import { useChat } from './Chat';
 import { Icon, type IconName } from './Icon';
 import { Tag, allTagKinds } from './Tag';
 
@@ -102,6 +103,9 @@ export function Header({ current }: { current: string }) {
             <LangToggle />
             <TextToggle />
           </div>
+          <a href={href('/book')} className="btn-primary btn-sm hidden xl:inline-flex">
+            {t({ en: 'Book', zh: '预订' })} <Icon name="arrow" size={14} />
+          </a>
           <button
             type="button"
             className="flex min-h-[42px] items-center gap-2 rounded-full border border-line bg-surface px-3.5 text-sm font-semibold lg:hidden"
@@ -187,7 +191,7 @@ export function Footer() {
 export function Toasts() {
   const { toasts } = useApp();
   return (
-    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex flex-col items-center gap-2 px-4">
+    <div aria-live="polite" className="pointer-events-none fixed inset-x-0 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-[60] lg:bottom-6 flex flex-col items-center gap-2 px-4">
       {toasts.map((x) => (
         <div key={x.id} className="rise pointer-events-auto flex max-w-md items-start gap-2 rounded-2xl bg-night px-4 py-3 text-sm text-nightInk shadow-2xl">
           <Icon name="check" className="mt-0.5 text-teal" />
@@ -273,7 +277,7 @@ export function PageHead({ eyebrow, title, sub, children, loop }: { eyebrow?: Re
 
 export function Section({ title, sub, children, id, right }: { title: string; sub?: string; children: ReactNode; id?: string; right?: ReactNode }) {
   return (
-    <section id={id} className="container-x mt-14">
+    <section id={id} className="container-x mt-16 sm:mt-20" data-reveal>
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-2xl font-extrabold sm:text-3xl">{title}</h2>
@@ -308,6 +312,91 @@ export function Stepper({ value, onChange, min = 1, max = 12, label, id }: { val
       <button type="button" className="btn-ghost h-11 w-11 !p-0" aria-label={`${label} +1`} onClick={() => onChange(Math.min(max, value + 1))} disabled={value >= max}>
         <Icon name="plus" />
       </button>
+    </div>
+  );
+}
+
+const mobileItems: { to: string; key: keyof typeof ui.nav; icon: IconName; chat?: boolean }[] = [
+  { to: '/tours', key: 'tours', icon: 'compass' },
+  { to: '/plan', key: 'plan', icon: 'route' },
+  { to: '/ask', key: 'ask', icon: 'chat', chat: true },
+  { to: '/trust', key: 'trust', icon: 'shieldCheck' },
+  { to: '/trip', key: 'trip', icon: 'map' },
+];
+
+/** Thumb-friendly tab bar on phones. "Ask" opens the concierge drawer in place. */
+export function MobileNav({ current }: { current: string }) {
+  const { t } = useApp();
+  const { openChat } = useChat();
+  return (
+    <nav aria-label="Quick" className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden">
+      <ul className="mx-auto grid max-w-lg grid-cols-5">
+        {mobileItems.map((n) => {
+          const active = current === n.to.slice(1) || (n.to === '/tours' && current === 'tour');
+          const cls = `flex h-16 w-full flex-col items-center justify-center gap-1 text-[11px] font-semibold ${active ? 'text-teal' : 'text-muted'}`;
+          const inner = (
+            <>
+              <span className={`grid h-8 w-12 place-items-center rounded-full transition ${active ? 'bg-teal/15' : ''}`}>
+                <Icon name={n.icon} size={20} />
+              </span>
+              {t(ui.nav[n.key])}
+            </>
+          );
+          return (
+            <li key={n.to}>
+              {n.chat && current !== 'ask' ? (
+                <button type="button" className={cls} onClick={() => openChat()}>
+                  {inner}
+                </button>
+              ) : (
+                <a href={href(n.to)} className={cls} aria-current={active ? 'page' : undefined}>
+                  {inner}
+                </a>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+/** Desktop: floating concierge button + back-to-top. */
+export function FloatingActions({ current }: { current: string }) {
+  const { t } = useApp();
+  const { openChat } = useChat();
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 900);
+    on();
+    window.addEventListener('scroll', on, { passive: true });
+    return () => window.removeEventListener('scroll', on);
+  }, []);
+  return (
+    <div className={`no-print fixed right-4 z-30 flex flex-col items-end gap-3 lg:bottom-6 lg:right-6 ${current === 'tour' ? 'bottom-[calc(9rem+env(safe-area-inset-bottom))]' : 'bottom-[calc(5rem+env(safe-area-inset-bottom))]'}`}>
+      {scrolled && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="rise grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-ink shadow-card hover:border-teal"
+          aria-label={t({ en: 'Back to top', zh: '回到顶部' })}
+        >
+          <Icon name="arrow" className="-rotate-90" />
+        </button>
+      )}
+      {current !== 'ask' && (
+        <button
+          type="button"
+          onClick={() => openChat()}
+          className="fab hidden items-center gap-2 rounded-full bg-night py-3 pl-3 pr-5 font-semibold text-nightInk shadow-2xl ring-1 ring-white/10 hover:bg-teal hover:text-tealInk lg:flex"
+        >
+          <span className="relative grid h-9 w-9 place-items-center rounded-full bg-teal text-tealInk">
+            <Icon name="chat" />
+            <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-night bg-ok" aria-hidden />
+          </span>
+          {t({ en: 'Ask in EN or 中文', zh: '中英文咨询' })}
+        </button>
+      )}
     </div>
   );
 }

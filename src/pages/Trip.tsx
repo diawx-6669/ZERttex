@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Icon, type IconName } from '../components/Icon';
 import { PageHead } from '../components/Layout';
-import { Scene } from '../components/Scene';
+import { Media } from '../components/Media';
 import { Tag } from '../components/Tag';
 import { ui } from '../data/i18n';
 import { tourById } from '../data/tours';
@@ -103,7 +103,7 @@ export default function Trip() {
       <div className="container-x mt-6">
         <div className="card flex flex-wrap items-center gap-4 overflow-hidden p-0">
           <div className="h-28 w-full sm:h-24 sm:w-40">
-            <Scene id={tour.id} />
+            <Media tour={tour.id} credit={false} />
           </div>
           <div className="min-w-0 flex-1 px-4 pb-4 sm:p-0">
             <div className="font-mono text-[11px] uppercase tracking-wide text-muted">{code}</div>

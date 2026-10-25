@@ -63,8 +63,9 @@ const ok = (name, cond, info = '') => {
   ok('Audio guide 中文 plays or degrades gracefully', (await page.getByText('科尔赛湖是被云杉林环绕').count()) > 0 || (await page.getByText('Playing…').count()) > 0);
 
   // 3. Ask a question from tour → auto-asks; Chinese → Chinese
-  await page.getByRole('link', { name: /Ask a question/ }).click();
+  await page.getByRole('button', { name: /Ask a question/ }).first().click();
   await page.waitForTimeout(1100);
+  ok('Ask a question opens the concierge drawer in place', (await page.getByRole('dialog').count()) === 1 && page.url().endsWith('#/tour/kolsai'));
   const log = page.locator('[role="log"]');
   ok('Concierge auto-asked about Kolsai', (await log.getByText("What's included in Kolsai Lakes & Kaindy?").count()) === 1);
   ok('Concierge answered with inclusions', (await log.getByText(/Not yet confirmed \(confirmed in writing/).count()) === 1);
@@ -81,6 +82,24 @@ const ok = (name, cond, info = '') => {
   await page.waitForTimeout(300);
   ok('Handoff sends (simulated) with toast', (await page.getByText(/Sent to a manager \(simulated\)/).count()) >= 1);
   await shot('03-concierge', false);
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(200);
+  ok('Esc closes the drawer', (await page.getByRole('dialog').count()) === 0);
+
+  // 3b. Tours filters + map
+  await go('/tours');
+  await page.getByRole('button', { name: 'Astana', exact: true }).click();
+  ok('Filter by start city: Astana → 1 tour', (await page.locator('article').count()) === 1);
+  await page.getByRole('button', { name: 'Clear filters' }).first().click();
+  ok('Clear filters → 4 tours', (await page.locator('article').count()) === 4);
+  await go('/');
+  await page.getByRole('button', { name: 'Turkestan: Silk Road Heritage' }).first().click();
+  ok('Map pin opens a tour card', (await page.locator('a[aria-label="Turkestan: Silk Road Heritage"]').count()) >= 1);
+  await page.getByRole('button', { name: /Ask in EN or 中文/ }).click();
+  await page.waitForTimeout(300);
+  ok('Floating chat button opens drawer from any page', (await page.getByRole('dialog').count()) === 1);
+  ok('Conversation is kept between pages', (await page.locator('[role="log"]').getByText(/I can't see live availability/).count()) === 1);
+  await page.keyboard.press('Escape');
 
   // 4. Trip builder: Kolsai + Burabay, 8 days
   await go('/plan');
@@ -237,6 +256,12 @@ const ok = (name, cond, info = '') => {
   await mp.goto(URL + '#/');
   await mp.waitForTimeout(800);
   await mp.screenshot({ path: path.join(SHOTS, '13-mobile-home.png') });
+  ok('Mobile bottom tab bar visible', await mp.getByRole('navigation', { name: 'Quick' }).isVisible());
+  await mp.getByRole('navigation', { name: 'Quick' }).getByRole('button', { name: /Ask/ }).click();
+  await mp.waitForTimeout(300);
+  ok('Mobile tab bar Ask opens chat drawer', (await mp.getByRole('dialog').count()) === 1);
+  await mp.screenshot({ path: path.join(SHOTS, '19-mobile-chat.png') });
+  await mp.keyboard.press('Escape');
   await mp.getByRole('button', { name: /Menu/ }).click();
   await mp.waitForTimeout(250);
   ok('Mobile menu drawer opens', await mp.getByRole('dialog').isVisible());

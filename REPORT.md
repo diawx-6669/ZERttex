@@ -50,7 +50,7 @@ Each step removes one doubt, and the last step (a shareable postcard sized for X
 
 **The numbers.** The 12-week MVP and first-year launch fit exactly inside 20,000,000 KZT. Reaching the goal needs about **1,263 extra foreign travelers per year**. With a 30% contribution margin (our assumption), cumulative cash turns positive in **month 32** in the base case and **month 44** if demand is 30% lower. **[Proposal — model]**
 
-**Proof that it works.** A clickable prototype covers the whole loop: tour pages, booking with validation and a simulated declined payment, a bilingual concierge, a trip builder, a trust center, an in-trip screen, a postcard generator and a live payback calculator. An automated test walked through **66 acceptance checks — all passed**, including the 375 px phone width and dark mode.
+**Proof that it works.** A clickable prototype covers the whole loop: tour pages, booking with validation and a simulated declined payment, a bilingual concierge, a trip builder, a trust center, an in-trip screen, a postcard generator and a live payback calculator. An automated test walked through **75 acceptance checks — all passed**, including the 375 px phone width and dark mode.
 
 ---
 
@@ -154,7 +154,12 @@ The prototype is not a mock-up: every button works in the browser.
 | Impact page: Gantt, budget, live payback model with 3 sliders | Working |
 | Mobile (375 px), dark mode, larger text, keyboard access | Working |
 
-Automated acceptance run: **66 / 66 checks passed** (see Appendix C).
+| Concierge in a slide-in drawer on every page, conversation kept across pages | Working |
+| Phone tab bar, sticky "Book" bar, tours filters and sorting, sticky section tabs | Working |
+| Interactive route map (real coordinates, tappable pins) | Working |
+| Real destination photos with author/licence credits, gallery + lightbox | Pipeline working; photos to be downloaded (see §8) |
+
+Automated acceptance run: **75 / 75 checks passed** (see Appendix C).
 
 ### 3.2 12-week MVP plan
 
@@ -341,6 +346,7 @@ Switch **EN / 中文** in the header at any point; try it on a phone.
 - [ ] Check the 30% contribution margin against the company's real costs.
 - [ ] Run the 10+ traveler interviews (and report only what was actually collected).
 - [ ] Check privacy rules for storing data of Chinese citizens.
+- [ ] Run `npm run photos` on a machine with internet, review every photo and keep the author/licence credits visible.
 
 ---
 
@@ -378,5 +384,6 @@ Switch **EN / 中文** in the header at any point; try it on a phone.
 
 - **Stack:** React 18, TypeScript (strict), Vite, Tailwind CSS; single-file build (`dist/index.html`, ~383 kB, ~120 kB gzipped) that opens by double-click.
 - **No backend, no API keys, no runtime network calls** except Google Fonts. Illustrations are inline SVG, so the demo works offline.
+- **Photos:** only freely licensed photos (CC BY, CC BY-SA, CC0, public domain) from Wikimedia Commons, each shown with author and licence; inlined into the single-file build, so they work offline too. No stock photos, no AI-generated images presented as real places.
 - **Accessibility:** labels on every input, visible focus, keyboard-operable controls, `aria-live` chat, larger-text mode, `prefers-reduced-motion` respected.
-- **Automated acceptance test (Playwright): 66 / 66 checks passed** — every loop step, booking validation, decline and success, Chinese answers, the Kolsai + Burabay 8-day plan with the Astana transfer, a budget total of exactly 20,000,000 KZT, payback at months 32 / 44, no horizontal scroll at 375 px on all 12 routes, dark mode, and zero JavaScript errors.
+- **Automated acceptance test (Playwright): 75 / 75 checks passed** — every loop step, booking validation, decline and success, Chinese answers, the Kolsai + Burabay 8-day plan with the Astana transfer, a budget total of exactly 20,000,000 KZT, payback at months 32 / 44, no horizontal scroll at 375 px on all 12 routes, dark mode, and zero JavaScript errors.

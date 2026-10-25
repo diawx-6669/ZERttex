@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { Icon } from '../components/Icon';
 import { Logo, PageHead } from '../components/Layout';
-import { Scene } from '../components/Scene';
+import { Media } from '../components/Media';
 import { Tag } from '../components/Tag';
 import { ui } from '../data/i18n';
 import { tourById, tours } from '../data/tours';
@@ -64,7 +64,7 @@ export default function Postcard() {
               {tours.map((tt) => (
                 <label key={tt.id} className={`cursor-pointer overflow-hidden rounded-xl border-2 text-xs font-semibold ${dest === tt.id ? 'border-teal' : 'border-line'}`}>
                   <input type="radio" name="dest" className="sr-only" checked={dest === tt.id} onChange={() => setDest(tt.id)} />
-                  <div className="aspect-[4/3]"><Scene id={tt.id} /></div>
+                  <div className="aspect-[4/3]"><Media tour={tt.id} credit={false} /></div>
                   <div className="p-2 leading-tight">{t(tt.name)}</div>
                 </label>
               ))}
@@ -157,7 +157,7 @@ export default function Postcard() {
                       ))}
                     </div>
                   ) : (
-                    <Scene id={dest} />
+                    <Media tour={dest} eager />
                   )}
                   <div className="absolute left-3 top-3 rounded-full bg-[#12213f]/85 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f0ebde]">
                     Kazakhstan · 哈萨克斯坦
