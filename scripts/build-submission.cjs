@@ -337,7 +337,7 @@ const ai = `
 <tr><td>Prototype (code)</td><td>High</td><td>The code of the clickable prototype and its automated tests were written by an AI coding assistant, based on our written description of the product. We decided what the product does, which market we target and which numbers and rules to use.</td></tr>
 <tr><td>Report, financial document, user flow</td><td>High</td><td>The AI assistant wrote the first draft of the text, the tables and the diagram from our description. The calculations are done by code from our assumptions. We read, edited and checked the final text.</td></tr>
 <tr><td>Idea, target market, assumptions</td><td>Low</td><td>Our own decisions. The AI pointed out some risks and weak points.</td></tr>
-<tr><td>Sources</td><td>Medium</td><td>The AI used web search to check our sources and found that the 15.7 million figure is for the first nine months of 2025. We checked the links ourselves.</td></tr>
+<tr><td>Research and sources</td><td>Low to medium</td><td>The team chose the target market and found the main market sources. The AI was used only to double-check them with web search: it found that the 15.7 million figure is for the first nine months of 2025 and suggested additional references (Trip.com, GetYourGuide, The Astana Times, World Bank, national statistics). We opened and checked the links ourselves.</td></tr>
 <tr><td>Images</td><td>None</td><td>No AI-generated images or photos were used. The pictures are screenshots of our prototype.</td></tr>
 </table>
 <h2>Tools</h2>
@@ -355,7 +355,7 @@ const ai = `
 const single = `
 <p class="title">Saryarqa Go</p>
 <p class="subtitle">ZERTTEX Hackathon 2026, Stage 1. Case 1: Technology Product<br>Team: ____________________</p>
-<p>Saryarqa Routes wants 30% of its travelers to come from abroad within 24 months, but today about 96% of its 3,400 travelers are from Kazakhstan (case data). We propose Saryarqa Go, a booking platform in English and Chinese for independent travelers from China. It shows exactly what each tour includes, lets travelers meet their guide before paying, and accepts foreign cards. The first version can be built in 12 weeks within the 20 million KZT budget.</p>
+<p>Saryarqa Routes wants 30% of its travelers to come from abroad within 24 months, but today about 96% of its 3,400 travelers are from Kazakhstan (case data). We propose Saryarqa Go, a booking platform in English and Chinese for independent travelers from China. It shows exactly what each tour includes, lets travelers meet their guide before paying, and accepts foreign cards. The first version can be built in 12 weeks within the 20 million KZT budget. Clickable prototype: <a href="https://claude.ai/artifact/NH9vk9BuaLC4qGUy8eSsYr">https://claude.ai/artifact/NH9vk9BuaLC4qGUy8eSsYr</a></p>
 
 <h1>1. Problem and market</h1>
 <h3>Target market: independent travelers from mainland China</h3>
@@ -399,7 +399,7 @@ const single = `
 <tr><td>10-11</td><td>Usability tests and payment checks</td><td>5-8 test sessions with no blocking problems left</td></tr>
 <tr><td>12</td><td>Pilot with real travelers</td><td>Pilot results collected</td></tr>
 </table>
-<p><b>Team:</b> a hired designer, two developers and a Chinese translator, with one person from Saryarqa Routes as product owner (our proposal). <b>How we test it:</b> 5-8 usability sessions with Chinese-speaking travelers, then a pilot where we measure how many people who start a booking finish it, how often the chat has to hand off to a manager, and how many postcards lead to new bookings. We already built a working clickable prototype of the whole path; payments in it are simulated.</p>
+<p><b>Team:</b> a hired designer, two developers and a Chinese translator, with one person from Saryarqa Routes as product owner (our proposal). <b>How we test it:</b> 5-8 usability sessions with Chinese-speaking travelers, then a pilot where we measure how many people who start a booking finish it, how often the chat has to hand off to a manager, and how many postcards lead to new bookings. We already built a working clickable prototype of the whole path (payments in it are simulated): <a href="https://claude.ai/artifact/NH9vk9BuaLC4qGUy8eSsYr">https://claude.ai/artifact/NH9vk9BuaLC4qGUy8eSsYr</a></p>
 <img src="IMG:flow" style="width:100%">
 <p class="caption">Figure 2. User flow from search to payment. Dashed boxes are optional.</p>
 
