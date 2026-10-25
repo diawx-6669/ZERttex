@@ -134,10 +134,11 @@ Break-even travelers = 20,000,000 ÷ 13,200 = **1,516** extra foreign travelers 
 
 ---
 
-## 9. AI Declaration (suggested line)
+## 9. AI use (suggested text)
 
-> We used Claude (Anthropic) as an AI coding assistant to build the clickable prototype (React / TypeScript code, SVG illustrations, scripted concierge logic and the payback calculator) and to draft parts of this report. All case facts, market sources, assumptions and final decisions were checked and are owned by the team.
+> We used Claude (Anthropic) mainly as a coding assistant: it wrote the code of the clickable prototype (React / TypeScript app, booking flow, scripted concierge, trip builder, payback calculator, SVG illustrations, automated tests). Claude also produced the first draft of the report text from our brief, which the team reviewed and edited. The team chose the idea, the market and the assumptions, and is responsible for checking every fact, source and number.
 
+Keep this accurate. If the team rewrites the report in its own words, the second sentence can be changed to say so. Do not claim "code only" while the report text is still the AI draft.
 ---
 
 ## 10. Best screens to screenshot for the report

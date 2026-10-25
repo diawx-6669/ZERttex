@@ -23,7 +23,7 @@ Team report — full draft (English)
 6. Honesty by design
 7. Prototype walkthrough for judges (3 minutes)
 8. What we still have to verify
-9. AI declaration
+9. AI use
 Appendix A — Sources · Appendix B — Prototype screens · Appendix C — Technical notes
 
 ---
@@ -349,9 +349,15 @@ Switch **EN / 中文** in the header at any point; try it on a phone.
 
 ---
 
-## 9. AI declaration
+## 9. AI use
 
-> We used Claude (Anthropic) as an AI coding assistant to build the clickable prototype (React / TypeScript code, SVG illustrations, scripted concierge logic and the payback calculator) and to draft parts of this report. All case facts, market sources, assumptions and final decisions were checked and are owned by the team.
+**What the AI did.** We used Claude (Anthropic) mainly as a coding assistant. It wrote the code of the clickable prototype: the React / TypeScript app, the booking flow, the scripted concierge, the trip builder, the payback calculator, the SVG illustrations and the automated tests.
+
+**Report text.** Claude also produced the first draft of this report's text and tables from our brief. The team reviewed and edited it.
+
+**What the team did.** The team chose the product idea, the target market and the features, set the assumptions (margin, budget split), and is responsible for checking every fact, source and number before submission.
+
+**What the AI did not do.** It did not invent statistics, interviews, reviews, licences or partnerships. Every claim carries one of the five labels, and all market figures link to published sources.
 
 ---
 
