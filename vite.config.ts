@@ -7,5 +7,5 @@ import { viteSingleFile } from 'vite-plugin-singlefile';
 export default defineConfig({
   base: './',
   plugins: [react(), viteSingleFile()],
-  build: { target: 'es2019', cssCodeSplit: false, assetsInlineLimit: 100_000_000 },
+  build: { target: 'es2019', cssCodeSplit: false, assetsInlineLimit: 100_000_000, rollupOptions: { input: 'app.html' } },
 });
