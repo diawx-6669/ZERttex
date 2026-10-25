@@ -1,71 +1,42 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Saryarqa Go: AI declaration</title>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=Instrument+Sans:wght@400..700&display=swap" rel="stylesheet">
-<style>
-@page { size: A4; margin: 15mm 16mm 17mm; }
-* { box-sizing: border-box; }
-body { font-family: 'Instrument Sans', Arial, sans-serif; font-size: 10pt; line-height: 1.45; color: #16191f; margin: 0; }
-h1, h2, h3 { font-family: 'Archivo', Arial, sans-serif; font-stretch: 108%; letter-spacing: -0.01em; line-height: 1.15; margin: 0; }
-h1 { font-size: 22pt; font-weight: 800; }
-h2 { font-size: 13pt; font-weight: 800; margin: 14pt 0 5pt; color: #16191f; break-after: avoid; }
-h3 { font-size: 10.5pt; font-weight: 700; margin: 9pt 0 3pt; break-after: avoid; }
-p { margin: 0 0 6pt; }
-ul, ol { margin: 0 0 6pt; padding-left: 15pt; }
-li { margin: 0 0 2.5pt; }
-table { width: 100%; border-collapse: collapse; margin: 4pt 0 8pt; font-size: 9pt; break-inside: avoid; }
-th { text-align: left; background: #16191f; color: #fff; font-weight: 600; padding: 4pt 6pt; }
-td { padding: 3.5pt 6pt; border-bottom: 0.6pt solid #dadde2; vertical-align: top; }
-td.r, th.r { text-align: right; font-variant-numeric: tabular-nums; }
-tr.total td { font-weight: 700; border-top: 1pt solid #16191f; border-bottom: none; }
-.muted { color: #585e68; }
-.small { font-size: 8.5pt; }
-.lead { font-size: 11pt; }
-.tag { display: inline-block; border: 0.7pt solid; border-radius: 2pt; padding: 0 3pt; font-size: 7pt; font-weight: 700; vertical-align: 1pt; white-space: nowrap; }
-.case { background: #16191f; color: #fff; border-color: #16191f; }
-.ver { color: #1a7a48; } .prop { color: #a85212; } .demo { color: #0b6f8c; } .conf { color: #a05c00; border-style: dashed; }
-.doc-head { border-bottom: 1.6pt solid #0b6f8c; padding-bottom: 7pt; margin-bottom: 10pt; }
-.doc-head .kicker { font-size: 8.5pt; color: #0b6f8c; font-weight: 700; margin-bottom: 4pt; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10pt; }
-.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 0.8pt solid #dadde2; border-bottom: 0.8pt solid #dadde2; margin: 6pt 0 10pt; }
-.kpis div { padding: 6pt 8pt; border-left: 0.8pt solid #dadde2; } .kpis div:first-child { border-left: none; padding-left: 0; }
-.kpis b { display: block; font-family: Archivo, Arial; font-size: 15pt; font-stretch: 110%; }
-.note { border-left: 2pt solid #0b6f8c; padding: 3pt 8pt; background: #f1f6f8; margin: 6pt 0 8pt; }
-.warnnote { border-left: 2pt solid #a05c00; padding: 3pt 8pt; background: #fbf4e8; margin: 6pt 0 8pt; }
-figure { margin: 6pt 0 8pt; break-inside: avoid; }
-figure img { width: 100%; border: 0.6pt solid #dadde2; border-radius: 4pt; display: block; }
-figcaption { font-size: 8.5pt; color: #585e68; margin-top: 3pt; }
-.shots { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt; }
-.page-break { break-before: page; }
-.refs { list-style: none; padding-left: 0; }
-.refs li { margin-bottom: 7pt; padding-left: 22pt; text-indent: -22pt; }
-.shots.fixed img { height: 58mm; object-fit: cover; object-position: top left; }
-.sign { display: grid; grid-template-columns: 1fr 1fr; gap: 20pt; margin-top: 18pt; }
-.sign div { border-top: 0.8pt solid #16191f; padding-top: 3pt; font-size: 8.5pt; color: #585e68; }
-a { color: #0b6f8c; text-decoration: none; word-break: break-all; }
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Saryarqa Go - AI Declaration</title><style>
+@page { size: A4; margin: 25.4mm; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 11pt; line-height: 1.32; color: #000; margin: 0; }
+.title { font-size: 26pt; margin: 0 0 3pt; font-weight: normal; }
+.subtitle { font-size: 15pt; color: #666; margin: 0 0 14pt; }
+h1 { font-size: 20pt; font-weight: normal; margin: 20pt 0 6pt; break-after: avoid; }
+h2 { font-size: 16pt; font-weight: normal; margin: 18pt 0 6pt; break-after: avoid; }
+h3 { font-size: 14pt; font-weight: normal; color: #434343; margin: 14pt 0 4pt; break-after: avoid; }
+p { margin: 0 0 9pt; }
+ul, ol { margin: 0 0 9pt; padding-left: 26pt; }
+li { margin: 0 0 3pt; }
+table { border-collapse: collapse; width: 100%; margin: 4pt 0 11pt; font-size: 10pt; break-inside: avoid; }
+td, th { border: 1px solid #000; padding: 5pt; vertical-align: top; text-align: left; }
+th { font-weight: bold; }
+td.r, th.r { text-align: right; }
+a { color: #1155cc; text-decoration: underline; word-break: break-all; }
+img { max-width: 100%; display: block; margin: 6pt auto 4pt; }
+.caption { text-align: center; font-size: 10pt; font-style: italic; color: #444; margin: 0 0 12pt; }
+.small { font-size: 9.5pt; }
+.pb { break-before: page; }
+.two { display: flex; gap: 10pt; } .two > div { flex: 1; }
 </style></head><body>
-<div class="doc-head"><div class="kicker">ZERTTEX Hackathon 2026 · Stage 1 · Case 1 "Technology Product" · AI Declaration</div><h1>Use of artificial intelligence</h1><p class="muted" style="margin:4pt 0 0">Completed honestly by the team. Edit the bracketed fields before submission.</p></div>
+<p class="title">AI Declaration</p>
+<p class="subtitle">Team: ____________________</p>
 <h2>Level of AI use</h2>
 <table>
-<tr><th style="width:34%">Part of the submission</th><th style="width:16%">AI use</th><th>What the AI did / what people did</th></tr>
-<tr><td>Prototype code (web app, logic, tests)</td><td><b>High</b></td><td>AI wrote the code from the team's written brief and also wrote and ran the automated tests. The team defined the product, features, case facts, honesty rules and the payback model logic.</td></tr>
-<tr><td>Main report, financial document, flow diagram</td><td><b>High</b> (first draft)</td><td>AI produced first drafts, tables and the diagram from the team's brief; numbers are calculated by code from the stated assumptions. The team reviewed, edited and is responsible for the final text.</td></tr>
-<tr><td>Product idea, target market, assumptions</td><td><b>Low</b></td><td>Chosen by the team (target market, features, 30% margin, budget split). AI pointed out risks and inconsistencies.</td></tr>
-<tr><td>Sources and statistics</td><td><b>Medium</b></td><td>Facts come from the case and published sources. AI ran web searches to cross-check them and found one correction (15.7 million refers to the first nine months of 2025). The team re-opens every link.</td></tr>
-<tr><td>Images</td><td><b>None generated</b></td><td>No AI-generated images or photos. Illustrations are simple vector drawings written as code; screenshots are of the prototype.</td></tr>
+<tr><th>Part</th><th>Level</th><th>How AI was used</th></tr>
+<tr><td>Prototype (code)</td><td>High</td><td>The code of the clickable prototype and its automated tests were written by an AI coding assistant, based on our written description of the product. We decided what the product does, which market we target and which numbers and rules to use.</td></tr>
+<tr><td>Report, financial document, user flow</td><td>High</td><td>The AI assistant wrote the first draft of the text, the tables and the diagram from our description. The calculations are done by code from our assumptions. We read, edited and checked the final text.</td></tr>
+<tr><td>Idea, target market, assumptions</td><td>Low</td><td>Our own decisions. The AI pointed out some risks and weak points.</td></tr>
+<tr><td>Sources</td><td>Medium</td><td>The AI used web search to check our sources and found that the 15.7 million figure is for the first nine months of 2025. We checked the links ourselves.</td></tr>
+<tr><td>Images</td><td>None</td><td>No AI-generated images or photos were used. The pictures are screenshots of our prototype.</td></tr>
 </table>
-
 <h2>Tools</h2>
 <table>
-<tr><th style="width:30%">Tool</th><th>Used for</th><th style="width:30%">Link to chat / session</th></tr>
-<tr><td>Claude (Anthropic), via Claude Code on the web</td><td>Writing the prototype code and automated tests; building the PDFs and Word report; drafting text; web search to cross-check sources</td><td><a href="https://claude.ai/code/session_01HrYY9Y9MwxQVFQRES5YEHH">claude.ai/code/session_01HrYY9Y9MwxQVFQRES5YEHH</a></td></tr>
-<tr><td>[Other AI tools used by the team, if any]</td><td>[purpose]</td><td>[link]</td></tr>
+<tr><th>Tool</th><th>What for</th><th>Link</th></tr>
+<tr><td>Claude (Anthropic), in Claude Code</td><td>Writing the prototype code and tests, drafting the documents, checking sources with web search, creating the PDF files</td><td><a href="https://claude.ai/code/session_01HrYY9Y9MwxQVFQRES5YEHH">https://claude.ai/code/session_01HrYY9Y9MwxQVFQRES5YEHH</a></td></tr>
+<tr><td>[other tools, if any]</td><td>[what for]</td><td>[link]</td></tr>
 </table>
-
-<h2>What AI did not do</h2>
-<ul>
-<li>It did not invent statistics, interviews, reviews, licences, insurance, partnerships or awards. Unproven items are labelled "Needs confirmation".</li>
-<li>It did not take decisions for the team: the idea, market, scope and assumptions are the team's.</li>
-<li>No real payments, card numbers or personal data were processed; payments in the prototype are simulated.</li>
-</ul>
-<p>We confirm that this declaration describes our use of AI accurately.</p>
-<div class="sign"><div>Team name and members</div><div>Date</div></div>
+<p>We did not use AI to invent statistics, interviews, reviews, licences or partnerships. Everything that is not proven yet is marked as a proposal or as "needs confirmation".</p>
+<p>Signed: ____________________ &nbsp;&nbsp;&nbsp; Date: ______________</p>
 </body></html>

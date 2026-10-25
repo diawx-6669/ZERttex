@@ -24,6 +24,7 @@ DISCOVER → PLAN → VERIFY → BOOK → TRAVEL → SHARE ─┐
 | Type-check only | `npm run typecheck` |
 | Acceptance test (needs Playwright + Chromium) | `npm run test:e2e` → writes `screenshots/` |
 | Download real destination photos (needs network to Wikimedia) | `npm run photos` (then `npm run build`) |
+| Build the ZERTTEX submission (PDFs + Google Docs-ready DOCX) | `npm run submission` → `submission/` |
 | Rebuild the Word report from `REPORT.md` | `npm run report:docx` → `docs/Saryarqa_Go_Report.docx` |
 
 Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/ask`, `#/trust`, `#/book`, `#/trip`, `#/postcard`, `#/impact`, `#/about`.
