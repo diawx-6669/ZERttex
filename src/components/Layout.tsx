@@ -165,13 +165,13 @@ export function Footer() {
           <h2 className="eyebrow mb-3">{t(ui.common.legend)}</h2>
           <ul className="grid gap-2.5 sm:grid-cols-2">
             {allTagKinds.map((k) => (
-              <li key={k} className="flex flex-wrap items-center gap-2 text-sm">
-                <Tag kind={k} />
+              <li key={k} className="flex items-start gap-2 text-sm">
+                <Tag kind={k} className="mt-0.5 shrink-0" />
                 <span className="text-muted">{t(tagExplain[k])}</span>
               </li>
             ))}
-            <li className="flex flex-wrap items-center gap-2 text-sm">
-              <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[10.5px] font-semibold uppercase">TEST MODE</span>
+            <li className="flex items-start gap-2 text-sm">
+              <span className="mt-0.5 shrink-0 rounded-full border border-line px-2 py-0.5 font-mono text-[10.5px] font-semibold uppercase">TEST MODE</span>
               <span className="text-muted">
                 {t({ en: 'Payments are simulated. No card numbers or passport data are collected.', zh: '支付为模拟，不收集卡号或护照信息。' })}
               </span>

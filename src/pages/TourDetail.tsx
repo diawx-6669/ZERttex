@@ -119,6 +119,27 @@ export default function TourDetail({ id }: { id?: string }) {
           </div>
         </aside>
       </div>
+
+      {/* Mobile: keep price and the booking action one tap away. */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/95 px-4 py-3 backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="num whitespace-nowrap font-semibold">{kzt(tour.priceKzt)}</div>
+            <div className="text-xs text-muted">
+              {t(ui.tour.perPerson)} · <span className="num">{indicative(tour.priceKzt, lang)}</span>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <a href={href(`/ask?tour=${tour.id}`)} className="btn-ghost btn-sm !px-3" aria-label={t(ui.tour.ask)}>
+              <Icon name="chat" />
+            </a>
+            <a href={href(`/book?tour=${tour.id}`)} className="btn-primary btn-sm">
+              {t(ui.tour.book)}
+            </a>
+          </div>
+        </div>
+      </div>
+      <div className="h-16 lg:hidden" aria-hidden />
     </>
   );
 }

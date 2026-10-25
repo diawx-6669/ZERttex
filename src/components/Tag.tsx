@@ -23,7 +23,7 @@ export function Tag({ kind, extra, className = '' }: { kind: TagKind; extra?: st
   const { t } = useApp();
   return (
     <span
-      className={`inline-flex max-w-full items-center gap-1.5 whitespace-normal rounded-full border px-2 py-0.5 align-middle font-mono text-[10.5px] font-semibold uppercase leading-tight tracking-wide ${style[kind]} ${className}`}
+      className={`inline-flex w-fit max-w-full items-center gap-1.5 whitespace-normal rounded-full border px-2 py-0.5 align-middle font-mono text-[10.5px] font-semibold uppercase leading-tight tracking-wide ${style[kind]} ${className}`}
       title={t(tagExplain[kind])}
     >
       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dot[kind]}`} aria-hidden />

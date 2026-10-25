@@ -51,6 +51,9 @@ export default function Book({ query }: { query: URLSearchParams }) {
 
   const total = draftTotal(draft);
 
+  // Clear stale inline errors as soon as the traveler edits anything.
+  useEffect(() => setErrors({}), [draft, agree]);
+
   const validate = (s: number): Errors => {
     const e: Errors = {};
     if (s === 1) {

@@ -33,9 +33,9 @@ export function TourCard({ tour }: { tour: Tour }) {
           </a>
         </h3>
         <p className="text-sm text-muted">{t(tour.tagline)}</p>
-        <div className="mt-auto flex items-end justify-between gap-3 pt-2">
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-2">
           <div>
-            <div className="num text-lg font-semibold">{kzt(tour.priceKzt)}</div>
+            <div className="num whitespace-nowrap text-lg font-semibold">{kzt(tour.priceKzt)}</div>
             <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted">
               {t(ui.tour.perPerson)} · <span className="num">{indicative(tour.priceKzt, lang)}</span>
               <Tag kind="demo" />
