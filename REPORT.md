@@ -76,7 +76,7 @@ None of these is a "nice to have". A traveler who does not understand the proces
 | **655,000** visitors from China in 2024, **+78%** vs 367,000 in 2023 | The Times of Central Asia, 19 June 2025, citing the Ministry of Tourism and Sports **[Verified source]** |
 | Mutual **visa-free regime since November 2023**: up to 30 days per visit, max 90 days in 180 days | Same source **[Verified source]** |
 | **241,700** Chinese citizens visited in 2025, **+38.9%**; China is the **#2 source market** after Russia (429,800) | Orda.kz, citing Energyprom.kz **[Verified source]** |
-| **15.7 million** foreign visitors for tourism purposes in 2025 | The Astana Times, February 2026 **[Verified source]** |
+| **15.7 million** foreign visitors for tourism purposes in the first nine months of 2025 | The Astana Times, February 2026 **[Verified source]** |
 
 > **Method note.** The 655,000 and 241,700 figures are measured differently (border crossings vs analyst data). We do **not** compare them with each other or compute a trend between them.
 

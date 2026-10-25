@@ -83,8 +83,8 @@ export const evidence: Evidence[] = [
   {
     figure: '15.7 million',
     text: {
-      en: 'foreign visitors for tourism purposes in 2025.',
-      zh: '2025年以旅游为目的的外国游客人次。',
+      en: 'foreign visitors for tourism purposes in the first nine months of 2025, excluding labour migrants and permanent residents.',
+      zh: '2025年前九个月以旅游为目的的外国访客人次（不含劳务移民和常住人员）。',
     },
     source: 'The Astana Times',
     date: 'February 2026',
