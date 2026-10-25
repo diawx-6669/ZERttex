@@ -355,7 +355,7 @@ const ai = `
 const single = `
 <p class="title">Saryarqa Go</p>
 <p class="subtitle">ZERTTEX Hackathon 2026, Stage 1. Case 1: Technology Product<br>Team: ____________________</p>
-<p>Saryarqa Routes wants 30% of its travelers to come from abroad within 24 months, but today about 96% of its 3,400 travelers are from Kazakhstan (case data). We propose Saryarqa Go, a booking platform in English and Chinese for independent travelers from China. It shows exactly what each tour includes, lets travelers meet their guide before paying, and accepts foreign cards. The first version can be built in 12 weeks within the 20 million KZT budget. Clickable prototype: <a href="https://claude.ai/artifact/NH9vk9BuaLC4qGUy8eSsYr">https://claude.ai/artifact/NH9vk9BuaLC4qGUy8eSsYr</a></p>
+<p>Saryarqa Routes wants 30% of its travelers to come from abroad within 24 months, but today about 96% of its 3,400 travelers are from Kazakhstan (case data). We propose Saryarqa Go, a booking platform in English and Chinese for independent travelers from China. It shows exactly what each tour includes, lets travelers meet their guide before paying, and accepts foreign cards. The first version can be built in 12 weeks within the 20 million KZT budget. Clickable prototype: <a href="https://diawx-6669.github.io/ZERttex/">https://diawx-6669.github.io/ZERttex/</a></p>
 
 <h1>1. Problem and market</h1>
 <h3>Target market: independent travelers from mainland China</h3>
@@ -399,7 +399,7 @@ const single = `
 <tr><td>10-11</td><td>Usability tests and payment checks</td><td>5-8 test sessions with no blocking problems left</td></tr>
 <tr><td>12</td><td>Pilot with real travelers</td><td>Pilot results collected</td></tr>
 </table>
-<p><b>Team:</b> a hired designer, two developers and a Chinese translator, with one person from Saryarqa Routes as product owner (our proposal). <b>How we test it:</b> 5-8 usability sessions with Chinese-speaking travelers, then a pilot where we measure how many people who start a booking finish it, how often the chat has to hand off to a manager, and how many postcards lead to new bookings. We already built a working clickable prototype of the whole path (payments in it are simulated): <a href="https://claude.ai/artifact/NH9vk9BuaLC4qGUy8eSsYr">https://claude.ai/artifact/NH9vk9BuaLC4qGUy8eSsYr</a></p>
+<p><b>Team:</b> a hired designer, two developers and a Chinese translator, with one person from Saryarqa Routes as product owner (our proposal). <b>How we test it:</b> 5-8 usability sessions with Chinese-speaking travelers, then a pilot where we measure how many people who start a booking finish it, how often the chat has to hand off to a manager, and how many postcards lead to new bookings. We already built a working clickable prototype of the whole path (payments in it are simulated): <a href="https://diawx-6669.github.io/ZERttex/">https://diawx-6669.github.io/ZERttex/</a></p>
 <img src="IMG:flow" style="width:100%">
 <p class="caption">Figure 2. User flow from search to payment. Dashed boxes are optional.</p>
 
@@ -469,6 +469,12 @@ const docs = [
     await pg.pdf({ path: path.join(OUT, file + '.pdf'), format: 'A4', printBackground: true, displayHeaderFooter: true, headerTemplate: '<div></div>', footerTemplate: footer, margin: { top: '25.4mm', bottom: '25.4mm', left: '25.4mm', right: '25.4mm' } });
   };
   // One file, as the case requires: report, then References, then AI Declaration.
+  // The five required parts as separate files too.
+  await print('1_Main_Report', 'Saryarqa Go - Main report', single);
+  await print('2_Financials_Business_Model', 'Saryarqa Go - Financials and business model', fin);
+  await print('3_User_Flow_Wireframes', 'Saryarqa Go - User flow and wireframes', flow);
+  await print('4_References', 'Saryarqa Go - References', refs);
+  await print('5_AI_Declaration', 'Saryarqa Go - AI Declaration', ai);
   const all = [single, refs, ai].join('<div class="pb"></div>');
   await print('TeamName_TechnologyProduct', 'Saryarqa Go - Technology Product', all);
   await browser.close();
