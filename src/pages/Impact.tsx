@@ -1,0 +1,286 @@
+import { useMemo, useState } from 'react';
+import { Icon } from '../components/Icon';
+import { PageHead, Section } from '../components/Layout';
+import { Tag } from '../components/Tag';
+import { budget, budgetTotal, gantt, inMvp, later, metrics, oneTimeTotal, otherTotal, risks } from '../data/budget';
+import { kzt, millions, num } from '../lib/format';
+import { AVG_PRICE, MONTHS, breakEvenTravelers, contributionPerTraveler, derivation, paybackMonth, series, type PaybackSeries } from '../lib/paybackModel';
+
+// Judges' page. English only, as allowed by the brief.
+
+function Chart({ base, down, pbBase, pbDown }: { base: PaybackSeries; down: PaybackSeries; pbBase: number | null; pbDown: number | null }) {
+  const W = 720;
+  const H = 300;
+  const pad = { l: 56, r: 16, t: 16, b: 34 };
+  const all = [...base, ...down].map((p) => p.cumulative);
+  const yMin = Math.min(...all, 0);
+  const yMax = Math.max(...all, 0);
+  const span = yMax - yMin || 1;
+  const x = (m: number) => pad.l + ((m - 1) / (MONTHS - 1)) * (W - pad.l - pad.r);
+  const y = (v: number) => pad.t + (1 - (v - yMin) / span) * (H - pad.t - pad.b);
+  const path = (s: PaybackSeries) => s.map((p, i) => `${i ? 'L' : 'M'}${x(p.month).toFixed(1)} ${y(p.cumulative).toFixed(1)}`).join(' ');
+  const step = span > 40e6 ? 10e6 : 5e6;
+  const ticks: number[] = [];
+  for (let v = Math.ceil(yMin / step) * step; v <= yMax; v += step) ticks.push(v);
+  const marker = (m: number | null, s: PaybackSeries, color: string, label: string, dy: number) => {
+    if (!m) return null;
+    const p = s[m - 1];
+    return (
+      <g>
+        <line x1={x(m)} x2={x(m)} y1={pad.t} y2={H - pad.b} stroke={color} strokeDasharray="4 4" strokeWidth="1.5" />
+        <circle cx={x(m)} cy={y(p.cumulative)} r="5" fill={color} stroke="rgb(var(--surface))" strokeWidth="2" />
+        <text x={x(m) - 6} y={pad.t + 12 + dy} textAnchor="end" className="fill-ink font-mono" fontSize="11" fontWeight="600">
+          {label} M{m}
+        </text>
+      </g>
+    );
+  };
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={`Cumulative cash over 48 months. Payback base month ${pbBase ?? 'beyond 48'}, downside month ${pbDown ?? 'beyond 48'}.`}>
+      {ticks.map((v) => (
+        <g key={v}>
+          <line x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} stroke="rgb(var(--line))" strokeWidth={v === 0 ? 1.6 : 1} />
+          <text x={pad.l - 8} y={y(v) + 4} textAnchor="end" fontSize="11" className="fill-muted font-mono">
+            {v === 0 ? '0' : `${v / 1e6}M`}
+          </text>
+        </g>
+      ))}
+      {[1, 4, 12, 24, 36, 48].map((m) => (
+        <text key={m} x={x(m)} y={H - 12} textAnchor="middle" fontSize="11" className="fill-muted font-mono">
+          M{m}
+        </text>
+      ))}
+      <rect x={x(1)} y={pad.t} width={x(4) - x(1)} height={H - pad.t - pad.b} fill="rgb(var(--gold))" opacity="0.08" />
+      <text x={x(1) + 4} y={H - pad.b - 6} fontSize="10" className="fill-muted font-mono">build</text>
+      <path d={path(down)} fill="none" stroke="rgb(var(--warn))" strokeWidth="2.5" strokeDasharray="7 5" />
+      <path d={path(base)} fill="none" stroke="rgb(var(--teal))" strokeWidth="3" />
+      {marker(pbBase, base, 'rgb(var(--teal))', 'Base', 0)}
+      {marker(pbDown, down, 'rgb(var(--warn))', 'Downside', 16)}
+    </svg>
+  );
+}
+
+function Slider({ id, label, value, min, max, step, onChange, display, tag }: { id: string; label: string; value: number; min: number; max: number; step: number; onChange: (n: number) => void; display: string; tag: string }) {
+  return (
+    <div>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <label htmlFor={id} className="label !mb-0">{label}</label>
+        <span className="num text-lg font-semibold">{display}</span>
+      </div>
+      <input id={id} type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(+e.target.value)} className="mt-1 w-full accent-[rgb(var(--teal))]" />
+      <div className="text-xs text-muted">{tag}</div>
+    </div>
+  );
+}
+
+export default function Impact() {
+  const [margin, setMargin] = useState(30);
+  const [trav, setTrav] = useState(derivation.extra);
+  const [run, setRun] = useState(300_000);
+
+  const { base, down, pbBase, pbDown } = useMemo(() => {
+    const input = { margin: margin / 100, travelersPerYear: trav, runningCost: run };
+    const base = series(input);
+    const down = series(input, 0.7);
+    return { base, down, pbBase: paybackMonth(base), pbDown: paybackMonth(down) };
+  }, [margin, trav, run]);
+
+  const cpt = contributionPerTraveler(margin / 100);
+  const be = breakEvenTravelers(margin / 100);
+  const isDefault = margin === 30 && trav === derivation.extra && run === 300_000;
+
+  return (
+    <>
+      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub="12-week MVP, year-1 budget of exactly 20,000,000 KZT, and an honest payback model you can stress-test." />
+
+      <Section title="12-week MVP plan" sub="One closed loop shipped end-to-end, then tested with real users.">
+        <div className="card overflow-x-auto p-4 sm:p-5">
+          <div className="min-w-[640px]">
+            <div className="grid grid-cols-[220px_repeat(12,1fr)] gap-1 font-mono text-[11px] text-muted">
+              <span />
+              {Array.from({ length: 12 }, (_, i) => (
+                <span key={i} className="text-center">W{i + 1}</span>
+              ))}
+            </div>
+            {gantt.map((g, i) => (
+              <div key={i} className="mt-1.5 grid grid-cols-[220px_repeat(12,1fr)] items-center gap-1">
+                <div className="pr-2 text-sm">
+                  <div className="font-semibold leading-tight">{g.label}</div>
+                  <div className="text-xs text-muted">{g.detail}</div>
+                </div>
+                {Array.from({ length: 12 }, (_, w) => {
+                  const on = w + 1 >= g.start && w + 1 <= g.end;
+                  return <div key={w} className={`h-7 rounded ${on ? (i === gantt.length - 1 ? 'bg-gold' : 'bg-teal') : 'bg-surface2'}`} />;
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="card p-5">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-bold"><Icon name="check" className="text-ok" /> In MVP (12 weeks)</h3>
+            <ul className="space-y-1.5 text-sm">
+              {inMvp.map((x) => (
+                <li key={x} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ok" />{x}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="card p-5">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-bold"><Icon name="clock" className="text-gold" /> Later phases</h3>
+            <ul className="space-y-1.5 text-sm">
+              {later.map((x) => (
+                <li key={x} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />{x}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Year-1 budget" sub="Planning assumptions. The case allows up to 20,000,000 KZT for development and launch.">
+        <div className="card overflow-x-auto">
+          <table className="w-full min-w-[520px] text-sm">
+            <thead>
+              <tr className="border-b border-line text-left font-mono text-[11px] uppercase tracking-wide text-muted">
+                <th className="px-4 py-3">Item</th>
+                <th className="px-4 py-3">Type</th>
+                <th className="px-4 py-3 text-right">KZT</th>
+                <th className="px-4 py-3 text-right">Share</th>
+              </tr>
+            </thead>
+            <tbody>
+              {budget.map((b) => (
+                <tr key={b.item} className="border-b border-line/70">
+                  <td className="px-4 py-2.5 font-medium">{b.item}</td>
+                  <td className="px-4 py-2.5 text-muted">{b.kind}</td>
+                  <td className="num px-4 py-2.5 text-right">{num(b.amount)}</td>
+                  <td className="num px-4 py-2.5 text-right text-muted">{((b.amount / budgetTotal) * 100).toFixed(1)}%</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr className="bg-night text-nightInk">
+                <td className="px-4 py-3 font-bold" colSpan={2}>Total</td>
+                <td className="num px-4 py-3 text-right font-bold" data-testid="budget-total">{num(budgetTotal)}</td>
+                <td className="num px-4 py-3 text-right">100%</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted">
+          <Tag kind="proposal" extra="planning assumptions" /> One-time: <span className="num">{kzt(oneTimeTotal)}</span> · Recurring + contingency: <span className="num">{kzt(otherTotal)}</span>
+        </div>
+      </Section>
+
+      <Section title="Payback model" sub="Move the sliders. Chart and KPIs update live. Defaults are not tuned to look good.">
+        <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
+          <div className="card space-y-6 p-5">
+            <Slider id="s-margin" label="Contribution margin" value={margin} min={10} max={50} step={1} onChange={setMargin} display={`${margin}%`} tag="Team assumption (default 30%)" />
+            <Slider id="s-trav" label="Extra foreign travelers / year by month 24" value={trav} min={300} max={2500} step={1} onChange={setTrav} display={num(trav)} tag={`Derived from the 30% goal (default ${num(derivation.extra)})`} />
+            <Slider id="s-run" label="Running cost after year 1 / month" value={run} min={100_000} max={1_500_000} step={50_000} onChange={setRun} display={kzt(run)} tag="Team assumption (default 300,000 KZT)" />
+            <button type="button" className="btn-ghost btn-sm w-full" disabled={isDefault} onClick={() => { setMargin(30); setTrav(derivation.extra); setRun(300_000); }}>
+              <Icon name="refresh" size={14} /> Reset to defaults
+            </button>
+            <Tag kind="proposal" extra="model, not a forecast" />
+          </div>
+          <div className="space-y-5">
+            <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+              {[
+                { k: 'Contribution / traveler', v: kzt(cpt), s: `${num(AVG_PRICE)} × ${margin}%` },
+                { k: 'Break-even travelers', v: Number.isFinite(be) ? num(be) : '—', s: '20M ÷ contribution' },
+                { k: 'Payback · base', v: pbBase ? `Month ${pbBase}` : '> 48 mo', s: 'cumulative cash ≥ 0', accent: 'text-teal' },
+                { k: 'Payback · downside', v: pbDown ? `Month ${pbDown}` : '> 48 mo', s: 'travelers × 0.7', accent: 'text-warn' },
+              ].map((x) => (
+                <div key={x.k} className="card p-4">
+                  <div className="font-mono text-[10.5px] uppercase tracking-wide text-muted">{x.k}</div>
+                  <div className={`num mt-1 text-xl font-semibold sm:text-2xl ${x.accent ?? ''}`} aria-live="polite">{x.v}</div>
+                  <div className="text-xs text-muted">{x.s}</div>
+                </div>
+              ))}
+            </div>
+            <div className="card p-4 sm:p-5">
+              <div className="mb-2 flex flex-wrap items-center gap-4 text-sm">
+                <span className="font-semibold">Cumulative cash, 48 months</span>
+                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded bg-teal" /> Base</span>
+                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dashed border-warn" /> Downside (× 0.7)</span>
+              </div>
+              <Chart base={base} down={down} pbBase={pbBase} pbDown={pbDown} />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="card p-5 text-sm">
+            <h3 className="mb-2 text-lg font-bold">How the model works</h3>
+            <ul className="space-y-1.5 text-muted">
+              <li>• One-time 12.0M KZT is spent over months 1–3; the other 8.0M over months 1–12.</li>
+              <li>• From month 13, running cost is charged monthly (slider).</li>
+              <li>• Launch at month 4. Extra foreign travelers ramp linearly: month m gets (m − 3) / 21 of the year-2 run rate, reaching 100% at month 24, then flat.</li>
+              <li>• Contribution per traveler = 44,000 KZT × margin.</li>
+              <li>• Monthly net = travelers × contribution − costs. Payback = first month the cumulative total is ≥ 0.</li>
+            </ul>
+          </div>
+          <div className="card p-5 text-sm">
+            <h3 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-bold">Where 1,263 comes from <Tag kind="case" extra="inputs" /></h3>
+            <ul className="space-y-1.5 text-muted">
+              <li>• ~4% of {num(derivation.travelers2025)} travelers are foreign today ≈ <b className="text-ink">{num(derivation.foreignToday)}</b>.</li>
+              <li>• Keep ≈{num(derivation.domestic)} domestic travelers. For 30% foreign: {num(derivation.domestic)} ÷ 0.7 ≈ <b className="text-ink">{num(derivation.total)}</b> total.</li>
+              <li>• 30% of {num(derivation.total)} ≈ <b className="text-ink">{num(derivation.foreignNeeded)}</b> foreign → ≈ <b className="text-ink">{num(derivation.extra)}</b> more per year.</li>
+              <li className="rounded-lg border border-warn/40 bg-warn/10 p-2 text-ink">
+                Note: 150,000,000 ÷ 3,400 = {num(derivation.revPerTraveler)} KZT, slightly above the stated 44,000 KZT average price. The model uses 44,000 KZT and flags the gap.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Pilot success metrics" sub="Measured in week 12 and after. No targets are invented before the pilot baseline.">
+        <div className="card overflow-x-auto">
+          <table className="w-full min-w-[480px] text-sm">
+            <tbody>
+              {metrics.map((m) => (
+                <tr key={m.metric} className="border-b border-line/70 last:border-0">
+                  <td className="px-4 py-3 font-medium">{m.metric}</td>
+                  <td className="px-4 py-3 text-muted">{m.target}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section title="Top 5 risks" sub="And what we do about each.">
+        <div className="grid gap-3 md:grid-cols-2">
+          {risks.map((r, i) => (
+            <div key={i} className="card flex gap-3 p-4">
+              <span className="num grid h-8 w-8 shrink-0 place-items-center rounded-full bg-danger/15 text-sm font-semibold text-danger">{i + 1}</span>
+              <div className="text-sm">
+                <div className="font-semibold">{r.risk}</div>
+                <div className="mt-1 text-muted"><span className="font-semibold text-teal">Mitigation: </span>{r.mitigation}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Impact" sub="Who wins if this works.">
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            { h: 'Saryarqa Routes', icon: 'chart' as const, p: ['A second, foreign revenue stream beside ~96% domestic demand.', 'Direct bookings instead of chat-only sales; fewer manual questions.', 'Reusable assets: bilingual tour data, guide videos, trust content.'] },
+            { h: 'Travelers', icon: 'users' as const, p: ['Clear prices and inclusions before paying.', 'Pay with a foreign card; Chinese language support.', 'Meet the guide first; refund rules in writing; family updates.'] },
+            { h: 'Kazakhstan abroad', icon: 'globe' as const, p: ['Shows Kazakhstan as easy and safe to book for Chinese travelers.', 'Spreads demand to regions: Charyn, Kolsai, Turkestan, Burabay.', 'Postcards on Xiaohongshu / WeChat carry the country image further.'] },
+          ].map((c) => (
+            <div key={c.h} className="card p-5">
+              <h3 className="mb-2 flex items-center gap-2 text-lg font-bold"><Icon name={c.icon} className="text-teal" /> {c.h}</h3>
+              <ul className="space-y-1.5 text-sm text-muted">
+                {c.p.map((x) => (
+                  <li key={x} className="flex gap-2"><Icon name="check" size={15} className="mt-0.5 text-teal" />{x}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 text-xs text-muted">All impact statements are <Tag kind="proposal" /> expected effects, to be measured in the pilot. Budget figures are shown in {millions(budgetTotal)} KZT total.</p>
+      </Section>
+    </>
+  );
+}
