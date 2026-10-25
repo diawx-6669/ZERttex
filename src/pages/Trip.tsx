@@ -106,7 +106,7 @@ export default function Trip() {
             <Media tour={tour.id} credit={false} />
           </div>
           <div className="min-w-0 flex-1 px-4 pb-4 sm:p-0">
-            <div className="font-mono text-[11px] uppercase tracking-wide text-muted">{code}</div>
+            <div className="text-xs text-muted">{code}</div>
             <div className="font-display text-xl font-bold">{t(tour.name)}</div>
             <div className="text-sm text-muted">
               {fmtDate(item.date, lang)} · {tour.days} {t(ui.tour.days)}
@@ -146,7 +146,7 @@ export default function Trip() {
                   <div className={`min-w-0 flex-1 rounded-xl px-3 py-2 ${state === 'now' ? 'bg-gold/15' : ''}`}>
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={`font-semibold ${state === 'next' ? 'text-muted' : ''}`}>{t(s.title)}</span>
-                      {state === 'now' && <span className="rounded-full bg-gold px-2 py-0.5 font-mono text-[10px] font-semibold uppercase text-night">{t(ui.trip.now)}</span>}
+                      {state === 'now' && <span className="rounded-full bg-gold px-2 py-0.5 text-xs font-semibold text-night">{t(ui.trip.now)}</span>}
                     </div>
                     <div className="font-mono text-[11px] text-muted">{s.when}</div>
                     {state !== 'next' && <p className="mt-0.5 text-sm text-muted">{t(s.text)}</p>}
@@ -156,7 +156,7 @@ export default function Trip() {
             })}
           </ol>
           {done && (
-            <div className="rise mt-3 flex flex-wrap items-center gap-3 rounded-2xl bg-night p-4 text-nightInk">
+            <div className="rise mt-3 flex flex-wrap items-center gap-3 rounded-2xl bg-teal/10 p-4">
               <Icon name="heart" className="text-gold" />
               <span className="flex-1">{t(ui.trip.tripDone)}</span>
               <button type="button" className="btn-primary btn-sm" onClick={() => navigate('/postcard')}>
@@ -218,7 +218,7 @@ export default function Trip() {
                   <p className="mt-1 text-xs text-muted"><Tag kind="demo" extra={t({ en: 'example domain, not a live link', zh: '示例域名，非真实链接' })} /></p>
                 </div>
                 <div className="rounded-xl border border-line p-3">
-                  <div className="font-mono text-[10.5px] uppercase tracking-wide text-muted">{t(ui.trip.familySees)}</div>
+                  <div className="text-xs text-muted">{t(ui.trip.familySees)}</div>
                   <div className="mt-1 flex items-center gap-2 font-semibold">
                     <span className="h-2.5 w-2.5 rounded-full bg-ok" /> {lastCheckin}
                   </div>

@@ -140,7 +140,7 @@ export default function Impact() {
         <div className="card overflow-x-auto">
           <table className="w-full min-w-[520px] text-sm">
             <thead>
-              <tr className="border-b border-line text-left font-mono text-[11px] uppercase tracking-wide text-muted">
+              <tr className="border-b border-line text-left text-xs text-muted">
                 <th className="px-4 py-3">Item</th>
                 <th className="px-4 py-3">Type</th>
                 <th className="px-4 py-3 text-right">KZT</th>
@@ -186,12 +186,12 @@ export default function Impact() {
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               {[
                 { k: 'Contribution / traveler', v: kzt(cpt), s: `${num(AVG_PRICE)} × ${margin}%` },
-                { k: 'Break-even travelers', v: Number.isFinite(be) ? num(be) : '—', s: '20M ÷ contribution' },
+                { k: 'Break-even travelers', v: Number.isFinite(be) ? num(be) : 'n/a', s: '20M ÷ contribution' },
                 { k: 'Payback · base', v: pbBase ? `Month ${pbBase}` : '> 48 mo', s: 'cumulative cash ≥ 0', accent: 'text-teal' },
                 { k: 'Payback · downside', v: pbDown ? `Month ${pbDown}` : '> 48 mo', s: 'travelers × 0.7', accent: 'text-warn' },
               ].map((x) => (
                 <div key={x.k} className="card p-4">
-                  <div className="font-mono text-[10.5px] uppercase tracking-wide text-muted">{x.k}</div>
+                  <div className="text-xs text-muted">{x.k}</div>
                   <div className={`num mt-1 text-xl font-semibold sm:text-2xl ${x.accent ?? ''}`} aria-live="polite">{x.v}</div>
                   <div className="text-xs text-muted">{x.s}</div>
                 </div>
@@ -212,7 +212,7 @@ export default function Impact() {
           <div className="card p-5 text-sm">
             <h3 className="mb-2 text-lg font-bold">How the model works</h3>
             <ul className="space-y-1.5 text-muted">
-              <li>• One-time 12.0M KZT is spent over months 1–3; the other 8.0M over months 1–12.</li>
+              <li>• One-time 12.0M KZT is spent over months 1-3; the other 8.0M over months 1-12.</li>
               <li>• From month 13, running cost is charged monthly (slider).</li>
               <li>• Launch at month 4. Extra foreign travelers ramp linearly: month m gets (m − 3) / 21 of the year-2 run rate, reaching 100% at month 24, then flat.</li>
               <li>• Contribution per traveler = 44,000 KZT × margin.</li>

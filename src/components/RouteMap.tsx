@@ -8,7 +8,7 @@ import { Icon } from './Icon';
 import { Media } from './Media';
 
 // Schematic map: places are projected from real latitude/longitude
-// (lon 64–82°E, lat 41–54.5°N), but there is no country border outline.
+// (lon 64-82°E, lat 41-54.5°N), but there is no country border outline.
 const W = 640;
 const H = 700;
 const proj = (lon: number, lat: number) => ({ x: ((lon - 64) / 18) * W, y: ((54.5 - lat) / 13.5) * H });
@@ -144,7 +144,7 @@ export function RouteMap({ highlight, className = '', interactive = true }: { hi
         })}
       </svg>
 
-      <div className="pointer-events-none absolute left-3 top-3 flex flex-wrap gap-2 font-mono text-[10.5px] uppercase tracking-wide text-muted">
+      <div className="pointer-events-none absolute left-3 top-3 flex flex-wrap gap-2 text-xs text-muted">
         <span className="rounded-full bg-surface/90 px-2 py-1">{t({ en: 'Schematic map', zh: '示意图' })}</span>
         <span className="flex items-center gap-1 rounded-full bg-surface/90 px-2 py-1">
           <span className="h-1 w-4 rounded bg-teal" /> {t({ en: 'Tour', zh: '线路' })}

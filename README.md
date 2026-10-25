@@ -76,6 +76,10 @@ Every label in the UI is one of exactly five: **Case fact · Verified source · 
 5. **Privacy and legal review** (Kazakhstan + China cross-border data rules), cookie/consent, data retention.
 6. Live weather/road feeds, offline audio downloads, GPS-based family sharing (opt-in), OTA listings (Trip.com / Klook).
 
+## Design
+
+Cool neutral paper and near-black ink with one accent (the sky blue of the Kazakh flag, deepened for contrast). Archivo for headlines (slightly expanded, like a travel poster), Instrument Sans for text, Phosphor icons. One shape system: controls 10 px, containers 16 px, honesty labels 4 px. No uppercase micro-labels, no decorative dots, no em-dashes; sections use different layouts (editorial list, asymmetric tour grid, big-number row, map split). Light and dark themes follow the system setting.
+
 ## Photos
 
 The app shows real photos when they exist and falls back to the hand-drawn SVG scenes when they don't, so it always works offline.
@@ -104,7 +108,7 @@ docs/Saryarqa_Go_Report.docx · .pdf   the report as Word / PDF with screenshots
 PLAN.md · REPORT.md · REPORT_NOTES.md
 ```
 
-Tech: React 18, TypeScript (strict), Vite 6, Tailwind CSS 3, `vite-plugin-singlefile`. No backend, no API keys, no runtime network calls except Google Fonts.
+Tech: React 18, TypeScript (strict), Vite 6, Tailwind CSS 3, Phosphor icons, `vite-plugin-singlefile`. No backend, no API keys, no runtime network calls except Google Fonts.
 
 ## Verification
 

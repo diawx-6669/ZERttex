@@ -14,7 +14,7 @@ export default function About() {
         title={t({ en: 'About this prototype', zh: '关于本原型' })}
         sub={t({
           en: 'Saryarqa Go is a team concept for Saryarqa Routes, a fictional Astana tour company from the official case. Below: the case facts we were given, and the market evidence with sources.',
-          zh: 'Saryarqa Go 是团队为官方案例中的虚构公司——阿斯塔纳旅行社 Saryarqa Routes——设计的方案。以下为案例给出的事实，以及附来源的市场数据。',
+          zh: 'Saryarqa Go 是团队为官方案例中的虚构公司（阿斯塔纳旅行社 Saryarqa Routes）设计的方案。以下为案例给出的事实，以及附来源的市场数据。',
         })}
       />
 

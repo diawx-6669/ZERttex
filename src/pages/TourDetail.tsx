@@ -36,8 +36,8 @@ function SectionTabs() {
     return () => io.disconnect();
   }, []);
   return (
-    <nav aria-label={t({ en: 'On this page', zh: '本页内容' })} className="sticky top-16 z-20 -mx-4 border-b border-line bg-bg/90 px-4 backdrop-blur-md sm:mx-0 sm:rounded-2xl sm:border sm:px-2">
-      <ul className="flex gap-1 overflow-x-auto py-2 no-scrollbar">
+    <nav aria-label={t({ en: 'On this page', zh: '本页内容' })} className="sticky top-16 z-20 -mx-4 border-b border-line bg-bg/90 px-4 backdrop-blur-md sm:mx-0 sm:px-0">
+      <ul className="flex gap-2 overflow-x-auto no-scrollbar">
         {sections.map((s) => (
           <li key={s.id} className="shrink-0">
             <a
@@ -47,7 +47,7 @@ function SectionTabs() {
                 document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
               }}
               aria-current={active === s.id ? 'true' : undefined}
-              className={`block rounded-full px-3.5 py-2 text-sm font-semibold transition ${active === s.id ? 'bg-night text-nightInk' : 'text-muted hover:bg-surface2 hover:text-ink'}`}
+              className={`block border-b-2 px-3 py-2.5 text-[15px] font-medium transition ${active === s.id ? 'border-teal text-ink' : 'border-transparent text-muted hover:text-ink'}`}
             >
               {t(s.label)}
             </a>
@@ -78,27 +78,20 @@ export default function TourDetail({ id }: { id?: string }) {
       <div className="container-x pt-6">
         <LoopStrip compact current={0} />
       </div>
-      <section className="container-x mt-5">
-        <div className="grain relative overflow-hidden rounded-[1.75rem] bg-night">
-          <div className="aspect-[4/3] overflow-hidden sm:aspect-[21/9]">
-            <div className="kenburns h-full w-full">
-              <Media tour={tour.id} title={t(tour.name)} eager credit={false} />
-            </div>
-          </div>
-          <div className="absolute inset-x-0 bottom-0 z-[2] bg-gradient-to-t from-night/95 via-night/60 to-transparent p-5 pt-16 text-nightInk sm:p-8">
-            <a href={href('/tours')} className="mb-3 inline-flex items-center gap-1 rounded-full bg-night/50 px-3 py-1 text-sm text-nightInk/90 backdrop-blur hover:text-nightInk">
-              <Icon name="arrowLeft" size={14} /> {t(ui.tour.allTours)}
-            </a>
-            <div className="mb-2 flex flex-wrap gap-1.5">
-              {tour.bestFor.map((b) => (
-                <span key={b} className="rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-semibold backdrop-blur">
-                  {t(interestText[b])}
-                </span>
-              ))}
-            </div>
-            <h1 className="text-3xl font-extrabold sm:text-5xl">{t(tour.name)}</h1>
-            <p className="mt-2 max-w-2xl text-nightInk/85 sm:text-lg">{t(tour.tagline)}</p>
-          </div>
+      <section className="container-x mt-6">
+        <a href={href('/tours')} className="inline-flex items-center gap-1.5 text-[15px] text-muted hover:text-ink">
+          <Icon name="arrowLeft" size={16} /> {t(ui.tour.allTours)}
+        </a>
+        <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-end lg:gap-12">
+          <h1 className="text-[2.2rem] font-extrabold leading-[1.02] sm:text-6xl" style={{ fontStretch: '112%' }}>
+            {t(tour.name)}
+          </h1>
+          <p className="max-w-[46ch] text-lg text-muted lg:pb-2">
+            {t(tour.tagline)} {t({ en: 'Good for', zh: '适合' })} {tour.bestFor.map((b) => t(interestText[b]).toLowerCase()).join(', ')}.
+          </p>
+        </div>
+        <div className="grain relative mt-8 aspect-[4/3] overflow-hidden rounded-2xl bg-surface2 sm:aspect-[21/9]">
+          <Media tour={tour.id} title={t(tour.name)} eager />
         </div>
       </section>
 
@@ -114,7 +107,7 @@ export default function TourDetail({ id }: { id?: string }) {
               ] as [L, string, 'clock' | 'pin' | 'map' | 'route'][]
             ).map(([k, v, ic], i) => (
               <div key={i} className="rounded-2xl border border-line bg-surface p-3">
-                <dt className="flex items-center gap-1.5 font-mono text-[10.5px] uppercase tracking-wide text-muted">
+                <dt className="flex items-center gap-1.5 text-xs text-muted">
                   <Icon name={ic} size={13} className="text-teal" /> {t(k)}
                 </dt>
                 <dd className="mt-1 text-sm font-semibold">{v}</dd>
@@ -166,7 +159,7 @@ export default function TourDetail({ id }: { id?: string }) {
         <aside className="hidden lg:sticky lg:top-24 lg:block lg:self-start">
           <div className="card space-y-4 p-5">
             <div>
-              <div className="font-mono text-[11px] uppercase tracking-wide text-muted">{t(ui.tour.from)}</div>
+              <div className="text-xs text-muted">{t(ui.tour.from)}</div>
               <div className="num text-3xl font-semibold">{kzt(tour.priceKzt)}</div>
               <div className="mt-1 flex flex-wrap items-center gap-1.5 text-sm text-muted">
                 {t(ui.tour.perPerson)} · <span className="num">{indicative(tour.priceKzt, lang)}</span> <Tag kind="demo" />

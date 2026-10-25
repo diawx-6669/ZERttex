@@ -21,13 +21,13 @@ export default {
         warn: v('warn'),
       },
       fontFamily: {
-        display: ['"Bricolage Grotesque"', '"PingFang SC"', '"Microsoft YaHei"', 'system-ui', 'sans-serif'],
-        sans: ['Figtree', '"PingFang SC"', '"Microsoft YaHei"', 'system-ui', 'sans-serif'],
+        display: ['Archivo', '"PingFang SC"', '"Microsoft YaHei"', 'system-ui', 'sans-serif'],
+        sans: ['"Instrument Sans"', '"PingFang SC"', '"Microsoft YaHei"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       borderRadius: { xl2: '1.25rem' },
       boxShadow: {
-        card: '0 1px 0 rgb(var(--line) / 0.6), 0 12px 32px -18px rgb(var(--night) / 0.35)',
+        card: '0 1px 2px rgb(var(--ink) / 0.04), 0 8px 24px -12px rgb(var(--ink) / 0.12)',
       },
     },
   },

@@ -144,23 +144,22 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
 
   return (
     <div className={`flex flex-col overflow-hidden ${className}`}>
-      <div className="flex items-center justify-between gap-2 border-b border-line bg-night px-4 py-3 text-nightInk">
+      <div className="flex items-center justify-between gap-2 border-b border-line bg-surface px-4 py-3">
         <div className="flex items-center gap-2.5">
-          <span className="relative grid h-9 w-9 place-items-center rounded-full bg-teal text-tealInk">
-            <Icon name="chat" />
-            <span className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-night bg-ok" aria-hidden />
+          <span className="grid h-9 w-9 place-items-center rounded-[10px] bg-teal/12 text-teal">
+            <Icon name="chat" size={20} />
           </span>
           <div className="leading-tight">
             <div className="font-semibold">{t(ui.ask.bot)}</div>
-            <div className="font-mono text-[10.5px] uppercase tracking-wide text-nightInk/70">EN · 中文 · {t(ui.ask.scripted)}</div>
+            <div className="text-xs text-muted">{t(ui.ask.scripted)}</div>
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <button type="button" className="rounded-full px-3 py-1.5 text-xs font-semibold text-nightInk/80 hover:bg-white/10" onClick={reset}>
+          <button type="button" className="rounded-[8px] px-3 py-1.5 text-sm font-medium text-muted hover:bg-surface2 hover:text-ink" onClick={reset}>
             {t(ui.ask.reset)}
           </button>
           {onClose && (
-            <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-full hover:bg-white/10" aria-label={t(ui.nav.close)}>
+            <button type="button" onClick={onClose} className="grid h-9 w-9 place-items-center rounded-[8px] text-muted hover:bg-surface2 hover:text-ink" aria-label={t(ui.nav.close)}>
               <Icon name="x" />
             </button>
           )}
@@ -171,7 +170,7 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
         {msgs.map((m) => (
           <div key={m.id} className={`rise flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className="max-w-[88%] sm:max-w-[80%]">
-              <div className={`mb-1 font-mono text-[10.5px] uppercase tracking-wide text-muted ${m.from === 'user' ? 'text-right' : ''}`}>
+              <div className={`mb-1 text-xs text-muted ${m.from === 'user' ? 'text-right' : ''}`}>
                 {m.from === 'user' ? t(ui.ask.you) : t(ui.ask.bot)}
               </div>
               <div

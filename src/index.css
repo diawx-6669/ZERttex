@@ -2,43 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Design tokens: midnight blue (trust/nav), sand/ivory (background),
-   turquoise (actions, water), muted gold (accents). Values are "r g b". */
+/* Design tokens (r g b). Cool neutral paper, near-black ink, one accent:
+   the sky blue of the Kazakh flag, deepened for contrast. "teal" is the
+   accent slot, "gold" a warm secondary used only for semantic highlights. */
 :root {
-  --bg: 248 243 233;
-  --surface: 255 252 246;
-  --surface-2: 241 233 218;
-  --ink: 20 30 52;
-  --muted: 92 98 112;
-  --line: 222 210 188;
-  --night: 18 33 63;
-  --night-ink: 240 235 222;
-  --teal: 14 128 122;
-  --teal-ink: 255 255 255;
-  --gold: 168 128 46;
-  --danger: 178 52 42;
-  --ok: 32 128 76;
-  --warn: 176 110 18;
+  --bg: 243 244 245;
+  --surface: 252 252 253;
+  --surface-2: 233 235 238;
+  --ink: 22 25 31;
+  --muted: 88 94 104;
+  --line: 218 221 226;
+  --night: 22 26 33;
+  --night-ink: 241 242 244;
+  --teal: 11 111 140;
+  --teal-ink: 252 252 253;
+  --gold: 168 82 18;
+  --danger: 176 42 36;
+  --ok: 26 122 72;
+  --warn: 160 92 0;
   --base-size: 16px;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: 11 18 33;
-    --surface: 18 28 48;
-    --surface-2: 26 38 62;
-    --ink: 236 231 218;
-    --muted: 160 166 180;
-    --line: 44 58 86;
-    --night: 7 12 24;
-    --night-ink: 236 231 218;
-    --teal: 52 196 184;
-    --teal-ink: 6 22 26;
-    --gold: 218 182 102;
+    --bg: 14 17 22;
+    --surface: 21 25 32;
+    --surface-2: 29 34 43;
+    --ink: 232 234 237;
+    --muted: 154 161 172;
+    --line: 42 48 58;
+    --night: 8 10 14;
+    --night-ink: 232 234 237;
+    --teal: 104 200 228;
+    --teal-ink: 8 22 30;
+    --gold: 236 150 84;
     --danger: 240 112 98;
-    --ok: 92 200 136;
-    --warn: 236 170 72;
+    --ok: 96 200 140;
+    --warn: 232 170 80;
     color-scheme: dark;
   }
 }
@@ -48,29 +49,34 @@ html.large-text { --base-size: 18.5px; }
 html, body { overflow-x: hidden; }
 body {
   @apply bg-bg text-ink font-sans antialiased;
-  line-height: 1.55;
+  line-height: 1.6;
+  font-feature-settings: 'ss01', 'cv11';
 }
-html[lang='zh-CN'] body { line-height: 1.7; }
+html[lang='zh-CN'] body { line-height: 1.75; }
 
-h1, h2, h3, h4 { @apply font-display; letter-spacing: -0.015em; line-height: 1.12; }
-html[lang='zh-CN'] h1, html[lang='zh-CN'] h2, html[lang='zh-CN'] h3 { letter-spacing: 0; }
+h1, h2, h3, h4 { @apply font-display; font-stretch: 108%; letter-spacing: -0.02em; line-height: 1.08; text-wrap: balance; }
+html[lang='zh-CN'] h1, html[lang='zh-CN'] h2, html[lang='zh-CN'] h3 { letter-spacing: 0; font-stretch: 100%; }
+p { text-wrap: pretty; }
+fieldset { min-width: 0; }
 
-:focus-visible { outline: 3px solid rgb(var(--teal)); outline-offset: 2px; border-radius: 6px; }
+:focus-visible { outline: 2px solid rgb(var(--teal)); outline-offset: 2px; border-radius: 6px; }
 
+/* Shape system: controls (buttons, inputs, chips) 10px, containers 16px,
+   images 16px, honesty labels 4px, avatars round. */
 @layer components {
   .container-x { @apply mx-auto w-full max-w-6xl px-4 sm:px-6; }
-  .card { @apply rounded-xl2 border border-line bg-surface shadow-card; }
-  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px]; }
-  .btn-primary { @apply btn bg-teal text-tealInk hover:brightness-110; }
-  .btn-dark { @apply btn bg-night text-nightInk hover:brightness-125; }
-  .btn-ghost { @apply btn border border-line bg-surface text-ink hover:bg-surface2; }
-  .btn-sm { @apply min-h-[36px] px-3.5 py-1.5 text-xs; }
-  .input { @apply w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-base text-ink placeholder:text-muted/70 focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/30; }
+  .card { @apply rounded-2xl border border-line bg-surface; }
+  .btn { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[10px] px-5 py-2.5 text-[15px] font-semibold transition duration-150 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-50 min-h-[44px]; }
+  .btn-primary { @apply btn bg-teal text-tealInk hover:bg-teal/90; }
+  .btn-dark { @apply btn bg-night text-nightInk hover:bg-night/85; }
+  .btn-ghost { @apply btn border border-line bg-surface text-ink hover:border-ink/30; }
+  .btn-sm { @apply min-h-[36px] px-3.5 py-1.5 text-sm; }
+  .input { @apply w-full rounded-[10px] border border-line bg-surface px-3.5 py-2.5 text-base text-ink placeholder:text-muted focus:border-teal focus:outline-none focus:ring-2 focus:ring-teal/25; }
   .input-error { @apply border-danger ring-2 ring-danger/20; }
   .label { @apply mb-1.5 block text-sm font-semibold text-ink; }
-  .eyebrow { @apply font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-gold; }
-  .chip { @apply inline-flex items-center rounded-full border border-line bg-surface px-3 py-1.5 text-sm text-ink hover:border-teal hover:text-teal min-h-[36px]; }
-  .num { @apply font-mono tabular-nums; }
+  .eyebrow { @apply text-sm font-semibold text-teal; }
+  .chip { @apply inline-flex items-center rounded-[10px] border border-line bg-surface px-3 py-1.5 text-sm text-ink transition hover:border-ink/30 min-h-[36px]; }
+  .num { font-variant-numeric: tabular-nums; }
 }
 
 /* TEST MODE stripes */
@@ -97,8 +103,8 @@ html[lang='zh-CN'] h1, html[lang='zh-CN'] h2, html[lang='zh-CN'] h3 { letter-spa
 .drawer-in { animation: drawer 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
 @keyframes pin { 0% { transform: scale(0.6); opacity: 0.5; } 100% { transform: scale(1.6); opacity: 0; } }
 .pin-pulse { transform-box: fill-box; transform-origin: center; animation: pin 2.2s ease-out infinite; }
-@keyframes fab { 0%, 100% { box-shadow: 0 0 0 0 rgb(var(--teal) / 0.45); } 50% { box-shadow: 0 0 0 10px rgb(var(--teal) / 0); } }
-.fab { animation: fab 2.8s ease-in-out 1.5s 3; }
+@keyframes fab { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.fab { animation: fab 0.5s ease-out 0.8s both; }
 html.js-reveal [data-reveal] { opacity: 0; transform: translateY(18px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
 html.js-reveal [data-reveal].in { opacity: 1; transform: none; }
 @keyframes kenburns { from { transform: scale(1.04); } to { transform: scale(1.12) translate(-1.5%, -1%); } }
@@ -107,7 +113,7 @@ html.js-reveal [data-reveal].in { opacity: 1; transform: none; }
 /* Film grain for illustrations: makes flat SVG feel printed */
 .grain { isolation: isolate; }
 .grain::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; opacity: 0.16; mix-blend-mode: overlay;
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; opacity: 0.12; mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 

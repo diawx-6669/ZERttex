@@ -203,7 +203,7 @@ export default function Book({ query }: { query: URLSearchParams }) {
                           onChange={(e) => setDraft({ items: draft.items.map((x, j) => (j === i ? { ...x, tourId: e.target.value as TourId } : x)) })}
                           {...a11y(`tour${i}`)}
                         >
-                          <option value="">—</option>
+                          <option value="">{t(ui.book.errTour)}</option>
                           {tours.map((tt) => (
                             <option key={tt.id} value={tt.id}>
                               {t(tt.name)} · {tt.days} {t(ui.tour.days)} · {kzt(tt.priceKzt)}
@@ -370,7 +370,7 @@ function Summary() {
   return (
     <aside className="lg:sticky lg:top-24 lg:self-start">
       <div className="card overflow-hidden">
-        <div className="flex items-center justify-between bg-night px-5 py-3 text-nightInk">
+        <div className="flex items-center justify-between border-b border-line px-5 py-3">
           <span className="font-semibold">{t(ui.book.summary)}</span>
           <Tag kind="demo" className="!border-teal/60" />
         </div>
@@ -445,15 +445,15 @@ function Success() {
       </div>
       <div className="container-x mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="card rise overflow-hidden">
-          <div className="flex flex-wrap items-center gap-4 bg-night p-6 text-nightInk">
+          <div className="flex flex-wrap items-center gap-4 border-b border-line bg-ok/10 p-6">
             <span className="grid h-14 w-14 place-items-center rounded-full bg-ok text-white">
               <Icon name="check" size={28} />
             </span>
             <div>
-              <div className="font-mono text-xs uppercase tracking-widest text-nightInk/70">{t(ui.book.code)}</div>
-              <div className="num font-display text-4xl font-extrabold tracking-wider text-gold" data-testid="booking-code">{booking.code}</div>
+              <div className="text-sm text-muted">{t(ui.book.code)}</div>
+              <div className="num font-display text-4xl font-extrabold tracking-wider text-ink" data-testid="booking-code">{booking.code}</div>
             </div>
-            <Tag kind="demo" extra={t(ui.book.simulated)} className="ml-auto !border-teal/60" />
+            <Tag kind="demo" extra={t(ui.book.simulated)} className="ml-auto" />
           </div>
           <div className="space-y-5 p-6">
             <p>

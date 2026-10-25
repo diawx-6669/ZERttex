@@ -127,8 +127,8 @@ export function answer(input: string, uiLang: Lang): BotAnswer {
       return {
         text: A(
           lang,
-          'Foreign cards (Visa, Mastercard and others) are paid on the payment provider’s secure hosted page — we never see your card number. Alipay and WeChat Pay are planned and need provider approval first. Prices are in KZT with an indicative USD or CNY amount. In this prototype all payments are simulated.',
-          '外国银行卡（Visa、万事达等）在支付服务商的安全托管页面完成支付——我们不会看到您的卡号。支付宝和微信支付正在规划中，需先获得服务商审批。价格以坚戈计，并显示美元或人民币参考价。本原型中所有支付均为模拟。',
+          'Foreign cards (Visa, Mastercard and others) are paid on the payment provider’s secure hosted page, so we never see your card number. Alipay and WeChat Pay are planned and need provider approval first. Prices are in KZT with an indicative USD or CNY amount. In this prototype all payments are simulated.',
+          '外国银行卡（Visa、万事达等）在支付服务商的安全托管页面完成支付，我们不会看到您的卡号。支付宝和微信支付正在规划中，需先获得服务商审批。价格以坚戈计，并显示美元或人民币参考价。本原型中所有支付均为模拟。',
         ),
         lang,
         tag: 'proposal',
@@ -139,7 +139,7 @@ export function answer(input: string, uiLang: Lang): BotAnswer {
       return {
         text: A(
           lang,
-          'Proposed refund guarantee: your money is held until the tour starts.\n• 14+ days before: full refund\n• 13–4 days before: 50%\n• Under 4 days: no refund\n• Road closure or severe weather: free reschedule',
+          'Proposed refund guarantee: your money is held until the tour starts.\n• 14+ days before: full refund\n• 13-4 days before: 50%\n• Under 4 days: no refund\n• Road closure or severe weather: free reschedule',
           '退款保障（提案）：您的款项在行程开始前托管。\n• 出发前14天以上：全额退款\n• 出发前13至4天：退款50%\n• 不足4天：不予退款\n• 道路封闭或恶劣天气：免费改期',
         ),
         lang,
@@ -151,8 +151,8 @@ export function answer(input: string, uiLang: Lang): BotAnswer {
       return {
         text: A(
           lang,
-          'Booking takes 3 steps: 1) choose the tour, date (at least 7 days ahead) and number of travelers; 2) enter the lead traveler’s name, email and country — no passport needed; 3) choose a payment method. You see what is included before you pay.',
-          '预订只需三步：1）选择线路、日期（至少提前7天）和人数；2）填写主要联系人的姓名、邮箱和国家——无需护照；3）选择支付方式。付款前您可以看到所有包含内容。',
+          'Booking takes 3 steps: 1) choose the tour, date (at least 7 days ahead) and number of travelers; 2) enter the lead traveler’s name, email and country (no passport needed); 3) choose a payment method. You see what is included before you pay.',
+          '预订只需三步：1）选择线路、日期（至少提前7天）和人数；2）填写主要联系人的姓名、邮箱和国家（无需护照）；3）选择支付方式。付款前您可以看到所有包含内容。',
         ),
         lang,
         actions: [{ kind: 'book', id: tour?.id }, { kind: 'plan' }],
@@ -163,8 +163,8 @@ export function answer(input: string, uiLang: Lang): BotAnswer {
       return {
         text: A(
           lang,
-          'Every tour page splits costs into four groups: Included, Optional extra, Not included and Not yet confirmed. Which tour are you interested in — Charyn, Kolsai, Turkestan or Burabay?',
-          '每条线路页面都把费用分为四组：已包含、可选附加、不包含、尚未确认。您对哪条线路感兴趣——查伦、科尔赛、突厥斯坦还是布拉拜？',
+          'Every tour page splits costs into four groups: Included, Optional extra, Not included and Not yet confirmed. Which tour are you interested in: Charyn, Kolsai, Turkestan or Burabay?',
+          '每条线路页面都把费用分为四组：已包含、可选附加、不包含、尚未确认。您对哪条线路感兴趣：查伦、科尔赛、突厥斯坦还是布拉拜？',
         ),
         lang,
         actions: tours.map((t) => ({ kind: 'tour', id: t.id }) as ChatAction),
@@ -186,8 +186,8 @@ export function answer(input: string, uiLang: Lang): BotAnswer {
       return {
         text: A(
           lang,
-          'You can choose 中文 as your guide language when booking. Chinese-speaking guide availability is not yet confirmed for every date — the company confirms in writing before you pay. The audio guide is available in Chinese on every tour.',
-          '预订时可选择"中文"作为导游语言。中文导游并非每个日期都已确认——公司会在您付款前书面确认。每条线路都提供中文语音导览。',
+          'You can choose 中文 as your guide language when booking. Chinese-speaking guide availability is not yet confirmed for every date. The company confirms in writing before you pay. The audio guide is available in Chinese on every tour.',
+          '预订时可选择"中文"作为导游语言。中文导游并非每个日期都已确认，公司会在您付款前书面确认。每条线路都提供中文语音导览。',
         ),
         lang,
         tag: 'confirm',
@@ -222,8 +222,8 @@ export function answer(input: string, uiLang: Lang): BotAnswer {
       return {
         text: A(
           lang,
-          'Here is what I can say honestly. Case facts: Saryarqa Routes was founded in 2020 in Astana, has 9 full-time staff and ~25 freelance guides, and served 3,400 travelers in 2025. Business registration, operator licence and insurance documents still need to be provided by the company — I won’t claim them before that. You can also book a 5-minute video call with your guide before paying.',
-          '我如实告诉您。案例事实：Saryarqa Routes 于2020年在阿斯塔纳成立，有9名全职员工和约25名兼职导游，2025年接待了3400名旅客。企业注册、经营许可和保险文件仍需公司提供——在此之前我不会声称已具备。您还可以在付款前与导游预约5分钟视频通话。',
+          'Here is what I can say honestly. Case facts: Saryarqa Routes was founded in 2020 in Astana, has 9 full-time staff and ~25 freelance guides, and served 3,400 travelers in 2025. Business registration, operator licence and insurance documents still need to be provided by the company. I won’t claim them before that. You can also book a 5-minute video call with your guide before paying.',
+          '我如实告诉您。案例事实：Saryarqa Routes 于2020年在阿斯塔纳成立，有9名全职员工和约25名兼职导游，2025年接待了3400名旅客。企业注册、经营许可和保险文件仍需公司提供，在此之前我不会声称已具备。您还可以在付款前与导游预约5分钟视频通话。',
         ),
         lang,
         tag: 'case',
@@ -248,7 +248,7 @@ export function answer(input: string, uiLang: Lang): BotAnswer {
         text:
           A(lang, 'Demo prices per person:\n', '演示价格（每人）：\n') +
           bullet(tours.map((t) => `${t.name[lang]} · ${t.days}${A(lang, ' days', '天')} · ${fmt(t.priceKzt)} KZT`)) +
-          A(lang, '\nI can’t quote live prices or discounts — the final price is shown before payment.', '\n我无法报实时价格或折扣——最终价格将在付款前显示。'),
+          A(lang, '\nI can’t quote live prices or discounts. The final price is shown before payment.', '\n我无法报实时价格或折扣，最终价格将在付款前显示。'),
         lang,
         tag: 'demo',
         actions: [{ kind: 'book' }],

@@ -57,7 +57,7 @@ export default function Postcard() {
       <PageHead loop={5} title={t(ui.postcard.title)} sub={t(ui.postcard.sub)} />
 
       <div className="container-x mt-6 grid gap-8 lg:grid-cols-[1fr_440px]">
-        <form className="card h-fit space-y-5 p-4 sm:p-5" onSubmit={(e) => e.preventDefault()}>
+        <form className="card h-fit min-w-0 space-y-5 p-4 sm:p-5" onSubmit={(e) => e.preventDefault()}>
           <fieldset>
             <legend className="label">{t(ui.postcard.destination)}</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -135,8 +135,8 @@ export default function Postcard() {
               <Icon name="heart" size={15} className="text-gold" /> {t(ui.postcard.friendOffer)} <Tag kind="proposal" />
               <Tag kind="demo" extra={t({ en: 'example domain', zh: '示例域名' })} />
             </div>
-            <button type="button" className="btn-ghost btn-sm mt-3" onClick={() => navigate(`/?ref=${encodeURIComponent(refCode)}`)}>
-              <Icon name="refresh" size={14} /> {t(ui.postcard.friendView)} → 01 {t(ui.loop.steps[0].label)}
+            <button type="button" className="btn-ghost btn-sm mt-3 !whitespace-normal text-left" onClick={() => navigate(`/?ref=${encodeURIComponent(refCode)}`)}>
+              <Icon name="refresh" size={14} /> {t(ui.postcard.friendView)}
             </button>
           </div>
         </form>
@@ -159,7 +159,7 @@ export default function Postcard() {
                   ) : (
                     <Media tour={dest} eager />
                   )}
-                  <div className="absolute left-3 top-3 rounded-full bg-[#12213f]/85 px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#f0ebde]">
+                  <div className="absolute left-3 top-3 rounded-full bg-[#12213f]/85 px-3 py-1 text-xs font-semibold text-[#f0ebde]">
                     Kazakhstan · 哈萨克斯坦
                   </div>
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-4 pb-3 pt-10 text-white">
@@ -170,7 +170,7 @@ export default function Postcard() {
                 <div className="grid grid-cols-[1fr_auto] gap-3 p-4">
                   <div className="min-w-0">
                     <p className="font-display text-lg font-bold leading-snug">"{msg || t(ui.postcard.defaultMsg)}"</p>
-                    <p className="mt-1 text-sm">— {name || 'Li Wei'}</p>
+                    <p className="mt-1 text-sm">- {name || 'Li Wei'}</p>
                     <div className="mt-3 flex items-center gap-2 text-[11px] font-semibold text-[#0e807a]">
                       <Icon name="refresh" size={13} /> {t(ui.postcard.scan)}
                     </div>
@@ -182,7 +182,7 @@ export default function Postcard() {
                     <div className="h-[84px] w-[84px] rounded-md border border-[#12213f]/15 p-1">
                       <QR seed={refCode} />
                     </div>
-                    <span className="text-center font-mono text-[8.5px] uppercase leading-tight text-[#5c6270]">{t(ui.postcard.notScannable)}</span>
+                    <span className="text-center text-[8.5px] leading-tight text-[#5c6270]">{t(ui.postcard.notScannable)}</span>
                   </div>
                 </div>
               </div>

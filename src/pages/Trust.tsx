@@ -82,7 +82,7 @@ function GuideVideo({ guide }: { guide: Guide }) {
           )}
         </div>
         {playing && (
-          <button type="button" onClick={() => setPlaying(false)} className="absolute right-3 top-3 z-10 rounded-full bg-night/70 px-3 py-1.5 text-xs font-semibold">
+          <button type="button" onClick={() => setPlaying(false)} className="absolute right-3 top-3 z-10 rounded-[8px] bg-night/70 px-3 py-1.5 text-xs font-semibold">
             <Icon name="pause" size={14} className="mr-1 inline" /> {t(ui.trust.pause)}
           </button>
         )}
@@ -170,15 +170,15 @@ export default function Trust() {
             </div>
             <dl className="grid gap-2 sm:grid-cols-3">
               <div>
-                <dt className="font-mono text-[10.5px] uppercase tracking-wide text-muted">{t(ui.trust.languages)}</dt>
+                <dt className="text-xs text-muted">{t(ui.trust.languages)}</dt>
                 <dd>{guide.languages.map((l) => t(l)).join(', ')}</dd>
               </div>
               <div>
-                <dt className="font-mono text-[10.5px] uppercase tracking-wide text-muted">{t(ui.trust.specialties)}</dt>
+                <dt className="text-xs text-muted">{t(ui.trust.specialties)}</dt>
                 <dd>{guide.specialties.map((l) => t(l)).join(', ')}</dd>
               </div>
               <div>
-                <dt className="font-mono text-[10.5px] uppercase tracking-wide text-muted">{t(ui.trust.based)}</dt>
+                <dt className="text-xs text-muted">{t(ui.trust.based)}</dt>
                 <dd>{t(guide.base)}</dd>
               </div>
             </dl>
@@ -266,13 +266,13 @@ export default function Trust() {
 
         <div className="space-y-6">
           <section className="card overflow-hidden" aria-labelledby="refund">
-            <div className="bg-night p-4 text-nightInk sm:p-5">
+            <div className="border-b border-line p-4 sm:p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <Icon name="shieldCheck" className="text-teal" />
                 <h2 id="refund" className="text-xl font-bold">{t(ui.trust.refund)}</h2>
-                <Tag kind="proposal" className="!border-gold/60" />
+                <Tag kind="proposal" />
               </div>
-              <p className="mt-1 text-sm text-nightInk/80">{t(ui.trust.refundSub)}</p>
+              <p className="mt-1 text-sm text-muted">{t(ui.trust.refundSub)}</p>
             </div>
             <ul className="space-y-2.5 p-4 text-sm sm:p-5">
               {[

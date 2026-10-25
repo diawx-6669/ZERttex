@@ -49,7 +49,7 @@ export default function Plan() {
   return (
     <>
       <PageHead loop={1} title={t(ui.plan.title)} sub={t(ui.plan.sub)}>
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-dashed border-teal px-2.5 py-1 font-mono text-[11px] font-semibold uppercase tracking-wide text-teal">
+        <span className="inline-flex items-center gap-1.5 rounded border border-dashed border-teal/60 px-2 py-0.5 text-sm font-medium text-teal">
           <Icon name="info" size={13} /> {t(ui.plan.rules)}
         </span>
       </PageHead>
@@ -193,13 +193,13 @@ export default function Plan() {
                     <li key={d.day} className="relative">
                       <span className={`absolute -left-[29px] top-4 h-4 w-4 rounded-full border-4 border-bg ${k.dot}`} aria-hidden />
                       <div className="card p-4">
-                        <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-muted">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
                           <span className="font-semibold text-ink">
                             {lang === 'zh' ? `第${d.day}天` : `Day ${d.day}`}
                           </span>
                           <span>· {fmtDate(d.date, lang)}</span>
                           <span>· {t(hubName[d.city])}</span>
-                          <span className="rounded-full bg-surface2 px-2 py-0.5 text-ink">{t(k.label)}</span>
+                          <span className="rounded bg-surface2 px-1.5 py-0.5 text-ink">{t(k.label)}</span>
                         </div>
                         <div className="mt-1 font-semibold">{t(d.title)}</div>
                         <ul className="mt-1 space-y-0.5 text-sm text-muted">
@@ -214,7 +214,7 @@ export default function Plan() {
               </ol>
 
               <div className="card overflow-hidden">
-                <div className="bg-night px-5 py-3 font-semibold text-nightInk">{t(ui.plan.total)}</div>
+                <div className="border-b border-line px-5 py-3 font-semibold">{t(ui.plan.total)}</div>
                 <dl className="divide-y divide-line px-5 text-sm">
                   <div className="flex flex-wrap items-center justify-between gap-2 py-3">
                     <dt className="flex flex-wrap items-center gap-2">{t(ui.plan.guided)} <Tag kind="demo" /></dt>

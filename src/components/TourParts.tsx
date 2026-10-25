@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { interestText, ui } from '../data/i18n';
+import { ui } from '../data/i18n';
 import { hubName } from '../data/tours';
 import type { InclusionItem, Tour } from '../data/types';
 import { indicative, kzt } from '../lib/format';
@@ -10,53 +10,34 @@ import { Icon } from './Icon';
 import { Media } from './Media';
 import { Tag } from './Tag';
 
-export function TourCard({ tour }: { tour: Tour }) {
+export function TourCard({ tour, featured = false }: { tour: Tour; featured?: boolean }) {
   const { t, lang } = useApp();
   return (
-    <article className="card group flex flex-col overflow-hidden">
-      <a href={href(`/tour/${tour.id}`)} className="grain relative block aspect-[16/10] overflow-hidden" tabIndex={-1} aria-hidden>
-        <div className="h-full w-full transition duration-700 group-hover:scale-[1.05]">
-          <Media tour={tour.id} credit={false} />
+    <article className="group relative flex h-full flex-col">
+      <div className={`grain relative overflow-hidden rounded-2xl bg-surface2 ${featured ? 'aspect-[4/3] lg:aspect-auto lg:flex-1' : 'aspect-[4/3]'}`}>
+        <div className="h-full w-full transition duration-700 ease-out group-hover:scale-[1.04]">
+          <Media tour={tour.id} credit={false} eager={featured} />
         </div>
-        <span className="absolute left-3 top-3 z-[2] rounded-full bg-night/80 px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-wide text-nightInk backdrop-blur">
-          {tour.days} {t(ui.tour.days)}
-        </span>
-        <span className="absolute right-3 top-3 z-[2] flex gap-1">
-          {tour.bestFor.slice(0, 2).map((b) => (
-            <span key={b} className="rounded-full bg-white/85 px-2 py-0.5 text-[10.5px] font-semibold text-night">
-              {t(interestText[b])}
-            </span>
-          ))}
-        </span>
-      </a>
-      <div className="flex flex-1 flex-col gap-3 p-5">
-        <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-muted">
-          <span>
-            {tour.days} {t(ui.tour.days)}
-          </span>
-          <span aria-hidden>·</span>
-          <span>
-            {t(ui.tour.starts)} {t(hubName[tour.hub])}
-          </span>
+      </div>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h3 className={`font-bold ${featured ? 'text-2xl sm:text-3xl' : 'text-xl'}`}>
+            <a href={href(`/tour/${tour.id}`)} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none group-hover:text-teal">
+              {t(tour.name)}
+            </a>
+          </h3>
+          <p className="mt-1 text-[15px] text-muted">
+            {tour.days} {t(ui.tour.days)}, {t({ en: 'from', zh: '出发地' })} {t(hubName[tour.hub])}
+          </p>
+          {featured && <p className="mt-3 max-w-[48ch] text-[15px]">{t(tour.tagline)}</p>}
         </div>
-        <h3 className="text-xl font-bold">
-          <a href={href(`/tour/${tour.id}`)} className="hover:text-teal">
-            {t(tour.name)}
-          </a>
-        </h3>
-        <p className="text-sm text-muted">{t(tour.tagline)}</p>
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-3 pt-2">
-          <div>
-            <div className="num whitespace-nowrap text-lg font-semibold">{kzt(tour.priceKzt)}</div>
-            <div className="flex flex-wrap items-center gap-1.5 text-xs text-muted">
-              {t(ui.tour.perPerson)} · <span className="num">{indicative(tour.priceKzt, lang)}</span>
-              <Tag kind="demo" />
-            </div>
-          </div>
-          <a href={href(`/tour/${tour.id}`)} className="btn-dark btn-sm shrink-0">
-            {t(ui.tour.view)} <Icon name="arrow" size={14} />
-          </a>
+        <div className="shrink-0 text-right">
+          <div className="num whitespace-nowrap font-semibold">{kzt(tour.priceKzt)}</div>
+          <div className="num text-sm text-muted">{indicative(tour.priceKzt, lang)}</div>
         </div>
+      </div>
+      <div className="mt-2">
+        <Tag kind="demo" />
       </div>
     </article>
   );
@@ -221,12 +202,12 @@ export function AudioGuide({ tour }: { tour: Tour }) {
 
   return (
     <div className="card overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-night px-4 py-3 text-nightInk sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5">
         <div className="flex items-center gap-2">
           <Icon name="volume" />
           <span className="font-semibold">{t(ui.audio.title)}</span>
         </div>
-        <div role="group" aria-label={t(ui.audio.voiceLang)} className="flex rounded-full bg-white/10 p-0.5 text-xs">
+        <div role="group" aria-label={t(ui.audio.voiceLang)} className="flex rounded-[10px] border border-line p-0.5 text-sm">
           {(['zh', 'en'] as const).map((v) => (
             <button
               key={v}
@@ -238,7 +219,7 @@ export function AudioGuide({ tour }: { tour: Tour }) {
                 setFallback(null);
                 setVoice(v);
               }}
-              className={`min-h-[32px] rounded-full px-3 font-semibold ${voice === v ? 'bg-teal text-tealInk' : 'text-nightInk/80'}`}
+              className={`min-h-[32px] rounded-[8px] px-3 font-semibold ${voice === v ? 'bg-ink text-bg' : 'text-muted hover:text-ink'}`}
             >
               {v === 'zh' ? '中文' : 'English'}
             </button>
@@ -258,7 +239,7 @@ export function AudioGuide({ tour }: { tour: Tour }) {
                 <Icon name={playing === i ? 'stop' : 'play'} />
               </button>
               <div className="min-w-0 flex-1">
-                <div className="font-mono text-[11px] uppercase tracking-wide text-muted">Stop {i + 1}</div>
+                <div className="text-xs text-muted">Stop {i + 1}</div>
                 <div className="font-semibold">{a.title[voice]}</div>
               </div>
               {playing === i && <span className="text-xs text-teal">{t(ui.audio.playing)}</span>}

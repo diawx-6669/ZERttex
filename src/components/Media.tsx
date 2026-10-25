@@ -14,7 +14,7 @@ export function Credit({ photo, className = '' }: { photo: Photo; className?: st
       rel="noreferrer"
       onClick={(e) => e.stopPropagation()}
       className={`pointer-events-auto max-w-[90%] truncate rounded bg-black/45 px-1.5 py-0.5 text-[10px] leading-tight text-white/90 hover:bg-black/70 ${className}`}
-      title={`${photo.credit.title ?? 'Photo'} — ${photo.credit.author}, ${photo.credit.license}`}
+      title={`${photo.credit.title ?? 'Photo'}, ${photo.credit.author}, ${photo.credit.license}`}
     >
       © {photo.credit.author} · {photo.credit.license}
     </a>

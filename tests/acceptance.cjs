@@ -39,7 +39,7 @@ const ok = (name, cond, info = '') => {
   await page.getByRole('link', { name: /Explore tours/ }).first().click();
   await page.waitForTimeout(200);
   ok('Explore tours → #/tours', page.url().endsWith('#/tours'));
-  await page.locator('a[href="#/tour/kolsai"]').filter({ hasText: 'View tour' }).click();
+  await page.locator('a[href="#/tour/kolsai"]').first().click();
   await page.waitForTimeout(200);
   ok('Kolsai detail opened', page.url().endsWith('#/tour/kolsai'));
   await page.getByRole('button', { name: 'Open all' }).click();
@@ -277,7 +277,7 @@ const ok = (name, cond, info = '') => {
   await dp.goto(URL + '#/');
   await dp.waitForTimeout(800);
   const bg = await dp.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  ok('Dark mode applies dark background', bg === 'rgb(11, 18, 33)', bg);
+  ok('Dark mode applies dark background', bg === 'rgb(14, 17, 22)', bg);
   await dp.screenshot({ path: path.join(SHOTS, '16-dark-home.png') });
   await dp.goto(URL + '#/book?tour=kolsai');
   await dp.waitForTimeout(300);

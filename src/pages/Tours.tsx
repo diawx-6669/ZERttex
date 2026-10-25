@@ -54,14 +54,14 @@ export default function Tours() {
       <div className="container-x mt-6">
         <div className="card space-y-3 p-3 sm:p-4">
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar" role="group" aria-label={t(ui.tour.starts)}>
-            <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted">{t(ui.tour.starts)}</span>
+            <span className="shrink-0 text-xs text-muted">{t(ui.tour.starts)}</span>
             <Chip on={hub === 'all'} onClick={() => setHub('all')}>{t({ en: 'Anywhere', zh: '全部' })}</Chip>
             {(['almaty', 'astana', 'turkestan'] as Hub[]).map((h) => (
               <Chip key={h} on={hub === h} onClick={() => setHub(h)}>{t(hubName[h])}</Chip>
             ))}
           </div>
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar" role="group" aria-label={t({ en: 'Interest', zh: '兴趣' })}>
-            <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted">{t({ en: 'Interest', zh: '兴趣' })}</span>
+            <span className="shrink-0 text-xs text-muted">{t({ en: 'Interest', zh: '兴趣' })}</span>
             <Chip on={interest === 'all'} onClick={() => setInterest('all')}>{t({ en: 'All', zh: '全部' })}</Chip>
             {(Object.keys(interestText) as Interest[]).map((i) => (
               <Chip key={i} on={interest === i} onClick={() => setInterest(i)}>{t(interestText[i])}</Chip>
@@ -69,7 +69,7 @@ export default function Tours() {
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar" role="group" aria-label={t({ en: 'Length', zh: '天数' })}>
-              <span className="shrink-0 font-mono text-[11px] uppercase tracking-wide text-muted">{t({ en: 'Length', zh: '天数' })}</span>
+              <span className="shrink-0 text-xs text-muted">{t({ en: 'Length', zh: '天数' })}</span>
               <Chip on={len === 'all'} onClick={() => setLen('all')}>{t({ en: 'Any', zh: '不限' })}</Chip>
               <Chip on={len === 'short'} onClick={() => setLen('short')}>{t({ en: '2 days', zh: '2天' })}</Chip>
               <Chip on={len === 'long'} onClick={() => setLen('long')}>{t({ en: '3+ days', zh: '3天以上' })}</Chip>

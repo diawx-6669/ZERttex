@@ -1,14 +1,12 @@
 import { Icon } from '../components/Icon';
 import { LoopStrip, Section } from '../components/Layout';
+import { Media } from '../components/Media';
 import { RouteMap } from '../components/RouteMap';
-import { HeroLandscape } from '../components/Scene';
-import { CountUp, DestinationDeck } from '../components/Showcase';
 import { Tag } from '../components/Tag';
 import { TourCard } from '../components/TourParts';
 import { complaints, evidence, methodNote } from '../data/facts';
 import { ui } from '../data/i18n';
-import { hubName, tours } from '../data/tours';
-import { kzt } from '../lib/format';
+import { tours } from '../data/tours';
 import { href } from '../lib/router';
 import { useApp } from '../state';
 
@@ -16,198 +14,197 @@ export default function Home({ query }: { query: URLSearchParams }) {
   const { t } = useApp();
   const ref = query.get('ref');
 
-  const stats = [
-    { v: <CountUp to={2020} plain />, l: { en: 'Founded in Astana', zh: '成立于阿斯塔纳' } },
-    { v: <CountUp to={3400} />, l: { en: 'Travelers in 2025', zh: '2025年接待旅客' } },
-    { v: <CountUp to={25} prefix="~" />, l: { en: 'Freelance guides', zh: '兼职导游' } },
-    { v: <CountUp to={4} />, l: { en: 'Signature destinations', zh: '精品目的地' } },
+  const facts = [
+    { v: '2020', l: { en: 'Founded in Astana', zh: '成立于阿斯塔纳' } },
+    { v: '3,400', l: { en: 'Travelers in 2025', zh: '2025年接待旅客' } },
+    { v: '~25', l: { en: 'Freelance guides', zh: '兼职导游' } },
+    { v: '4', l: { en: 'Destinations', zh: '目的地' } },
   ];
 
   return (
     <>
       {ref && (
-        <div className="border-b border-gold/40 bg-gold/15">
+        <div className="border-b border-line bg-surface">
           <div className="container-x flex flex-wrap items-center gap-2 py-3 text-sm">
             <Icon name="heart" className="text-gold" />
-            <span className="font-mono text-xs font-semibold">{ref}</span>
+            <span className="font-semibold">{ref}</span>
             <span>{t(ui.home.referral)}</span>
             <Tag kind="proposal" />
           </div>
         </div>
       )}
 
-      <section className="relative isolate overflow-hidden bg-night text-nightInk">
-        <div className="absolute inset-0 -z-10">
-          <HeroLandscape />
-          <div className="absolute inset-0 bg-gradient-to-r from-night via-night/80 to-night/20" />
-          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-night/70 to-transparent" />
-        </div>
-        <div className="container-x grid min-h-[580px] items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.15fr_1fr]">
-          <div className="rise max-w-2xl space-y-6">
-            <p className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-gold">
-              <span className="h-1.5 w-1.5 rounded-full bg-gold" /> {t(ui.home.eyebrow)}
-            </p>
-            <h1 className="text-[2.6rem] font-extrabold leading-[1.02] sm:text-6xl">
-              {t(ui.home.title)}
-            </h1>
-            <p className="max-w-xl text-lg text-nightInk/85">{t(ui.home.lead)}</p>
-            <div className="flex flex-wrap gap-3 pt-1">
-              <a href={href('/tours')} className="btn-primary px-6 text-base shadow-lg shadow-teal/30">
-                {t(ui.home.ctaTours)} <Icon name="arrow" />
-              </a>
-              <a href={href('/plan')} className="btn border border-nightInk/30 bg-white/5 px-6 text-base text-nightInk backdrop-blur hover:bg-white/15">
-                <Icon name="route" /> {t(ui.home.ctaPlan)}
-              </a>
-            </div>
-            <ul className="grid max-w-xl grid-cols-2 gap-x-5 gap-y-2.5 pt-2 text-sm text-nightInk/85 sm:flex sm:flex-wrap">
-              <li className="flex items-center gap-1.5"><Icon name="globe" size={16} className="text-teal" /> EN · 中文</li>
-              <li className="flex items-center gap-1.5"><Icon name="card" size={16} className="text-teal" /> {t({ en: 'Foreign cards', zh: '支持外卡' })}</li>
-              <li className="flex items-center gap-1.5"><Icon name="video" size={16} className="text-teal" /> {t({ en: 'Meet your guide first', zh: '先见导游再付款' })}</li>
-              <li className="flex flex-wrap items-center gap-1.5"><Icon name="shield" size={16} className="text-teal" /> {t({ en: 'Refund guarantee', zh: '退款保障' })} <Tag kind="proposal" className="!border-gold/60" /></li>
-            </ul>
+      {/* Hero: copy left, photo collage right */}
+      <section className="container-x grid items-center gap-10 pb-8 pt-10 sm:pt-14 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-[1fr_1.05fr] lg:gap-14 lg:py-12">
+        <div className="rise max-w-xl">
+          <h1 className="text-[2.6rem] font-extrabold leading-[1.02] sm:text-6xl" style={{ fontStretch: '115%' }}>
+            {t(ui.home.title)}
+          </h1>
+          <p className="mt-5 max-w-[46ch] text-lg text-muted sm:text-xl">{t(ui.home.lead)}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <a href={href('/tours')} className="btn-primary px-6 text-base">
+              {t(ui.home.ctaTours)} <Icon name="arrow" />
+            </a>
+            <a href={href('/plan')} className="btn-ghost px-6 text-base">
+              {t(ui.home.ctaPlan)}
+            </a>
           </div>
-          <div className="hidden pb-10 lg:block">
-            <DestinationDeck />
+        </div>
+
+        <div className="relative">
+          <figure>
+            <div className="grain relative aspect-[4/5] overflow-hidden rounded-2xl bg-surface2 sm:aspect-[5/4] lg:aspect-[4/5]">
+              <div className="h-full w-full">
+                <Media tour="kolsai" eager credit />
+              </div>
+            </div>
+            <figcaption className="mt-3 text-sm text-muted">
+              {t({ en: 'Kolsai Lakes, three days from Almaty.', zh: '科尔赛湖，从阿拉木图出发三天。' })}
+            </figcaption>
+          </figure>
+          <div className="grain absolute -left-6 bottom-16 hidden aspect-square w-40 overflow-hidden rounded-2xl border-[5px] border-bg bg-surface2 shadow-card md:block xl:-left-14 xl:w-48">
+            <Media tour="turkestan" credit={false} />
           </div>
         </div>
       </section>
 
-      <div className="container-x relative z-10 -mt-8">
-        <dl className="grid grid-cols-2 overflow-hidden rounded-3xl border border-line bg-surface shadow-card sm:grid-cols-4">
-          {stats.map((s, i) => (
-            <div key={i} className={`p-4 sm:p-6 ${i % 2 ? 'border-l border-line' : ''} ${i > 1 ? 'border-t border-line sm:border-t-0' : ''} ${i === 2 ? 'sm:border-l' : ''}`}>
-              <dd className="font-display text-3xl font-extrabold text-ink sm:text-4xl">{s.v}</dd>
-              <dt className="mt-1 text-sm text-muted">{t(s.l)}</dt>
+      {/* Case facts, plain numbers */}
+      <section className="border-y border-line" aria-label={t({ en: 'About the company', zh: '关于公司' })}>
+        <div className="container-x grid grid-cols-2 sm:grid-cols-4">
+          {facts.map((f, i) => (
+            <div
+              key={i}
+              className={`py-6 sm:py-8 ${i % 2 ? 'border-l border-line pl-5' : 'pr-5'} ${i > 1 ? 'border-t border-line sm:border-t-0' : ''} ${i === 2 ? 'sm:border-l sm:pl-8' : ''} ${i > 0 ? 'sm:pl-8' : ''}`}
+            >
+              <div className="num font-display text-4xl font-bold sm:text-5xl" style={{ fontStretch: '112%' }}>
+                {f.v}
+              </div>
+              <div className="mt-1 text-[15px] text-muted">{t(f.l)}</div>
             </div>
           ))}
-        </dl>
-        <div className="mt-2 flex justify-end"><Tag kind="case" /></div>
-      </div>
+        </div>
+        <div className="container-x -mt-3 flex justify-end pb-3">
+          <Tag kind="case" />
+        </div>
+      </section>
 
-      <Section title={t(ui.loop.title)} sub={t(ui.loop.sub)}>
+      <Section title={t(ui.loop.title)}>
         <LoopStrip />
       </Section>
 
+      {/* Complaints as an editorial list */}
       <Section title={t(ui.home.complaintsTitle)} sub={t(ui.home.complaintsSub)}>
-        <div className="grid gap-4 md:grid-cols-2">
+        <ol className="border-b border-line">
           {complaints.map((c, i) => (
-            <a key={i} href={href(c.route)} className="card group grid gap-4 p-5 transition hover:-translate-y-0.5 hover:border-teal sm:grid-cols-[1fr_auto_1.2fr] sm:items-center">
-              <div>
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <span className="eyebrow">{t(ui.home.guestSaid)}</span>
-                  <Tag kind="case" />
+            <li key={i} className="border-t border-line">
+              <a href={href(c.route)} className="group grid gap-3 py-7 sm:grid-cols-[1.1fr_1fr_auto] sm:items-baseline sm:gap-10">
+                <p className="font-display text-2xl font-semibold leading-snug sm:text-[1.7rem]">{t(c.quote)}</p>
+                <div>
+                  <p className="font-semibold">{t(c.feature)}</p>
+                  <p className="mt-1 text-muted">{t(c.answer)}</p>
                 </div>
-                <p className="font-display text-lg font-semibold leading-snug">{t(c.quote)}</p>
-              </div>
-              <span className="hidden h-10 w-10 place-items-center rounded-full bg-teal/10 text-teal transition group-hover:bg-teal group-hover:text-tealInk sm:grid">
-                <Icon name="arrow" size={18} />
-              </span>
-              <div className="border-t border-line pt-4 sm:border-l sm:border-t-0 sm:pl-4 sm:pt-0">
-                <span className="eyebrow !text-teal">{t(ui.home.weBuilt)}</span>
-                <p className="mt-1 font-semibold">{t(c.feature)}</p>
-                <p className="mt-1 text-sm text-muted">{t(c.answer)}</p>
-                <span className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-teal group-hover:underline">
-                  {t(ui.home.open)} <Icon name="arrow" size={14} />
-                </span>
-              </div>
-            </a>
+                <Icon name="arrow" size={22} className="hidden text-muted transition group-hover:translate-x-1 group-hover:text-teal sm:block" />
+              </a>
+            </li>
           ))}
-        </div>
+        </ol>
+        <p className="mt-3 text-sm text-muted">
+          {t({ en: 'Quotes from foreign guests, as given in the case.', zh: '外国游客原话，摘自案例。' })} <Tag kind="case" />
+        </p>
       </Section>
 
+      {/* Tours: one featured, three supporting */}
       <Section
         title={t(ui.home.toursTitle)}
-        sub={t(ui.home.toursSub)}
         right={
-          <a href={href('/tours')} className="btn-ghost btn-sm">
-            {t(ui.tour.allTours)} <Icon name="arrow" size={14} />
+          <a href={href('/tours')} className="inline-flex items-center gap-1.5 font-semibold text-teal hover:underline">
+            {t(ui.tour.allTours)} <Icon name="arrow" size={16} />
           </a>
         }
       >
-        <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 no-scrollbar sm:mx-0 sm:grid sm:grid-cols-2 sm:gap-5 sm:overflow-visible sm:px-0 lg:grid-cols-4">
-          {tours.map((tour) => (
-            <div key={tour.id} className="w-[82%] shrink-0 snap-start sm:w-auto">
-              <TourCard tour={tour} />
-            </div>
+        <div className="grid gap-x-6 gap-y-12 lg:grid-cols-3">
+          <div className="lg:col-span-2 lg:row-span-2">
+            <TourCard tour={tours[1]} featured />
+          </div>
+          {[tours[0], tours[2]].map((tour) => (
+            <TourCard key={tour.id} tour={tour} />
           ))}
-        </div>
-      </Section>
-
-      <Section title={t({ en: 'Where we go', zh: '我们去哪里' })} sub={t({ en: 'Tap a pin. Three start cities, four landscapes, one booking.', zh: '点击地图上的标记。三个出发城市，四种风景，一次预订。' })}>
-        <div className="grid items-start gap-6 lg:grid-cols-[1fr_1fr]">
-          <RouteMap className="mx-auto w-full max-w-xl" />
-          <div className="space-y-3">
-            {tours.map((tour) => (
-              <a key={tour.id} href={href(`/tour/${tour.id}`)} className="card group flex items-center gap-4 p-4 transition hover:border-teal">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-teal/10 text-teal group-hover:bg-teal group-hover:text-tealInk">
-                  <Icon name="pin" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="font-semibold">{t(tour.name)}</div>
-                  <div className="text-sm text-muted">
-                    {t(ui.tour.starts)} {t(hubName[tour.hub])} · {tour.days} {t(ui.tour.days)} · <span className="num">{kzt(tour.priceKzt)}</span>
-                  </div>
-                </div>
-                <Icon name="chevron" className="text-muted group-hover:text-teal" />
+          <div className="lg:col-span-3 lg:grid lg:grid-cols-3 lg:gap-6">
+            <TourCard tour={tours[3]} />
+            <div className="mt-10 rounded-2xl bg-surface2 p-6 lg:col-span-2 lg:mt-0 lg:flex lg:items-center lg:justify-between lg:gap-8 lg:p-10">
+              <div>
+                <h3 className="text-2xl font-bold">{t({ en: 'Not sure which one?', zh: '不知道选哪条？' })}</h3>
+                <p className="mt-2 max-w-[44ch] text-muted">
+                  {t({ en: 'Tell the trip builder your days and interests. It fits the tours, transfers and city days for you.', zh: '告诉行程规划你的天数和兴趣，它会为你安排线路、交通和城市游。' })}
+                </p>
+              </div>
+              <a href={href('/plan')} className="btn-dark mt-5 lg:mt-0">
+                {t(ui.home.ctaPlan)} <Icon name="arrow" />
               </a>
-            ))}
-            <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-ok/40 bg-ok/10 p-4 text-sm">
-              <Icon name="globe" className="text-ok" />
-              <span>
-                {t({ en: 'Visa-free for citizens of China: up to 30 days per visit, max 90 days in 180.', zh: '中国公民免签：每次最多停留30天，每180天累计不超过90天。' })}
-              </span>
-              <Tag kind="verified" />
             </div>
           </div>
         </div>
       </Section>
 
-      <Section title={t(ui.home.marketTitle)} sub={t(ui.home.marketSub)}>
-        <div className="grid gap-4 md:grid-cols-3">
-          {evidence.map((e) => (
-            <figure key={e.url} className="card flex flex-col gap-3 p-5">
+      {/* Map with context */}
+      <Section title={t({ en: 'Where the trips go', zh: '线路分布' })}>
+        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
+          <RouteMap className="w-full" />
+          <div className="space-y-6 text-lg">
+            <p>
+              {t({
+                en: 'Three start cities. Canyons and mountain lakes east of Almaty, granite and pine forest near Astana, and the Silk Road heritage of Turkestan in the south.',
+                zh: '三个出发城市：阿拉木图以东的峡谷与高山湖泊，阿斯塔纳附近的花岗岩与松林，以及南部突厥斯坦的丝绸之路遗产。',
+              })}
+            </p>
+            <p className="text-muted">
+              {t({ en: 'Citizens of China can visit visa-free for up to 30 days per visit, max 90 days in 180.', zh: '中国公民可免签入境，每次最多停留30天，每180天累计不超过90天。' })}{' '}
               <Tag kind="verified" />
-              <div className="num font-display text-4xl font-extrabold text-teal">{e.figure}</div>
-              <p className="text-sm">{t(e.text)}</p>
-              <figcaption className="mt-auto border-t border-line pt-3 text-xs text-muted">
-                {t(ui.common.source)}:{' '}
-                <a className="font-semibold text-ink underline underline-offset-2 hover:text-teal" href={e.url} target="_blank" rel="noreferrer">
+            </p>
+            <p className="text-base text-muted">{t({ en: 'Tap a pin on the map to open a tour.', zh: '点击地图上的标记即可查看线路。' })}</p>
+          </div>
+        </div>
+      </Section>
+
+      {/* Evidence: big numbers, no cards */}
+      <Section title={t(ui.home.marketTitle)}>
+        <div className="grid border-t border-line md:grid-cols-[1fr_1fr_1.3fr]">
+          {evidence.map((e, i) => (
+            <figure key={e.url} className={`py-8 md:py-10 ${i > 0 ? 'border-t border-line md:border-l md:border-t-0 md:pl-8' : 'md:pr-8'}`}>
+              <div className="num whitespace-nowrap font-display text-5xl font-bold text-teal xl:text-6xl" style={{ fontStretch: "108%" }}>
+                {e.figure}
+              </div>
+              <p className="mt-4 max-w-[40ch]">{t(e.text)}</p>
+              <figcaption className="mt-4 text-sm text-muted">
+                <a className="underline decoration-line underline-offset-4 hover:text-ink" href={e.url} target="_blank" rel="noreferrer">
                   {e.source}
-                </a>{' '}
-                · {e.date}
+                </a>
+                , {e.date}. <Tag kind="verified" />
               </figcaption>
             </figure>
           ))}
         </div>
-        <p className="mt-4 flex items-start gap-2 rounded-xl border border-warn/40 bg-warn/10 p-3 text-sm">
-          <Icon name="info" className="mt-0.5 text-warn" />
+        <p className="mt-2 flex max-w-3xl items-start gap-2 text-[15px] text-muted">
+          <Icon name="info" className="mt-1 text-warn" />
           {t(methodNote)}
         </p>
       </Section>
 
-      <section className="container-x mt-16 sm:mt-20" data-reveal>
-        <div className="relative overflow-hidden rounded-[2rem] bg-night p-6 text-nightInk sm:p-10">
-          <div className="absolute inset-0 -z-0 opacity-40">
-            <HeroLandscape />
-          </div>
-          <div className="relative z-10 grid gap-6 lg:grid-cols-[1.4fr_1fr] lg:items-center">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Icon name="flag" className="text-gold" />
-                <span className="eyebrow !text-gold">{t(ui.home.goalTitle)}</span>
-                <Tag kind="case" className="!border-gold/50" />
-              </div>
-              <p className="mt-3 font-display text-2xl font-bold leading-snug sm:text-3xl">{t(ui.home.goalText)}</p>
-            </div>
-            <div className="flex flex-wrap gap-3 lg:justify-end">
-              <a href={href('/plan')} className="btn-primary px-6 text-base">
-                <Icon name="route" /> {t(ui.home.ctaPlan)}
-              </a>
-              <a href={href('/impact')} className="btn border border-nightInk/30 bg-white/5 px-6 text-base text-nightInk hover:bg-white/15">
-                {t(ui.nav.impact)} <Icon name="arrow" />
-              </a>
+      {/* Goal */}
+      <section className="container-x mt-20 sm:mt-28" data-reveal>
+        <div className="grid gap-8 rounded-2xl bg-teal/10 p-6 sm:p-12 lg:grid-cols-[1.5fr_auto] lg:items-end">
+          <div>
+            <p className="font-semibold text-teal">{t(ui.home.goalTitle)}</p>
+            <p className="mt-3 font-display text-2xl font-bold leading-snug sm:text-4xl" style={{ fontStretch: '110%' }}>
+              {t(ui.home.goalText)}
+            </p>
+            <div className="mt-4">
+              <Tag kind="case" />
             </div>
           </div>
+          <a href={href('/impact')} className="btn-ghost px-6 text-base">
+            {t({ en: 'See the plan and payback', zh: '查看计划与回本' })} <Icon name="arrow" />
+          </a>
         </div>
       </section>
     </>

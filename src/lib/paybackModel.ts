@@ -1,8 +1,8 @@
 // Payback model for the Impact page. Planning assumptions only.
 //
 // Cash out:
-//   • one-time 12,000,000 KZT spread evenly over months 1–3
-//   • the other 8,000,000 KZT spread evenly over months 1–12
+//   • one-time 12,000,000 KZT spread evenly over months 1-3
+//   • the other 8,000,000 KZT spread evenly over months 1-12
 //   • from month 13: running cost per month (slider)
 // Cash in:
 //   • launch at month 4

@@ -26,7 +26,7 @@ export const gantt: { label: string; start: number; end: number; detail: string 
   { label: 'UX + tour pages', start: 3, end: 4, detail: 'Wireframes, EN/中文 tour pages, design system' },
   { label: 'Booking, inclusions, concierge, trust', start: 5, end: 7, detail: 'Core flow and Trust Center content' },
   { label: 'Trip builder, checkout, weather/reschedule', start: 8, end: 9, detail: 'Hosted checkout sandbox, reschedule workflow' },
-  { label: 'Usability tests + payment-provider checks', start: 10, end: 11, detail: '5–8 test sessions; provider due diligence' },
+  { label: 'Usability tests + payment-provider checks', start: 10, end: 11, detail: '5-8 test sessions; provider due diligence' },
   { label: 'Pilot with real users', start: 12, end: 12, detail: 'Limited launch, measure success metrics' },
 ];
 

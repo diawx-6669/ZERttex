@@ -4,7 +4,7 @@ import type { L } from './types';
 export const caseFacts: { label: string; value: string }[] = [
   { label: 'Company', value: 'Saryarqa Routes, founded 2020 in Astana' },
   { label: 'Team', value: '9 full-time staff, ~25 freelance guides' },
-  { label: 'Products', value: 'Guided trips of 2–7 days to Charyn Canyon, Kolsai Lakes, Turkestan, Burabay' },
+  { label: 'Products', value: 'Guided trips of 2-7 days to Charyn Canyon, Kolsai Lakes, Turkestan, Burabay' },
   { label: 'Travelers in 2025', value: '3,400' },
   { label: 'Revenue in 2025', value: '150,000,000 KZT' },
   { label: 'Average price', value: '44,000 KZT per traveler' },

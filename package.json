@@ -10,9 +10,10 @@
     "typecheck": "tsc -b",
     "test:e2e": "npm run build && node tests/acceptance.cjs",
     "photos": "node scripts/fetch-photos.mjs",
-    "report:docx": "node scripts/build-report-docx.cjs"
+    "report:docx": "node scripts/report-screenshots.cjs && node scripts/build-report-docx.cjs"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
