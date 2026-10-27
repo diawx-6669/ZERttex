@@ -14,7 +14,8 @@ const path = require('path');
 const M = require('./lib/model.cjs');
 
 const ROOT = path.resolve(__dirname, '..');
-const FILES = ['README.md', 'REPORT.md', 'REPORT_NOTES.md', 'PLAN.md'];
+// REPORT.md is the Stage 1 report as submitted (20M plan) and is frozen.
+const FILES = ['README.md', 'REPORT_NOTES.md', 'PLAN.md'];
 
 const n = (x) => Math.round(x).toLocaleString('en-US');
 const mm = (x) => `${x < 0 ? '−' : '+'}${(Math.abs(x) / 1e6).toFixed(1)}M`;
@@ -52,24 +53,24 @@ const values = {
   m48Base: mm(at(r.base, 48)),
   m48Down: mm(at(r.down, 48)),
   budgetTable: [
-    '| Item | Type | KZT | Share | Gate |',
-    '|---|---|---:|---:|---|',
-    ...C.lines.map((b) => `| ${b.item} | ${b.kind} | ${n(b.amount)} | ${((b.amount / M.budgetTotal) * 100).toFixed(1)}% | ${b.gate} |`),
-    `| **Total** (case limit ${n(M.BUDGET_CAP)}) | | **${n(M.budgetTotal)}** | **100%** | |`,
+    '| Item | Group | Months | KZT |',
+    '|---|---|---|---:|',
+    ...C.lines.map((b) => `| ${b.item} | ${b.group} | ${b.start === b.end ? `M${b.start}` : `M${b.start}–${b.end}`} | ${n(b.amount)} |`),
+    `| **Phase 1 total** (case cap ${n(M.BUDGET_CAP)}; Phase 2 up to ${n(M.PHASE2_MAX)} only after the month-${C.model.stageGateMonth} stage gate) | | | **${n(M.budgetTotal)}** |`,
   ].join('\n'),
   resultsTable: [
-    '| | Base | Worse case (−30%, travelers × 0.7) |',
-    '|---|---:|---:|',
-    `| Lowest cumulative cash | ${mm(r.lowBase.cumulative)} KZT (month ${r.lowBase.month}) | ${mm(r.lowDown.cumulative)} KZT (month ${r.lowDown.month}) |`,
-    `| Cumulative cash at month 24 | ${mm(at(r.base, 24))} KZT | ${mm(at(r.down, 24))} KZT |`,
-    `| **Payback month** | **Month ${r.pbBase}** | **Month ${r.pbDown}** |`,
-    `| Cumulative cash at month 48 | ${mm(at(r.base, 48))} KZT | ${mm(at(r.down, 48))} KZT |`,
-    `| Break-even travelers (${n(M.BUDGET_CAP)} ÷ ${n(r.contribution)}) | ${n(r.breakEven)} | ${n(r.breakEven)} |`,
+    '| | Company target (100%) | Worse case (−30%, required) | Stress test |',
+    '|---|---:|---:|---:|',
+    `| Lowest cumulative cash | ${mm(r.lowBase.cumulative)} KZT (month ${r.lowBase.month}) | ${mm(r.lowDown.cumulative)} KZT (month ${r.lowDown.month}) | ${mm(r.lowStress.cumulative)} KZT (month ${r.lowStress.month}) |`,
+    `| Cumulative cash at month 24 | ${mm(at(r.base, 24))} KZT | ${mm(at(r.down, 24))} KZT | ${mm(at(r.stress, 24))} KZT |`,
+    `| **Payback month** | **Month ${r.pbBase}** | **Month ${r.pbDown}** | ${r.pbStress ? `Month ${r.pbStress}` : 'none within 48 months'} |`,
+    `| Cumulative cash at month 48 | ${mm(at(r.base, 48))} KZT | ${mm(at(r.down, 48))} KZT | ${mm(at(r.stress, 48))} KZT |`,
+    `| Break-even travelers (${n(M.budgetTotal)} ÷ ${n(r.contribution)}) | ${n(r.breakEven)} | ${n(r.breakEven)} | |`,
   ].join('\n'),
   sensTable: [
     `| Contribution margin | ${sens.map((s) => (s.mg === C.model.margin ? `**${s.mg * 100}%**` : `${s.mg * 100}%`)).join(' | ')} |`,
     `|---|${sens.map(() => '---').join('|')}|`,
-    `| Payback · base | ${sens.map((s) => (s.mg === C.model.margin ? `**${pb(s.b)}**` : pb(s.b))).join(' | ')} |`,
+    `| Payback · company target | ${sens.map((s) => (s.mg === C.model.margin ? `**${pb(s.b)}**` : pb(s.b))).join(' | ')} |`,
     `| Payback · worse case | ${sens.map((s) => (s.mg === C.model.margin ? `**${pb(s.d)}**` : pb(s.d))).join(' | ')} |`,
   ].join('\n'),
 };

@@ -6,7 +6,7 @@ Labels used everywhere: **Case fact** · **Verified source** · **Proposal** · 
 
 ## 1. Product summary (3 sentences)
 
-Saryarqa Go is a bilingual (English / Chinese) booking app that lets foreign travelers, starting with Chinese-speaking independent travelers, discover, plan, verify, book and pay for Saryarqa Routes' guided trips in three clear steps with a foreign card. It answers the four complaints foreign guests actually made (unclear booking, doubtful trust, foreign card failing, unknown inclusions) with one closed loop: Discover → Plan → Verify → Book → Travel → Share, where the shared postcard brings the next traveler back to Discover. The 12-week MVP fits inside the <!--m:cap-->20,000,000<!--/m--> KZT year-1 budget and, under stated assumptions, pays back in month <!--m:pbBase-->32<!--/m--> (base case) or month <!--m:pbDown-->44<!--/m--> (30% lower results).
+Saryarqa Go is a bilingual (English / Chinese) booking app that lets foreign travelers, starting with Chinese-speaking independent travelers, discover, plan, verify, book and pay for Saryarqa Routes' guided trips in three clear steps with a foreign card. It answers the four complaints foreign guests actually made (unclear booking, doubtful trust, foreign card failing, unknown inclusions) with one closed loop: Discover → Plan → Verify → Book → Travel → Share, where the shared postcard brings the next traveler back to Discover. The 12-week MVP and year-1 operations need <!--m:total-->8,000,000<!--/m--> KZT (Phase 1) of the <!--m:cap-->20,000,000<!--/m--> KZT case cap and, under stated assumptions, pay back in month <!--m:pbBase-->22<!--/m--> (company target) or month <!--m:pbDown-->28<!--/m--> (required worse case, 30% lower results).
 
 ---
 
@@ -55,32 +55,37 @@ The app shows the same split as a small pill badge on pages and sections: **● 
 
 ---
 
-## 5. Year-1 budget (planning assumptions) — total exactly <!--m:cap-->20,000,000<!--/m--> KZT
+## 5. Phase 1 budget (planning assumptions) — exactly <!--m:total-->8,000,000<!--/m--> KZT of the <!--m:cap-->20,000,000<!--/m--> KZT case cap
 
 <!--m:budgetTable-->
-| Item | Type | KZT | Share | Gate |
-|---|---|---:|---:|---|
-| Design & development | one-time | 8,000,000 | 40.0% | 1 |
-| Localization EN / 中文 | one-time | 1,500,000 | 7.5% | 1 |
-| Payment integration & testing | one-time | 1,500,000 | 7.5% | 1 |
-| Trust content: guide videos, photos | one-time | 1,000,000 | 5.0% | 1 |
-| Marketing & acquisition | recurring | 4,500,000 | 22.5% | 2 |
-| Hosting, AI usage, maintenance | recurring | 1,500,000 | 7.5% | 1 |
-| Pilot & support | recurring | 1,000,000 | 5.0% | 1 |
-| Contingency | reserve | 1,000,000 | 5.0% | 2 |
-| **Total** (case limit 20,000,000) | | **20,000,000** | **100%** | |
+| Item | Group | Months | KZT |
+|---|---|---|---:|
+| Senior full-stack developer (contract) | Build | M1–3 | 2,100,000 |
+| UX/UI design finishing (freelance) | Build | M1–2 | 400,000 |
+| Localization ZH + EN, native proofreading | Build | M2–3 | 600,000 |
+| Legal: offer, refund rules, privacy, data consent | Build | M1–3 | 450,000 |
+| Payment provider onboarding + real test payments | Build | M2–3 | 150,000 |
+| Guide videos + tour photos (4 guides, 4 tours) | Build | M2–3 | 500,000 |
+| Pre-launch security review | Build | M3 | 250,000 |
+| Interviews + usability tests | Validation | M1–3 | 250,000 |
+| Xiaohongshu content + creator collaborations | Launch | M4–12 | 1,200,000 |
+| Printed postcards + QR cards | Launch | M4 | 100,000 |
+| Hosting, CDN, database, domain, e-mail, monitoring | Operations | M1–12 | 300,000 |
+| Chinese-speaking support, part-time | Operations | M4–12 | 1,080,000 |
+| Contingency reserve (assumed fully spent) | Reserve | M3–12 | 620,000 |
+| **Phase 1 total** (case cap 20,000,000; Phase 2 up to 12,000,000 only after the month-9 stage gate) | | | **8,000,000** |
 <!--/m-->
 
-One-time: <!--m:oneTime-->12,000,000<!--/m--> KZT. Recurring (12 months): <!--m:recurring-->7,000,000<!--/m--> KZT. Reserve: <!--m:reserve-->1,000,000<!--/m--> KZT. Source of truth: `src/data/budget.ts` (`npm run sync:money` refreshes this file).
+One-time: <!--m:oneTime-->4,700,000<!--/m--> KZT. Recurring (12 months): <!--m:recurring-->2,680,000<!--/m--> KZT. Reserve: <!--m:reserve-->620,000<!--/m--> KZT. Source of truth: `src/data/budget.ts` (`npm run sync:money` refreshes this file).
 
 ---
 
 ## 6. Payback model and results
 
-**Inputs (defaults).** Average price 44,000 KZT (Case fact). Contribution margin 30% (team assumption). Extra foreign travelers per year at month 24: 1,263 (derived below). Running cost after year 1: <!--m:run-->300,000<!--/m--> KZT/month (team assumption).
+**Inputs (defaults).** Average price 44,000 KZT (Case fact). Contribution margin 30% (team assumption). Extra foreign travelers per year at month 24: 1,263 (derived below). Running cost after year 1: <!--m:run-->395,000<!--/m--> KZT/month (team assumption).
 
 **Formula.**
-- Cash out: <!--m:oneTime-->12,000,000<!--/m--> ÷ 3 per month in months 1–3; <!--m:other-->8,000,000<!--/m--> ÷ 12 per month in months 1–12; running cost per month from month 13.
+- Cash out: each Phase 1 line is spent evenly over its own months (table above); running costs + marketing per month from month 13.
 - Launch in month 4. Extra travelers in month *m* = (1,263 ÷ 12) × ramp(*m*), with ramp(*m*) = (*m* − 3) ÷ 21 for months 4–24 and 1 from month 24.
 - Contribution per traveler = 44,000 × 30% = **<!--m:contribution-->13,200<!--/m--> KZT**.
 - Monthly net = travelers × <!--m:contribution-->13,200<!--/m--> − costs. Payback = first month with cumulative cash ≥ 0.
@@ -89,24 +94,24 @@ One-time: <!--m:oneTime-->12,000,000<!--/m--> KZT. Recurring (12 months): <!--m:
 **Results (defaults).**
 
 <!--m:resultsTable-->
-| | Base | Worse case (−30%, travelers × 0.7) |
-|---|---:|---:|
-| Lowest cumulative cash | −17.0M KZT (month 12) | −17.9M KZT (month 12) |
-| Cumulative cash at month 24 | −8.3M KZT | −12.9M KZT |
-| **Payback month** | **Month 32** | **Month 44** |
-| Cumulative cash at month 48 | +17.8M KZT | +3.2M KZT |
-| Break-even travelers (20,000,000 ÷ 13,200) | 1,516 | 1,516 |
+| | Company target (100%) | Worse case (−30%, required) | Stress test |
+|---|---:|---:|---:|
+| Lowest cumulative cash | −5.6M KZT (month 8) | −6.0M KZT (month 10) | −8.6M KZT (month 22) |
+| Cumulative cash at month 24 | +2.5M KZT | −2.0M KZT | −8.6M KZT |
+| **Payback month** | **Month 22** | **Month 28** | none within 48 months |
+| Cumulative cash at month 48 | +26.4M KZT | +11.8M KZT | −6.9M KZT |
+| Break-even travelers (8,000,000 ÷ 13,200) | 607 | 607 | |
 <!--/m-->
 
-Break-even travelers = <!--m:cap-->20,000,000<!--/m--> ÷ <!--m:contribution-->13,200<!--/m--> = **<!--m:breakEven-->1,516<!--/m-->** extra foreign travelers (cumulative).
+Break-even travelers = <!--m:total-->8,000,000<!--/m--> ÷ <!--m:contribution-->13,200<!--/m--> = **<!--m:breakEven-->607<!--/m-->** extra foreign travelers (cumulative).
 
 **Sensitivity to margin** (other defaults unchanged):
 
 <!--m:sensTable-->
 | Contribution margin | 20% | 25% | **30%** | 35% | 40% |
 |---|---|---|---|---|---|
-| Payback · base | M46 | M37 | **M32** | M29 | M27 |
-| Payback · worse case | > M48 | > M48 | **M44** | M38 | M34 |
+| Payback · company target | M29 | M25 | **M22** | M20 | M18 |
+| Payback · worse case | M47 | M34 | **M28** | M25 | M23 |
 <!--/m-->
 
 **Derivation of 1,263.** ~4% of 3,400 travelers are foreign today ≈ 136. Keeping ≈ 3,264 domestic travelers, 30% foreign requires 3,264 ÷ 0.7 ≈ 4,663 travelers in total → 30% ≈ 1,399 foreign → ≈ **1,263 more** than today.

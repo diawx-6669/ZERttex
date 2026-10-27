@@ -237,22 +237,23 @@ const skip = (name, why) => {
 
   // 8. Impact
   await go('/impact');
-  ok('Budget total exactly 20,000,000', (await page.getByTestId('budget-total').textContent()) === '20,000,000');
+  ok('Phase 1 budget total exactly 8,000,000', (await page.getByTestId('budget-total').textContent()) === '8,000,000');
   const lineSum = await page.evaluate(() => [...document.querySelectorAll('[data-testid="budget-amount"]')].reduce((s, td) => s + Number(td.textContent.replace(/,/g, '')), 0));
-  ok('Budget lines add up to 20,000,000', lineSum === 20000000, String(lineSum));
-  ok('Staged spending: Gate 1 14,500,000 + Gate 2 5,500,000 (Proposal)', (await page.getByTestId('gate-1').textContent()) === '14,500,000' && (await page.getByTestId('gate-2').textContent()) === '5,500,000' && (await page.getByTestId('staged-spending').getByText('Proposal').count()) === 1);
-  ok('Default payback base = Month 32', (await page.getByText('Month 32').count()) >= 1);
-  ok('Default payback downside = Month 44', (await page.getByText('Month 44').count()) >= 1);
-  ok('Payback table shows base and −30%', (await page.getByTestId('payback-table').getByText('M32').count()) === 1 && (await page.getByTestId('payback-table').getByText('M44').count()) === 1);
-  ok('Break-even travelers 1,516 (20M ÷ 13,200)', (await page.getByText('1,516', { exact: true }).count()) >= 1);
-  ok('No 8M cap wording left on Impact', !/Stage 2 (cap|rule|limit)|In MVP \(8M\)|within 8,000,000/.test(await page.content()));
+  ok('Phase 1 lines add up to 8,000,000 (13 lines)', lineSum === 8000000 && (await page.getByTestId('budget-amount').count()) === 13, String(lineSum));
+  ok('Staged spending: Phase 1 8,000,000 + Phase 2 up to 12,000,000 within the 20M cap', (await page.getByTestId('gate-1').textContent()) === '8,000,000' && (await page.getByTestId('gate-2').textContent()) === 'up to 12,000,000' && (await page.getByTestId('staged-spending').getByText('Proposal').count()) === 1);
+  ok('Default payback at company target = Month 22', (await page.getByText('Month 22').count()) >= 1);
+  ok('Default payback worse case −30% = Month 28', (await page.getByText('Month 28').count()) >= 1);
+  ok('Payback table shows target and −30%', (await page.getByTestId('payback-table').getByText('M22').count()) === 1 && (await page.getByTestId('payback-table').getByText('M28').count()) === 1);
+  ok('Stress test shows no payback in 48 months', (await page.getByText(/Stress test .*no payback in 48 mo/).count()) >= 1);
+  ok('Break-even travelers 607 (8M ÷ 13,200)', (await page.getByText('607', { exact: true }).count()) >= 1);
+  ok('No old 20M-spent / 32 / 44 wording on Impact', !/Month 32|Month 44|year-1 budget of exactly 20,000,000/.test(await page.content()));
   ok('Impact lists: In MVP and Phase 2 badges', (await page.locator('[data-scope="mvp"]').count()) >= 1 && (await page.locator('[data-scope="p2"]').count()) >= 1);
-  ok('Impact MVP / later lists from budget.ts', (await page.getByText('Rules-based trip builder').count()) === 1 && (await page.getByText('Live LLM concierge with retrieval').count()) === 1);
+  ok('Impact MVP / later lists from budget.ts', (await page.getByText('Scripted bilingual chat with hand-off to a manager').count()) === 1 && (await page.getByText(/Live AI concierge with retrieval/).count()) === 1);
   await shot('08-impact');
   await page.locator('#s-margin').fill('40');
   await page.waitForTimeout(150);
   const after = await page.locator('text=/Month \\d+/').allTextContents();
-  ok('Sliders update KPIs live', !after.includes('Month 32'), after.join(', '));
+  ok('Sliders update KPIs live', !after.includes('Month 22'), after.join(', '));
 
   // 9. Trust center
   await go('/trust');
@@ -606,7 +607,7 @@ const skip = (name, why) => {
   }
   const xlsx = fs.readFileSync(path.join(ROOT, 'submission/stage2/Cost_Payback_Sheet.xlsx'));
   const sheetXml = require('child_process').execFileSync('unzip', ['-p', path.join(ROOT, 'submission/stage2/Cost_Payback_Sheet.xlsx'), 'xl/worksheets/sheet1.xml']).toString();
-  ok('Cost_Payback_Sheet.xlsx uses real formulas', xlsx.length > 0 && (sheetXml.match(/<f>/g) || []).length >= 15);
+  ok('Cost_Payback_Sheet.xlsx uses real formulas', xlsx.length > 0 && (sheetXml.match(/<f[ >]/g) || []).length >= 15);
   ok('Money docs in sync with budget.ts', (() => { try { require('child_process').execFileSync('node', [path.join(ROOT, 'scripts/sync-money-docs.cjs'), '--check']); return true; } catch { return false; } })());
 
   await browser.close();

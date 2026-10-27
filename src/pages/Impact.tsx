@@ -3,20 +3,20 @@ import { Icon } from '../components/Icon';
 import { startJudgeMode } from '../components/JudgeMode';
 import { PageHead, Section } from '../components/Layout';
 import { Scope, Tag } from '../components/Tag';
-import { BUDGET_CAP, budget, budgetConfig, budgetTotal, gantt, gateTotal, inMvp, later, metrics, oneTimeTotal, otherTotal, risks } from '../data/budget';
+import { BUDGET_CAP, PHASE2_MAX, budget, budgetConfig, budgetGroups, budgetTotal, gantt, groupTotal, inMvp, later, metrics, risks } from '../data/budget';
 import { kzt, millions, num } from '../lib/format';
-import { AVG_PRICE, DEFAULT_MARGIN, DEFAULT_RUNNING, DOWNSIDE, MONTHS, breakEvenTravelers, contributionPerTraveler, derivation, paybackMonth, series, type PaybackSeries } from '../lib/paybackModel';
+import { AVG_PRICE, DEFAULT_MARGIN, DEFAULT_RUNNING, DOWNSIDE, MONTHS, STRESS, breakEvenTravelers, contributionPerTraveler, derivation, paybackMonth, series, type PaybackSeries } from '../lib/paybackModel';
 
 const M = budgetConfig.model;
 const DEF_MARGIN = Math.round(DEFAULT_MARGIN * 100);
 
 // Judges' page. English only, as allowed by the brief.
 
-function Chart({ base, down, pbBase, pbDown }: { base: PaybackSeries; down: PaybackSeries; pbBase: number | null; pbDown: number | null }) {
+function Chart({ base, down, stress, pbBase, pbDown }: { base: PaybackSeries; down: PaybackSeries; stress: PaybackSeries; pbBase: number | null; pbDown: number | null }) {
   const W = 720;
   const H = 300;
   const pad = { l: 56, r: 16, t: 16, b: 34 };
-  const all = [...base, ...down].map((p) => p.cumulative);
+  const all = [...base, ...down, ...stress].map((p) => p.cumulative);
   const yMin = Math.min(...all, 0);
   const yMax = Math.max(...all, 0);
   const span = yMax - yMin || 1;
@@ -40,7 +40,7 @@ function Chart({ base, down, pbBase, pbDown }: { base: PaybackSeries; down: Payb
     );
   };
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={`Cumulative cash over 48 months. Payback base month ${pbBase ?? 'beyond 48'}, downside month ${pbDown ?? 'beyond 48'}.`}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={`Cumulative cash over 48 months. Payback at company target month ${pbBase ?? 'beyond 48'}, worse case −30% month ${pbDown ?? 'beyond 48'}, stress test none within 48 months.`}>
       {ticks.map((v) => (
         <g key={v}>
           <line x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} stroke="rgb(var(--line))" strokeWidth={v === 0 ? 1.6 : 1} />
@@ -56,10 +56,11 @@ function Chart({ base, down, pbBase, pbDown }: { base: PaybackSeries; down: Payb
       ))}
       <rect x={x(1)} y={pad.t} width={x(4) - x(1)} height={H - pad.t - pad.b} fill="rgb(var(--gold))" opacity="0.08" />
       <text x={x(1) + 4} y={H - pad.b - 6} fontSize="10" className="fill-muted font-mono">build</text>
+      <path d={path(stress)} fill="none" stroke="rgb(var(--muted))" strokeWidth="2" strokeDasharray="2 4" />
       <path d={path(down)} fill="none" stroke="rgb(var(--warn))" strokeWidth="2.5" strokeDasharray="7 5" />
       <path d={path(base)} fill="none" stroke="rgb(var(--teal))" strokeWidth="3" />
-      {marker(pbBase, base, 'rgb(var(--teal))', 'Base', 0)}
-      {marker(pbDown, down, 'rgb(var(--warn))', 'Downside', 16)}
+      {marker(pbBase, base, 'rgb(var(--teal))', 'Target', 0)}
+      {marker(pbDown, down, 'rgb(var(--warn))', '−30%', 16)}
     </svg>
   );
 }
@@ -82,11 +83,12 @@ export default function Impact() {
   const [trav, setTrav] = useState(derivation.extra);
   const [run, setRun] = useState<number>(DEFAULT_RUNNING);
 
-  const { base, down, pbBase, pbDown } = useMemo(() => {
+  const { base, down, stress, pbBase, pbDown, pbStress } = useMemo(() => {
     const input = { margin: margin / 100, travelersPerYear: trav, runningCost: run };
     const base = series(input);
     const down = series(input, DOWNSIDE);
-    return { base, down, pbBase: paybackMonth(base), pbDown: paybackMonth(down) };
+    const stress = series({ ...input, margin: STRESS.margin, delay: STRESS.delay }, STRESS.volume);
+    return { base, down, stress, pbBase: paybackMonth(base), pbDown: paybackMonth(down), pbStress: paybackMonth(stress) };
   }, [margin, trav, run]);
 
   const cpt = contributionPerTraveler(margin / 100);
@@ -97,7 +99,7 @@ export default function Impact() {
 
   return (
     <>
-      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub={`12-week MVP, year-1 budget of exactly ${num(budgetTotal)} KZT, and an honest payback model you can stress-test.`}>
+      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub={`12-week MVP. The case allows up to ${num(BUDGET_CAP)} KZT; Phase 1 needs ${num(budgetTotal)} KZT, built bottom-up. An honest payback model you can stress-test.`}>
         <button type="button" className="btn-primary btn-sm" onClick={startJudgeMode}>
           <Icon name="arrow" size={14} /> Judge mode: 2-minute walkthrough
         </button>
@@ -146,62 +148,71 @@ export default function Impact() {
         </div>
       </Section>
 
-      <Section title="Year-1 budget" sub={`Planning assumptions. The case allows up to ${num(BUDGET_CAP)} KZT for development and launch. The build fails if these lines do not add up to it.`}>
+      <Section title="Phase 1 budget" sub={`Bottom-up: every line is quantity × price with a reason. The case cap is ${num(BUDGET_CAP)} KZT; we ask for ${num(budgetTotal)} KZT now. The build fails if Phase 1 does not add up exactly.`}>
         <div className="card overflow-x-auto">
-          <table className="w-full min-w-[520px] text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-xs text-muted">
-                <th className="px-4 py-3">Item</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Gate</th>
+                <th className="px-4 py-3">Item and why</th>
+                <th className="px-4 py-3">Group</th>
+                <th className="px-4 py-3">Months</th>
                 <th className="px-4 py-3 text-right">KZT</th>
-                <th className="px-4 py-3 text-right">Share</th>
               </tr>
             </thead>
             <tbody>
               {budget.map((b) => (
-                <tr key={b.item} className="border-b border-line/70">
-                  <td className="px-4 py-2.5 font-medium">{b.item}</td>
-                  <td className="px-4 py-2.5 text-muted">{b.kind}</td>
-                  <td className="px-4 py-2.5 text-muted" data-gate={b.gate}>Gate {b.gate}</td>
+                <tr key={b.item} className="border-b border-line/70 align-top">
+                  <td className="px-4 py-2.5">
+                    <div className="font-medium">{b.item}</div>
+                    <div className="text-xs text-muted">{b.why}</div>
+                  </td>
+                  <td className="px-4 py-2.5 text-muted" data-gate={b.gate}>{b.group}</td>
+                  <td className="num px-4 py-2.5 text-muted">{b.start === b.end ? `M${b.start}` : `M${b.start}–${b.end}`}</td>
                   <td className="num px-4 py-2.5 text-right" data-testid="budget-amount">{num(b.amount)}</td>
-                  <td className="num px-4 py-2.5 text-right text-muted">{((b.amount / budgetTotal) * 100).toFixed(1)}%</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr className="bg-night text-nightInk">
-                <td className="px-4 py-3 font-bold" colSpan={3}>Total</td>
+                <td className="px-4 py-3 font-bold" colSpan={3}>Phase 1 total (12 months)</td>
                 <td className="num px-4 py-3 text-right font-bold" data-testid="budget-total">{num(budgetTotal)}</td>
-                <td className="num px-4 py-3 text-right">100%</td>
               </tr>
             </tfoot>
           </table>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted">
-          <Tag kind="proposal" extra="planning assumptions" /> One-time: <span className="num">{kzt(oneTimeTotal)}</span> · Recurring + contingency: <span className="num">{kzt(otherTotal)}</span> · AI usage is inside "Hosting, AI usage, maintenance"
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+          <Tag kind="proposal" extra="planning assumptions" />
+          {budgetGroups.map((g) => (
+            <span key={g}>{g}: <span className="num text-ink">{millions(groupTotal(g))}</span></span>
+          ))}
         </div>
-        <div className="card mt-4 p-5 text-sm" data-testid="staged-spending">
-          <h3 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-bold">Staged spending <Tag kind="proposal" /></h3>
-          <p className="text-muted">
-            The {num(BUDGET_CAP)} KZT is a cap, not a target. <b className="text-ink">Gate 1</b> funds the MVP and the pilot. The rest is released only if the pilot meets its metrics (booking completion, concierge answers without handoff, referral bookings; see below).
-          </p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            {([1, 2] as const).map((g) => (
-              <div key={g} className="rounded-xl border border-line p-3">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-semibold">{g === 1 ? 'Gate 1 · MVP + pilot' : 'Gate 2 · only if pilot metrics are met'}</span>
-                  <span className="num font-semibold" data-testid={`gate-${g}`}>{num(gateTotal(g))}</span>
-                </div>
+        <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="card p-5 text-sm" data-testid="staged-spending">
+            <h3 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-bold">Staged spending <Tag kind="proposal" /></h3>
+            <p className="text-muted">The {num(BUDGET_CAP)} KZT is a cap, not a target.</p>
+            <div className="mt-3 space-y-3">
+              <div className="rounded-xl border border-line p-3">
+                <div className="flex items-baseline justify-between gap-2"><span className="font-semibold">Phase 1 · build, launch, year-1 operations</span><span className="num font-semibold" data-testid="gate-1">{num(budgetTotal)}</span></div>
+              </div>
+              <div className="rounded-xl border border-line p-3">
+                <div className="flex items-baseline justify-between gap-2"><span className="font-semibold">Phase 2 · only after the month-{M.stageGateMonth} stage gate</span><span className="num font-semibold" data-testid="gate-2">up to {num(PHASE2_MAX)}</span></div>
                 <ul className="mt-1.5 space-y-0.5 text-muted">
-                  {budget.filter((b) => b.gate === g).map((b) => (
-                    <li key={b.item} className="flex justify-between gap-2"><span>{b.item}</span><span className="num">{num(b.amount)}</span></li>
-                  ))}
+                  {budgetConfig.phase2.map((x) => (<li key={x}>• {x}</li>))}
                 </ul>
               </div>
-            ))}
+            </div>
+            <p className="mt-2 text-xs text-muted">Stage gate at month {M.stageGateMonth}: compare real bookings with the scenarios below. Near the stress-test path → pause paid ads and re-test the offer; Phase 2 is not released.</p>
           </div>
-          <p className="mt-2 text-xs text-muted">The payback model below still assumes the full {num(BUDGET_CAP)} KZT is spent (the careful case).</p>
+          <div className="card p-5 text-sm">
+            <h3 className="mb-2 text-lg font-bold">From month 13 <span className="num text-muted">({kzt(DEFAULT_RUNNING)} / month)</span></h3>
+            <ul className="space-y-1 text-muted">
+              {budgetConfig.runningItems.map((r) => (<li key={r.item} className="flex justify-between gap-2"><span>{r.item}</span><span className="num">{num(r.amount)}</span></li>))}
+            </ul>
+            <h3 className="mb-2 mt-4 text-lg font-bold">Not paid from the budget (stated, not hidden)</h3>
+            <ul className="space-y-1 text-muted">
+              {budgetConfig.notInBudget.map((x) => (<li key={x}>• {x}</li>))}
+            </ul>
+          </div>
         </div>
       </Section>
 
@@ -220,9 +231,9 @@ export default function Impact() {
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               {[
                 { k: 'Contribution / traveler', v: kzt(cpt), s: `${num(AVG_PRICE)} × ${margin}%` },
-                { k: 'Break-even travelers', v: Number.isFinite(be) ? num(be) : 'n/a', s: `${millions(BUDGET_CAP)} ÷ contribution` },
-                { k: 'Payback · base', v: pbBase ? `Month ${pbBase}` : '> 48 mo', s: 'cumulative cash ≥ 0', accent: 'text-teal' },
-                { k: 'Payback · downside', v: pbDown ? `Month ${pbDown}` : '> 48 mo', s: `travelers × ${DOWNSIDE} (−30%)`, accent: 'text-warn' },
+                { k: 'Break-even travelers', v: Number.isFinite(be) ? num(be) : 'n/a', s: `${millions(budgetTotal)} ÷ contribution` },
+                { k: 'Payback · company target', v: pbBase ? `Month ${pbBase}` : '> 48 mo', s: '100% of the 30% goal path', accent: 'text-teal' },
+                { k: 'Payback · worse case −30%', v: pbDown ? `Month ${pbDown}` : '> 48 mo', s: `travelers × ${DOWNSIDE} (required scenario)`, accent: 'text-warn' },
               ].map((x) => (
                 <div key={x.k} className="card p-4">
                   <div className="text-xs text-muted">{x.k}</div>
@@ -234,17 +245,18 @@ export default function Impact() {
             <div className="card p-4 sm:p-5">
               <div className="mb-2 flex flex-wrap items-center gap-4 text-sm">
                 <span className="font-semibold">Cumulative cash, {MONTHS} months</span>
-                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded bg-teal" /> Base</span>
-                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dashed border-warn" /> Worse case (× {DOWNSIDE})</span>
+                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded bg-teal" /> Company target</span>
+                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dashed border-warn" /> Worse case −30%</span>
+                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dotted border-muted" /> Stress test ({Math.round(STRESS.volume * 100)}%, margin {Math.round(STRESS.margin * 100)}%, +{STRESS.delay} mo): {pbStress ? `M${pbStress}` : 'no payback in 48 mo'}</span>
               </div>
-              <Chart base={base} down={down} pbBase={pbBase} pbDown={pbDown} />
+              <Chart base={base} down={down} stress={stress} pbBase={pbBase} pbDown={pbDown} />
             </div>
             <div className="card overflow-x-auto">
               <table className="w-full min-w-[420px] text-sm" data-testid="payback-table">
                 <thead>
                   <tr className="border-b border-line text-left text-xs text-muted">
                     <th className="px-4 py-2.5">Cumulative cash</th>
-                    <th className="px-4 py-2.5 text-right">Base</th>
+                    <th className="px-4 py-2.5 text-right">Company target</th>
                     <th className="px-4 py-2.5 text-right">Worse case (−30%)</th>
                   </tr>
                 </thead>
@@ -263,11 +275,11 @@ export default function Impact() {
           <div className="card p-5 text-sm">
             <h3 className="mb-2 text-lg font-bold">How the model works</h3>
             <ul className="space-y-1.5 text-muted">
-              <li>• One-time {millions(oneTimeTotal)} KZT is spent over months 1-{M.oneTimeMonths}; the other {millions(otherTotal)} (recurring + reserve) over months 1-{M.otherMonths}.</li>
-              <li>• From month {M.otherMonths + 1}, running cost is charged monthly (slider).</li>
+              <li>• Months 1-12: each Phase 1 line is spent evenly over its own months (table above), {millions(budgetTotal)} KZT in total.</li>
+              <li>• From month 13: running costs + marketing per month (slider, default {num(DEFAULT_RUNNING)} KZT).</li>
               <li>• Launch at month {M.launchMonth}. Extra foreign travelers ramp linearly: month m gets (m − {M.launchMonth - 1}) / {M.rampEndMonth - M.launchMonth + 1} of the year-2 run rate, reaching 100% at month {M.rampEndMonth}, then flat.</li>
               <li>• Contribution per traveler = {num(AVG_PRICE)} KZT × margin.</li>
-              <li>• Worse case: {Math.round((1 - DOWNSIDE) * 100)}% fewer extra travelers (× {DOWNSIDE}), same costs.</li>
+              <li>• Worse case (required): {Math.round((1 - DOWNSIDE) * 100)}% fewer extra travelers (× {DOWNSIDE}), same costs. Stress test: {Math.round(STRESS.volume * 100)}% of the path, {Math.round(STRESS.margin * 100)}% margin, launch {STRESS.delay} months late.</li>
               <li>• Monthly net = travelers × contribution − costs. Payback = first month the cumulative total is ≥ 0.</li>
             </ul>
           </div>
@@ -331,7 +343,7 @@ export default function Impact() {
             </div>
           ))}
         </div>
-        <p className="mt-3 text-xs text-muted">All impact statements are <Tag kind="proposal" /> expected effects, to be measured in the pilot. Budget figures are shown in {millions(budgetTotal)} KZT total.</p>
+        <p className="mt-3 text-xs text-muted">All impact statements are <Tag kind="proposal" /> expected effects, to be measured in the pilot. Phase 1 budget: {millions(budgetTotal)} KZT of the {millions(BUDGET_CAP)} KZT cap.</p>
       </Section>
     </>
   );
