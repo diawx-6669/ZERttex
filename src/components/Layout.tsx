@@ -4,7 +4,8 @@ import { href } from '../lib/router';
 import { useApp } from '../state';
 import { useChat } from './Chat';
 import { Icon, type IconName } from './Icon';
-import { Scope, Tag, allTagKinds } from './Tag';
+import { AiModeBadge, Scope, Tag, allTagKinds } from './Tag';
+import { aiConfigured, setForceScripted, useForceScripted } from '../lib/ai';
 
 const navItems: { to: string; key: keyof typeof ui.nav; icon: IconName }[] = [
   { to: '/tours', key: 'tours', icon: 'compass' },
@@ -153,6 +154,23 @@ export function Header({ current }: { current: string }) {
   );
 }
 
+/** Footer control for the live pitch: force scripted answers even when the AI Worker is configured. */
+function AiSwitch() {
+  const { t } = useApp();
+  const forced = useForceScripted();
+  return (
+    <div className="flex flex-wrap items-center gap-2 pt-1 text-sm">
+      <span className="text-muted">{t({ en: 'Answers:', zh: '回答模式：' })}</span>
+      <AiModeBadge />
+      <label className="inline-flex cursor-pointer items-center gap-2">
+        <input type="checkbox" data-testid="force-scripted" className="h-4 w-4 accent-[rgb(var(--teal))]" checked={forced} onChange={(e) => setForceScripted(e.target.checked)} />
+        <span>{t({ en: 'Scripted demo only', zh: '仅用预设脚本' })}</span>
+      </label>
+      {!aiConfigured && <span className="text-xs text-muted">{t({ en: '(no AI server in this build)', zh: '（此版本未连接 AI 服务器）' })}</span>}
+    </div>
+  );
+}
+
 export function Footer() {
   const { t } = useApp();
   return (
@@ -165,7 +183,9 @@ export function Footer() {
             <a className="underline-offset-4 hover:underline" href={href('/about')}>{t(ui.nav.about)}</a>
             <a className="underline-offset-4 hover:underline" href={href('/impact')}>{t(ui.nav.impact)}</a>
             <a className="underline-offset-4 hover:underline" href={href('/postcard')}>{t(ui.nav.postcard)}</a>
+            <a className="underline-offset-4 hover:underline" href={href('/manager')}>{t({ en: 'Manager inbox (staff demo)', zh: '经理收件箱（员工演示）' })}</a>
           </div>
+          <AiSwitch />
         </div>
         <div>
           <h2 className="mb-3 text-sm font-semibold">{t(ui.common.legend)}</h2>

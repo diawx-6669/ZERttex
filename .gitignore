@@ -7,3 +7,4 @@ screenshots-tmp
 !.env.example
 .dev.vars
 worker/.wrangler
+dist-aitest

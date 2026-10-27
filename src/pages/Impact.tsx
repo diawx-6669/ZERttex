@@ -312,7 +312,7 @@ export default function Impact() {
       <Section title="Impact" sub="Who wins if this works.">
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { h: 'Saryarqa Routes', icon: 'chart' as const, p: ['A second, foreign revenue stream beside ~96% domestic demand.', 'Direct bookings instead of chat-only sales; fewer manual questions.', 'Reusable assets: bilingual tour data, guide videos, trust content.'] },
+            { h: 'Saryarqa Routes', icon: 'chart' as const, p: ['A second, foreign revenue stream beside ~96% domestic demand.', 'Direct bookings instead of chat-only sales; fewer manual questions.', 'Saves manager time on repeat questions (to measure in pilot).', 'Reusable assets: bilingual tour data, guide videos, trust content.'] },
             { h: 'Travelers', icon: 'users' as const, p: ['Clear prices and inclusions before paying.', 'Pay with a foreign card; Chinese language support.', 'Meet the guide first; refund rules in writing; family updates.'] },
             { h: 'Kazakhstan abroad', icon: 'globe' as const, p: ['Shows Kazakhstan as easy and safe to book for Chinese travelers.', 'Spreads demand to regions: Charyn, Kolsai, Turkestan, Burabay.', 'Postcards on Xiaohongshu / WeChat carry the country image further.'] },
           ].map((c) => (

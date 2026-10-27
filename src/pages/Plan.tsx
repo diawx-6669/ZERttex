@@ -3,7 +3,9 @@ import { Icon } from '../components/Icon';
 import { PageHead, Stepper } from '../components/Layout';
 import { Media } from '../components/Media';
 import { RouteMap } from '../components/RouteMap';
-import { Tag } from '../components/Tag';
+import { AiTag, Scope, Tag } from '../components/Tag';
+import { aiLive, callAi, validatePlan, type AiPlan } from '../lib/ai';
+import { parsePlanText } from '../lib/planParse';
 import { interestText, ui } from '../data/i18n';
 import { hubName, tours } from '../data/tours';
 import type { Interest, TourId } from '../data/types';
@@ -35,9 +37,43 @@ export default function Plan() {
   const toggle = <T,>(arr: T[], v: T) => (arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);
   const min = minDaysFor(sel);
 
-  const generate = () => {
-    setResult(buildPlan({ tours: sel, days, interests: ints, budget, travelers, arrival: arrival < minBookDate() ? minBookDate() : arrival }));
+  const [freeText, setFreeText] = useState('');
+  const [reading, setReading] = useState(false);
+  const [understood, setUnderstood] = useState<{ note: string; ai: boolean } | null>(null);
+
+  const generate = (o: { tours?: TourId[]; days?: number; interests?: Interest[]; budget?: BudgetLevel; travelers?: number } = {}) => {
+    setResult(buildPlan({ tours: o.tours ?? sel, days: o.days ?? days, interests: o.interests ?? ints, budget: o.budget ?? budget, travelers: o.travelers ?? travelers, arrival: arrival < minBookDate() ? minBookDate() : arrival }));
     window.setTimeout(() => document.getElementById('plan-result')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 30);
+  };
+
+  /** Free text → preferences (AI, else scripted rules) → the SAME rules-based trip builder. */
+  const readRequest = async () => {
+    const text = freeText.trim();
+    if (!text) return;
+    setReading(true);
+    const zh = /[㐀-鿿]/.test(text) || lang === 'zh';
+    let prefs: AiPlan | null = null;
+    let ai = false;
+    if (aiLive()) {
+      prefs = await callAi('plan', { text, lang: zh ? 'zh' : 'en' }, validatePlan);
+      ai = !!prefs;
+    }
+    if (!prefs) prefs = parsePlanText(text, zh);
+    const next = {
+      tours: prefs.destinations.length ? prefs.destinations : sel,
+      days: prefs.days ? Math.min(14, Math.max(3, prefs.days)) : days,
+      interests: prefs.interests.length ? prefs.interests : ints,
+      budget: prefs.budget !== 'unknown' ? prefs.budget : budget,
+      travelers: prefs.travelers ? Math.min(12, prefs.travelers) : travelers,
+    };
+    setSel(next.tours);
+    setDays(next.days);
+    setInts(next.interests);
+    setBudget(next.budget);
+    setTravelers(next.travelers);
+    setUnderstood({ note: prefs.note, ai });
+    setReading(false);
+    generate(next);
   };
 
   const book = () => {
@@ -53,6 +89,39 @@ export default function Plan() {
           <Icon name="info" size={13} /> {t(ui.plan.rules)}
         </span>
       </PageHead>
+
+      <section className="container-x mt-6" aria-labelledby="describe-h">
+        <div className="card p-4 sm:p-5">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <h2 id="describe-h" className="text-lg font-bold">{t({ en: 'Describe your trip', zh: '描述您的行程' })}</h2>
+            <Scope phase="p2" />
+          </div>
+          <p className="mb-3 text-sm text-muted">
+            {t({ en: 'Write it in English or 中文. We only read your wishes from it; the day-by-day plan always comes from our rules and real tour lengths.', zh: '可用中文或英文填写。我们只从中读取您的偏好，每日行程始终由规则和真实线路天数生成。' })}
+          </p>
+          <label htmlFor="plan-text" className="sr-only">{t({ en: 'Describe your trip', zh: '描述您的行程' })}</label>
+          <textarea
+            id="plan-text"
+            rows={2}
+            className="input min-h-[64px] w-full resize-y"
+            value={freeText}
+            maxLength={800}
+            onChange={(e) => setFreeText(e.target.value)}
+            placeholder={t({ en: 'e.g. 8 days in October, two of us, lakes and mountains, good photos, comfortable hotels', zh: '例如：10月去8天，两个人，想看湖和山，拍好看的照片，住得舒适一点' })}
+          />
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <button type="button" className="btn-dark btn-sm" onClick={readRequest} disabled={!freeText.trim() || reading}>
+              <Icon name="refresh" size={14} /> {reading ? t({ en: 'Reading…', zh: '正在读取…' }) : t({ en: 'Read my request', zh: '读取我的需求' })}
+            </button>
+            {understood && (
+              <p className="flex flex-wrap items-center gap-2 text-sm" role="status" data-testid="plan-understood">
+                {understood.ai ? <AiTag /> : <span className="rounded-full border border-line px-2 py-px text-[11px] font-semibold text-muted">{t({ en: 'Scripted rules', zh: '规则识别' })}</span>}
+                <span>{understood.note}</span>
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
       <div className="container-x mt-6 grid gap-6 lg:grid-cols-[400px_1fr]">
         <form

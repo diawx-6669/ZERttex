@@ -10,7 +10,8 @@ export type ChatAction =
   | { kind: 'book'; id?: TourId }
   | { kind: 'manager' }
   | { kind: 'trust' }
-  | { kind: 'plan' };
+  | { kind: 'plan' }
+  | { kind: 'route'; to: '/tours' | '/trip' | '/postcard' };
 
 export type BotAnswer = {
   text: string;
@@ -19,6 +20,10 @@ export type BotAnswer = {
   actions?: ChatAction[];
   handoff?: boolean;
   intent: string;
+  /** True when the live AI wrote this answer (always shown with an AI tag). */
+  ai?: boolean;
+  /** Honesty labels of the data the AI used. */
+  tags?: TagKind[];
 };
 
 export const detectLang = (text: string, fallback: Lang): Lang => {
@@ -65,6 +70,12 @@ export const findTour = (text: string): Tour | undefined => {
   const q = text.toLowerCase();
   const id = (Object.keys(tourWords) as TourId[]).find((k) => tourWords[k].some((w) => has(q, w)));
   return tourById(id);
+};
+
+/** Every tour mentioned in the text (for the trip-builder free-text box). */
+export const findTours = (text: string): TourId[] => {
+  const q = text.toLowerCase();
+  return (Object.keys(tourWords) as TourId[]).filter((k) => tourWords[k].some((w) => has(q, w)));
 };
 
 const score = (q: string, it: Intent) => it.en.filter((w) => has(q, w)).length + it.zh.filter((w) => q.includes(w)).length;

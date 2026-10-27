@@ -16,6 +16,7 @@ import Postcard from './pages/Postcard';
 import Impact from './pages/Impact';
 import About from './pages/About';
 import PrintPostcards from './pages/PrintPostcards';
+import Manager from './pages/Manager';
 
 export default function App() {
   const route = useRoute();
@@ -57,6 +58,9 @@ export default function App() {
       break;
     case 'about':
       page = <About />;
+      break;
+    case 'manager':
+      page = <Manager />;
       break;
     default:
       page = (

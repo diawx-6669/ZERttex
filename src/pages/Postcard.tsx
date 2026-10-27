@@ -2,7 +2,8 @@ import { useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { Icon } from '../components/Icon';
 import { Logo, PageHead } from '../components/Layout';
 import { Media } from '../components/Media';
-import { Tag } from '../components/Tag';
+import { AiTag, Scope, Tag } from '../components/Tag';
+import { aiLive, callAi, validateCaptions, type AiCaptions } from '../lib/ai';
 import { ui } from '../data/i18n';
 import { tourById, tours } from '../data/tours';
 import type { TourId } from '../data/types';
@@ -11,6 +12,16 @@ import { navigate } from '../lib/router';
 import { qrMatrix, referralUrl } from '../lib/qr';
 import { downloadPostcard } from '../lib/postcardPng';
 import { useApp } from '../state';
+
+/** Scripted captions from verified tour data only (used when the live AI is off or fails). */
+function scriptedCaptions(id: TourId): AiCaptions {
+  const tour = tourById(id)!;
+  const [h1, h2] = tour.highlights;
+  return {
+    zh: [`${tour.name.zh}｜${h1.zh} #哈萨克斯坦`, `在${tour.region.zh}的${tour.days}天：${h2?.zh ?? h1.zh}`, `下一站，${tour.name.zh} #哈萨克斯坦旅行`],
+    en: [`${tour.name.en}: ${h1.en.toLowerCase()} #Kazakhstan`, `${tour.days} days in ${tour.region.en}. ${h2?.en ?? h1.en}.`, `Postcard from ${tour.name.en} #Kazakhstan`],
+  };
+}
 
 /** Real, scannable QR code (SVG, 2-module quiet zone). */
 export function QR({ text, label }: { text: string; label: string }) {
@@ -53,6 +64,16 @@ export default function Postcard() {
       toast(t({ en: 'Could not create the PNG. Take a screenshot instead.', zh: '无法生成图片，请直接截图。' }));
     }
     setSaving(false);
+  };
+
+  const [captions, setCaptions] = useState<(AiCaptions & { ai: boolean }) | null>(null);
+  const [capBusy, setCapBusy] = useState(false);
+  const suggest = async () => {
+    setCapBusy(true);
+    let c: AiCaptions | null = null;
+    if (aiLive()) c = await callAi('caption', { tourId: dest, message: msg }, validateCaptions);
+    setCaptions(c ? { ...c, ai: true } : { ...scriptedCaptions(dest), ai: false });
+    setCapBusy(false);
   };
 
   const onFiles = (e: ChangeEvent<HTMLInputElement>) => {
@@ -130,6 +151,32 @@ export default function Postcard() {
                   </li>
                 ))}
               </ul>
+            )}
+          </div>
+
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" className="btn-ghost btn-sm" onClick={suggest} disabled={capBusy}>
+                <Icon name="chat" size={14} /> {capBusy ? t({ en: 'Thinking…', zh: '生成中…' }) : t({ en: 'Suggest a caption', zh: '推荐文案' })}
+              </button>
+              <span className="text-xs text-muted">{t({ en: 'For your Xiaohongshu / Instagram post text', zh: '用于小红书 / Instagram 的帖子文案' })}</span>
+              <Scope phase="p2" />
+            </div>
+            {captions && (
+              <div className="mt-3 space-y-2" data-testid="captions">
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  {captions.ai ? <AiTag /> : <span className="rounded-full border border-line px-2 py-px font-semibold text-muted">{t({ en: 'Scripted templates', zh: '预设模板' })}</span>}
+                </div>
+                {[...captions.zh.map((c) => ({ c, zh: true })), ...captions.en.map((c) => ({ c, zh: false }))].map(({ c, zh }, i) => (
+                  <div key={i} className="flex items-start gap-2 rounded-lg border border-line bg-surface px-3 py-2 text-sm">
+                    <span className="mt-0.5 shrink-0 rounded bg-surface2 px-1.5 text-[10px] font-semibold text-muted">{zh ? '小红书' : 'EN'}</span>
+                    <span className="min-w-0 flex-1 break-words" lang={zh ? 'zh-CN' : 'en'} data-caption={zh ? 'zh' : 'en'}>{c}</span>
+                    <button type="button" className="shrink-0 text-xs font-semibold text-teal hover:underline" onClick={async () => toast((await copyText(c)) ? t(ui.trip.copied) : c)}>
+                      {t({ en: 'Copy', zh: '复制' })}
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
 

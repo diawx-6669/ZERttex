@@ -1,5 +1,6 @@
 import { tagExplain, tagText } from '../data/i18n';
 import type { TagKind } from '../data/types';
+import { useAiMode } from '../lib/ai';
 import { useApp } from '../state';
 
 const style: Record<TagKind, string> = {
@@ -48,6 +49,35 @@ export function Scope({ phase, className = '' }: { phase: 'mvp' | 'p2'; classNam
       } ${className}`}
     >
       {phase === 'mvp' ? '●' : '○'} {t(text)}
+    </span>
+  );
+}
+
+/** Which brain answers right now: the live AI (Worker) or the scripted demo logic. */
+export function AiModeBadge({ className = '' }: { className?: string }) {
+  const { t } = useApp();
+  const mode = useAiMode();
+  return (
+    <span
+      data-ai-mode={mode}
+      title={t(mode === 'live'
+        ? { en: 'Answers come from Claude via our server, using only verified tour data. If it fails, scripted answers are used.', zh: '回答来自 Claude（经由我们的服务器），只使用已核实的线路数据。失败时自动使用预设回答。' }
+        : { en: 'Rules-based answers written by the team. No live AI.', zh: '团队编写的规则回答，非实时 AI。' })}
+      className={`inline-flex w-fit shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-px text-[11px] font-semibold leading-tight ${
+        mode === 'live' ? 'border-teal/60 bg-teal/10 text-teal' : 'border-line text-muted'
+      } ${className}`}
+    >
+      {mode === 'live' ? t({ en: 'Live AI · beta', zh: '实时 AI · 测试版' }) : t({ en: 'Scripted demo', zh: '预设脚本演示' })}
+    </span>
+  );
+}
+
+/** Marks one piece of content as AI-generated (always shown next to AI output). */
+export function AiTag({ className = '' }: { className?: string }) {
+  const { t } = useApp();
+  return (
+    <span data-ai-tag="" className={`inline-flex w-fit shrink-0 items-center whitespace-nowrap rounded-full bg-teal/12 px-2 py-px text-[11px] font-semibold leading-tight text-teal ${className}`}>
+      {t({ en: 'AI-generated · check before relying on it', zh: 'AI 生成 · 请核对后再使用' })}
     </span>
   );
 }

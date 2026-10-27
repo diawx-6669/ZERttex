@@ -1,11 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { ui } from '../data/i18n';
 import { tourById } from '../data/tours';
-import { answer, type BotAnswer, type ChatAction } from '../lib/concierge';
+import type { TourId } from '../data/types';
+import { aiLive, callAi, validateChat, type AiChat } from '../lib/ai';
+import { answer, detectLang, findTour, type BotAnswer, type ChatAction } from '../lib/concierge';
+import { addToInbox } from '../lib/inbox';
 import { navigate } from '../lib/router';
 import { useApp } from '../state';
 import { Icon } from './Icon';
-import { Scope, Tag } from './Tag';
+import { AiModeBadge, AiTag, Scope, Tag } from './Tag';
 
 // One conversation shared by the Ask page and the slide-in drawer,
 // so a traveler never loses the thread when moving between screens.
@@ -39,17 +42,26 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const langRef = useRef(lang);
   langRef.current = lang;
 
-  const ask = useCallback((text: string) => {
+  const msgsRef = useRef(msgs);
+  msgsRef.current = msgs;
+
+  const ask = useCallback(async (text: string) => {
     const q = text.trim();
     if (!q) return;
     setMsgs((m) => [...m, { id: idRef.current++, from: 'user', text: q }]);
     setTyping(true);
-    window.setTimeout(() => {
-      const a = answer(q, langRef.current);
-      setMsgs((m) => [...m, { id: idRef.current++, from: 'bot', text: a.text, a }]);
-      setTyping(false);
-      if (a.handoff) setHandoff({ open: true, question: q });
-    }, 550);
+    const scripted = answer(q, langRef.current);
+    let a: BotAnswer = scripted;
+    if (aiLive()) {
+      const history = msgsRef.current.filter((m) => !m.greet && m.text).slice(-6).map((m) => ({ from: m.from, text: m.text }));
+      const live = await callAi('chat', { question: q, lang: scripted.lang, tourId: findTour(q)?.id, history }, validateChat);
+      if (live) a = fromAi(live, scripted.lang);
+    } else {
+      await new Promise((r) => window.setTimeout(r, 550));
+    }
+    setMsgs((m) => [...m, { id: idRef.current++, from: 'bot', text: a.text, a }]);
+    setTyping(false);
+    if (a.handoff) setHandoff({ open: true, question: q });
   }, []);
 
   const value = useMemo<ChatCtx>(
@@ -80,6 +92,19 @@ export function useChat() {
   const c = useContext(Ctx);
   if (!c) throw new Error('useChat outside ChatProvider');
   return c;
+}
+
+/** Turns a validated AI reply into the same shape the scripted concierge uses. */
+function fromAi(r: AiChat, lang: BotAnswer['lang']): BotAnswer {
+  const actions: ChatAction[] = r.routes.map((to): ChatAction => {
+    if (to === 'handoff') return { kind: 'manager' };
+    if (to.startsWith('/tour/')) return { kind: 'tour', id: to.slice(6) as TourId };
+    if (to === '/book') return { kind: 'book' };
+    if (to === '/plan') return { kind: 'plan' };
+    if (to === '/trust') return { kind: 'trust' };
+    return { kind: 'route', to: to as '/tours' | '/trip' | '/postcard' };
+  });
+  return { text: r.answer, lang, actions, intent: 'ai', ai: true, tags: r.tags };
 }
 
 /** Question the concierge auto-asks when opened from a tour. */
@@ -119,6 +144,7 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
     if (a.kind === 'trust') go('/trust');
     if (a.kind === 'plan') go('/plan');
     if (a.kind === 'manager') setHandoff({ open: true, question: lastQ });
+    if (a.kind === 'route') go(a.to);
   };
 
   const actionLabel = (a: ChatAction) => {
@@ -126,6 +152,7 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
     if (a.kind === 'book') return t(ui.ask.startBooking);
     if (a.kind === 'trust') return t(ui.ask.openTrust);
     if (a.kind === 'plan') return t(ui.ask.openPlan);
+    if (a.kind === 'route') return t(a.to === '/tours' ? ui.nav.tours : a.to === '/trip' ? ui.nav.trip : ui.nav.postcard);
     return t(ui.ask.manager);
   };
 
@@ -136,6 +163,8 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
       return;
     }
     setHErr('');
+    const q = handoff.question.trim() || lastQ;
+    if (q) addToInbox({ question: q, email: hEmail.trim(), lang: detectLang(q, lang), tourId: findTour(q)?.id });
     setHandoff({ open: false, question: '' });
     setHEmail('');
     toast(t(ui.ask.sent));
@@ -151,7 +180,7 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
           </span>
           <div className="leading-tight">
             <div className="flex flex-wrap items-center gap-1.5 font-semibold">{t(ui.ask.bot)} <Scope phase="mvp" /></div>
-            <div className="text-xs text-muted">{t(ui.ask.scripted)}</div>
+            <AiModeBadge className="mt-0.5" />
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -179,8 +208,10 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
               >
                 {m.greet ? t(ui.ask.greeting) : m.text}
               </div>
-              {m.a && (m.a.tag || m.a.actions?.length) ? (
+              {m.a && (m.a.tag || m.a.ai || m.a.actions?.length) ? (
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  {m.a.ai && <AiTag />}
+                  {m.a.tags?.map((k) => <Tag key={k} kind={k} />)}
                   {m.a.tag && <Tag kind={m.a.tag} />}
                   {m.a.actions?.map((a, i) => (
                     <button key={i} type="button" className="chip !min-h-[32px] !py-1 text-xs" onClick={() => runAction(a)}>
