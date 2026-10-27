@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { PageHead, Stepper, TestModeBanner } from '../components/Layout';
-import { Tag } from '../components/Tag';
+import { Scope, Tag } from '../components/Tag';
 import { ui } from '../data/i18n';
 import { tourById, tours } from '../data/tours';
 import type { L, TourId } from '../data/types';
@@ -117,7 +117,7 @@ export default function Book({ query }: { query: URLSearchParams }) {
 
   return (
     <>
-      <PageHead loop={3} title={t(ui.book.title)} />
+      <PageHead loop={3} scope="mvp" title={t(ui.book.title)} />
       <div className="container-x mt-4">
         <TestModeBanner />
       </div>
@@ -310,6 +310,7 @@ export default function Book({ query }: { query: URLSearchParams }) {
                           <span className="flex flex-wrap items-center gap-2 font-semibold">
                             <Icon name={m.icon} size={17} /> {t(m.label)}
                             {m.planned && <Tag kind="proposal" extra={t(ui.book.planned)} />}
+                            {m.planned && <Scope phase="p2" />}
                           </span>
                           {m.id === 'card' && <span className="mt-1 block text-sm text-muted">{t(ui.book.cardText)}</span>}
                         </span>

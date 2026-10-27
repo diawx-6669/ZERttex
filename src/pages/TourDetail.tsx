@@ -3,7 +3,7 @@ import { tourQuestion, useChat } from '../components/Chat';
 import { Icon } from '../components/Icon';
 import { LoopStrip } from '../components/Layout';
 import { Gallery, Media } from '../components/Media';
-import { Tag } from '../components/Tag';
+import { Scope, Tag } from '../components/Tag';
 import { AudioGuide, Inclusions, Itinerary, PackingList, TourCard } from '../components/TourParts';
 import { interestText, ui } from '../data/i18n';
 import type { L } from '../data/types';
@@ -135,6 +135,7 @@ export default function TourDetail({ id }: { id?: string }) {
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <h2 id="inc-h" className="text-xl font-bold">{t(ui.tour.whatsIncluded)}</h2>
               <Tag kind="demo" />
+              <Scope phase="mvp" />
             </div>
             <Inclusions tour={tour} />
           </section>
@@ -145,7 +146,10 @@ export default function TourDetail({ id }: { id?: string }) {
           </section>
 
           <section id="audio" className="scroll-mt-32">
-            <h2 className="mb-1 text-xl font-bold">{t(ui.audio.title)}</h2>
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <h2 className="text-xl font-bold">{t(ui.audio.title)}</h2>
+              <Scope phase="p2" />
+            </div>
             <p className="mb-3 text-sm text-muted">{t(ui.audio.sub)}</p>
             <AudioGuide tour={tour} />
           </section>

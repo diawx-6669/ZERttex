@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { PageHead, Section } from '../components/Layout';
-import { Tag } from '../components/Tag';
+import { Scope, Tag } from '../components/Tag';
 import { BUDGET_CAP, budget, budgetConfig, budgetTotal, gantt, inMvp, later, metrics, oneTimeTotal, otherTotal, recurringTotal, reserveTotal, risks } from '../data/budget';
 import { kzt, millions, num } from '../lib/format';
 import { AVG_PRICE, DEFAULT_MARGIN, DEFAULT_RUNNING, DOWNSIDE, MONTHS, breakEvenTravelers, contributionPerTraveler, derivation, paybackMonth, series, type PaybackSeries } from '../lib/paybackModel';
@@ -123,7 +123,7 @@ export default function Impact() {
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div className="card p-5">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-bold"><Icon name="check" className="text-ok" /> In MVP (12 weeks)</h3>
+            <h3 className="mb-3 flex flex-wrap items-center gap-2 text-lg font-bold"><Icon name="check" className="text-ok" /> Paid from the {millions(BUDGET_CAP)} budget (12 weeks) <Scope phase="mvp" /></h3>
             <ul className="space-y-1.5 text-sm">
               {inMvp.map((x) => (
                 <li key={x} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ok" />{x}</li>
@@ -131,7 +131,7 @@ export default function Impact() {
             </ul>
           </div>
           <div className="card p-5">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-bold"><Icon name="clock" className="text-gold" /> Later phases</h3>
+            <h3 className="mb-3 flex flex-wrap items-center gap-2 text-lg font-bold"><Icon name="clock" className="text-gold" /> After the pilot <Scope phase="p2" /></h3>
             <ul className="space-y-1.5 text-sm">
               {later.map((x) => (
                 <li key={x} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />{x}</li>

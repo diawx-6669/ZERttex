@@ -5,7 +5,7 @@ import { answer, type BotAnswer, type ChatAction } from '../lib/concierge';
 import { navigate } from '../lib/router';
 import { useApp } from '../state';
 import { Icon } from './Icon';
-import { Tag } from './Tag';
+import { Scope, Tag } from './Tag';
 
 // One conversation shared by the Ask page and the slide-in drawer,
 // so a traveler never loses the thread when moving between screens.
@@ -150,7 +150,7 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
             <Icon name="chat" size={20} />
           </span>
           <div className="leading-tight">
-            <div className="font-semibold">{t(ui.ask.bot)}</div>
+            <div className="flex flex-wrap items-center gap-1.5 font-semibold">{t(ui.ask.bot)} <Scope phase="mvp" /></div>
             <div className="text-xs text-muted">{t(ui.ask.scripted)}</div>
           </div>
         </div>

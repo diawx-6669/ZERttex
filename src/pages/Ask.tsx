@@ -28,7 +28,7 @@ export default function Ask({ query }: { query: URLSearchParams }) {
 
   return (
     <>
-      <PageHead loop={2} title={t(ui.ask.title)} sub={t(ui.ask.sub)}>
+      <PageHead loop={2} scope="mvp" title={t(ui.ask.title)} sub={t(ui.ask.sub)}>
         <span className="inline-flex items-center gap-1.5 rounded border border-dashed border-teal/60 px-2 py-0.5 text-sm font-medium text-teal">
           <Icon name="info" size={13} /> {t(ui.ask.scripted)}
         </span>

@@ -21,24 +21,24 @@ Saryarqa Go is a bilingual (English / Chinese) booking app that lets foreign tra
 
 ---
 
-## 3. Features: MVP vs later
+## 3. Features: In MVP (8M) vs Phase 2
 
-| Feature | MVP (12 weeks) | Later |
+The app shows the same split as a small pill badge on every page / section: **● In MVP (8M)** or **○ Phase 2**.
+
+| Feature | In MVP (paid from 8,000,000 KZT) | Phase 2 (after the pilot) |
 |---|---|---|
-| EN / 中文 tour pages with "What's included" breakdown | ✅ | |
+| EN / 中文 tour pages with "What's included" (4 groups) | ✅ | |
 | 3-step booking, international card via hosted checkout | ✅ | |
-| Alipay / WeChat Pay | | ✅ after provider approval |
-| Concierge: scripted bilingual FAQ + human hand-off | ✅ | Live LLM with retrieval over verified tour data |
+| Concierge: AI answers only from verified data + human handoff | ✅ | |
 | Trust Center: guide videos, checklist, refund policy, video call request | ✅ | |
-| Rules-based trip builder | ✅ | |
-| My trip: timeline, daily check-ins, reschedule requests | ✅ | |
-| Weather & road alerts | Manual operator alerts | Live weather / road feeds |
-| Family updates | Check-in status sharing | GPS-based sharing (opt-in) |
-| Audio guide EN / 中文 | Text-to-speech in browser | Offline pre-downloaded audio |
-| Postcard + referral link | ✅ | Referral discount (Proposal) |
-| Distribution | Own app/site, Xiaohongshu content | Trip.com / Klook listing |
-
----
+| Postcard + referral QR code | ✅ | |
+| Manager inbox (staff): handoff questions, AI summary in Russian, reply drafts staff approve | ✅ | |
+| Trip builder (rules-based; AI only reads the free-text request) | | ✅ |
+| Weather / road alerts and rescheduling | | ✅ |
+| Family updates during the trip | | ✅ |
+| Offline audio guide | | ✅ |
+| Alipay / WeChat Pay live | | ✅ after provider approval |
+| Trip.com listing | | ✅ |
 
 ## 4. 12-week MVP plan
 

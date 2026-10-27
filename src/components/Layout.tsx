@@ -4,7 +4,7 @@ import { href } from '../lib/router';
 import { useApp } from '../state';
 import { useChat } from './Chat';
 import { Icon, type IconName } from './Icon';
-import { Tag, allTagKinds } from './Tag';
+import { Scope, Tag, allTagKinds } from './Tag';
 
 const navItems: { to: string; key: keyof typeof ui.nav; icon: IconName }[] = [
   { to: '/tours', key: 'tours', icon: 'compass' },
@@ -259,7 +259,7 @@ export function LoopStrip({ current, compact = false }: { current?: number; comp
   );
 }
 
-export function PageHead({ eyebrow, title, sub, children, loop }: { eyebrow?: ReactNode; title: string; sub?: string; children?: ReactNode; loop?: number }) {
+export function PageHead({ eyebrow, title, sub, children, loop, scope }: { eyebrow?: ReactNode; title: string; sub?: string; children?: ReactNode; loop?: number; scope?: 'mvp' | 'p2' }) {
   return (
     <div className="container-x pt-6 sm:pt-8">
       {loop !== undefined && (
@@ -268,6 +268,7 @@ export function PageHead({ eyebrow, title, sub, children, loop }: { eyebrow?: Re
         </div>
       )}
       {eyebrow && <div className="eyebrow mb-3 flex flex-wrap items-center gap-2">{eyebrow}</div>}
+      {scope && <Scope phase={scope} className="mb-2" />}
       <h1 className="max-w-3xl text-[2rem] font-extrabold sm:text-5xl">{title}</h1>
       {sub && <p className="mt-3 max-w-[60ch] text-lg text-muted">{sub}</p>}
       {children && <div className="mt-3 flex flex-wrap items-center gap-2">{children}</div>}

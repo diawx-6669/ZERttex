@@ -1,3 +1,4 @@
+import { BUDGET_CAP } from '../data/budget';
 import { tagExplain, tagText } from '../data/i18n';
 import type { TagKind } from '../data/types';
 import { useApp } from '../state';
@@ -27,3 +28,28 @@ export function Tag({ kind, extra, className = '' }: { kind: TagKind; extra?: st
 }
 
 export const allTagKinds: TagKind[] = ['case', 'verified', 'proposal', 'demo', 'confirm'];
+
+/**
+ * Scope badge: is this feature paid for by the 8M MVP budget, or Phase 2?
+ * Pill-shaped so it is never confused with the five square honesty labels.
+ */
+export function Scope({ phase, className = '' }: { phase: 'mvp' | 'p2'; className?: string }) {
+  const { t } = useApp();
+  const cap = `${BUDGET_CAP / 1_000_000}M`;
+  const text = phase === 'mvp' ? { en: `In MVP (${cap})`, zh: `MVP 范围内（${BUDGET_CAP / 10_000}万）` } : { en: 'Phase 2', zh: '第二阶段' };
+  const tip =
+    phase === 'mvp'
+      ? { en: `Built in the 12-week MVP, paid from the ${cap} KZT budget.`, zh: `12 周 MVP 内完成，由 ${BUDGET_CAP / 10_000} 万坚戈预算支付。` }
+      : { en: 'Shown in the prototype, but not paid from the MVP budget. Built after the pilot.', zh: '原型中可演示，但不在 MVP 预算内，试点之后开发。' };
+  return (
+    <span
+      data-scope={phase}
+      title={t(tip)}
+      className={`inline-flex w-fit shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-px align-middle text-[11px] font-semibold leading-tight ${
+        phase === 'mvp' ? 'border-ok/50 bg-ok/10 text-ok' : 'border-dashed border-muted/60 text-muted'
+      } ${className}`}
+    >
+      {phase === 'mvp' ? '●' : '○'} {t(text)}
+    </span>
+  );
+}

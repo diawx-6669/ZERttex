@@ -2,7 +2,7 @@ import { Icon } from '../components/Icon';
 import { LoopStrip, Section } from '../components/Layout';
 import { Media } from '../components/Media';
 import { RouteMap } from '../components/RouteMap';
-import { Tag } from '../components/Tag';
+import { Scope, Tag } from '../components/Tag';
 import { TourCard } from '../components/TourParts';
 import { complaints, evidence, methodNote } from '../data/facts';
 import { ui } from '../data/i18n';
@@ -100,7 +100,7 @@ export default function Home({ query }: { query: URLSearchParams }) {
               <a href={href(c.route)} className="group grid gap-3 py-7 sm:grid-cols-[1.1fr_1fr_auto] sm:items-baseline sm:gap-10">
                 <p className="font-display text-2xl font-semibold leading-snug sm:text-[1.7rem]">{t(c.quote)}</p>
                 <div>
-                  <p className="font-semibold">{t(c.feature)}</p>
+                  <p className="flex flex-wrap items-center gap-2 font-semibold">{t(c.feature)} <Scope phase="mvp" /></p>
                   <p className="mt-1 text-muted">{t(c.answer)}</p>
                 </div>
                 <Icon name="arrow" size={22} className="hidden text-muted transition group-hover:translate-x-1 group-hover:text-teal sm:block" />

@@ -208,6 +208,8 @@ const ok = (name, cond, info = '') => {
   ok('Payback table shows base and −30%', (await page.getByTestId('payback-table').getByText('M20').count()) === 1 && (await page.getByTestId('payback-table').getByText('M25').count()) === 1);
   ok('Break-even travelers 607 (8M ÷ 13,200)', (await page.getByText('607', { exact: true }).count()) >= 1);
   ok('No 20,000,000 left on Impact', !(await page.content()).includes('20,000,000'));
+  ok('Impact lists: MVP (8M) and Phase 2 badges', (await page.locator('[data-scope="mvp"]').count()) >= 1 && (await page.locator('[data-scope="p2"]').count()) >= 1);
+  ok('Impact MVP list matches 8M scope', (await page.getByText('Manager inbox: handoff questions').count()) === 1 && (await page.getByText('Trip builder (rules-based').count()) === 1);
   await shot('08-impact');
   await page.locator('#s-margin').fill('40');
   await page.waitForTimeout(150);
@@ -224,6 +226,16 @@ const ok = (name, cond, info = '') => {
   await page.getByRole('button', { name: /Request video call/ }).click();
   ok('Video call request (simulated)', (await page.getByText(/Request sent \(simulated\)/).count()) >= 1);
   await shot('09-trust');
+
+  // 9b. Scope badges: In MVP (8M) vs Phase 2
+  const scopeOf = async (r) => { await go(r); return page.locator('h1').locator('xpath=preceding-sibling::*[@data-scope][1]').getAttribute('data-scope').catch(() => null); };
+  for (const [r, want] of [['/tours', 'mvp'], ['/book?tour=kolsai', 'mvp'], ['/ask', 'mvp'], ['/trust', 'mvp'], ['/postcard', 'mvp'], ['/plan', 'p2'], ['/trip', 'p2']]) {
+    const got = await scopeOf(r);
+    ok(`Scope badge on ${r}: ${want}`, got === want, String(got));
+  }
+  await go('/tour/kolsai');
+  ok('Tour page: inclusions In MVP, audio guide Phase 2', (await page.locator('#inc [data-scope="mvp"]').count()) === 1 && (await page.locator('#audio [data-scope="p2"]').count()) === 1);
+  ok('Scope badge text says In MVP (8M)', (await page.locator('#inc [data-scope="mvp"]').textContent()).includes('In MVP (8M)'));
 
   // 10. Language toggle
   await go('/');

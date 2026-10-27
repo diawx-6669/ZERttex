@@ -54,7 +54,7 @@ export default function Postcard() {
 
   return (
     <>
-      <PageHead loop={5} title={t(ui.postcard.title)} sub={t(ui.postcard.sub)} />
+      <PageHead loop={5} scope="mvp" title={t(ui.postcard.title)} sub={t(ui.postcard.sub)} />
 
       <div className="container-x mt-6 grid gap-8 lg:grid-cols-[1fr_440px]">
         <form className="card h-fit min-w-0 space-y-5 p-4 sm:p-5" onSubmit={(e) => e.preventDefault()}>

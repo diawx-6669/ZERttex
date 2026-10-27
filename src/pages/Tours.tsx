@@ -47,7 +47,7 @@ export default function Tours() {
 
   return (
     <>
-      <PageHead loop={0} title={t(ui.tour.toursTitle)} sub={t(ui.tour.toursLead)}>
+      <PageHead loop={0} scope="mvp" title={t(ui.tour.toursTitle)} sub={t(ui.tour.toursLead)}>
         <Tag kind="demo" extra={t({ en: 'prices and details', zh: '价格与详情' })} />
       </PageHead>
 

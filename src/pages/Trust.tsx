@@ -131,7 +131,7 @@ export default function Trust() {
 
   return (
     <>
-      <PageHead loop={2} title={t(ui.trust.title)} sub={t(ui.trust.sub)} />
+      <PageHead loop={2} scope="mvp" title={t(ui.trust.title)} sub={t(ui.trust.sub)} />
 
       <div className="container-x mt-8 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
         <section className="card p-4 sm:p-5" aria-labelledby="meet">
