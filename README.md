@@ -82,16 +82,24 @@ Every label in the UI is one of exactly five: **Case fact · Verified source · 
 
 Cool neutral paper and near-black ink with one accent (the sky blue of the Kazakh flag, deepened for contrast). Archivo for headlines (slightly expanded, like a travel poster), Instrument Sans for text, Phosphor icons. One shape system: controls 10 px, containers 16 px, honesty labels 4 px. No uppercase micro-labels, no decorative dots, no em-dashes; sections use different layouts (editorial list, asymmetric tour grid, big-number row, map split). Light and dark themes follow the system setting.
 
-## Photos
+## Photos (offline-safe)
 
-The app shows real photos when they exist and falls back to the hand-drawn SVG scenes when they don't, so it always works offline.
+The app shows 12 freely licensed Wikimedia Commons photos (listed with author and licence in `src/data/commonsPhotos.json` and on About → Photo credits) and falls back to the hand-drawn SVG scenes when a photo cannot load.
 
-- Put photos into `src/assets/photos/` as `<tour>-<n>.jpg` (`charyn`, `kolsai`, `turkestan`, `burabay`).
-- **Every photo needs a credit** (author, licence, source) in `src/data/photoCredits.json`; photos without a credit are ignored. The credit is shown on the photo and in the lightbox.
-- `npm run photos` does both automatically from **Wikimedia Commons**, accepting only CC BY, CC BY-SA, CC0 and public-domain files (no NC / ND, no maps or logos). Tune or pin exact files in `scripts/photos.config.json`. Review every photo before showing it.
-- Tour pages get a swipeable **photo gallery with a full-screen lightbox** (arrows, swipe, Esc) as soon as photos exist.
+**Before the live pitch, bundle the photos so they work with no Wi-Fi:**
 
-The cloud session that built this prototype had no network access to Wikimedia, so no photos are committed yet; the pipeline was verified end-to-end with a simulated Commons response.
+```bash
+npm run photos:offline   # downloads the 12 files → src/assets/photos/<tour>-<n>.jpg (≤ 1600 px, ≤ 250 KB) + photoCredits.json
+npm run build            # inlines them into dist/index.html and docs/index.html
+node tests/acceptance.cjs   # "Offline: real photos on /tour/…" checks now run instead of SKIP
+```
+
+No time to run it locally? GitHub → Actions → **Fetch offline photos** → Run workflow on your branch: it downloads, rebuilds and commits the files.
+Already have the files? `node scripts/photos-offline.cjs --from <folder>` resizes and credits them.
+
+- Downloaded files take priority; any photo not downloaded yet is loaded from Commons at runtime.
+- Every photo needs a credit; files without one in `photoCredits.json` are ignored.
+- `npm run photos` (older script) searches Commons for other free photos; review every one before showing it.
 
 ## Where things are
 

@@ -14,6 +14,12 @@ const ok = (name, cond, info = '') => {
   results.push({ name, pass: !!cond, info });
   console.log(`${cond ? 'PASS' : 'FAIL'}  ${name}${info ? '  — ' + info : ''}`);
 };
+// A check that cannot run in this environment is reported, never counted as passed.
+const skipped = [];
+const skip = (name, why) => {
+  skipped.push({ name, why });
+  console.log(`SKIP  ${name}  — ${why}`);
+};
 
 (async () => {
   const browser = await chromium.launch();
@@ -287,6 +293,37 @@ const ok = (name, cond, info = '') => {
   await mp.waitForTimeout(250);
   await mp.screenshot({ path: path.join(SHOTS, '15-mobile-tour.png'), fullPage: true });
 
+  // 11b. Offline-safe photos: with the network disabled, tour pages still show real (bundled) photos.
+  const photoDir = path.join(ROOT, 'src/assets/photos');
+  const commonsList = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/commonsPhotos.json'), 'utf8'));
+  const credits = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/photoCredits.json'), 'utf8'));
+  const bundled = commonsList.filter((p) => fs.existsSync(path.join(photoDir, p.local)) && credits[p.local]);
+  if (bundled.length === 0) {
+    skip('Photos show with network disabled', 'no local photos yet: run `npm run photos:offline` on a machine with internet');
+  } else {
+    ok('All 12 credited photos are bundled', bundled.length === commonsList.length, `${bundled.length}/${commonsList.length}`);
+    for (const p of bundled) {
+      const st = fs.statSync(path.join(photoDir, p.local));
+      const dims = fs.readFileSync(path.join(photoDir, p.local));
+      // JPEG SOF0/SOF2 marker → width
+      let w = 0;
+      for (let i = 2; i < dims.length - 9; i++) if (dims[i] === 0xff && (dims[i + 1] === 0xc0 || dims[i + 1] === 0xc2)) { w = dims.readUInt16BE(i + 7); break; }
+      ok(`Photo ${p.local} ≤ 1600px and ≤ 250 KB`, w > 0 && w <= 1600 && st.size <= 250 * 1024, `${w}px, ${Math.round(st.size / 1024)} KB`);
+    }
+    const off = await browser.newContext({ viewport: { width: 1366, height: 900 }, offline: true });
+    const op = await off.newPage();
+    for (const tour of ['charyn', 'kolsai', 'turkestan', 'burabay']) {
+      await op.goto(URL + '#/tour/' + tour);
+      await op.waitForTimeout(900);
+      const real = await op.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth > 0 && i.src.startsWith('data:image/')).length);
+      ok(`Offline: real photos on /tour/${tour}`, real >= 1, `${real} loaded`);
+    }
+    await op.goto(URL + '#/about');
+    await op.waitForTimeout(400);
+    ok('Offline: About lists photo credits', (await op.locator('#photo-credits li').count()) >= 12);
+    await off.close();
+  }
+
   // 12. Dark mode
   const d = await browser.newContext({ viewport: { width: 1366, height: 900 }, colorScheme: 'dark' });
   await d.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
@@ -305,7 +342,7 @@ const ok = (name, cond, info = '') => {
 
   await browser.close();
   const failed = results.filter((r) => !r.pass);
-  console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
+  console.log(`\n${results.length - failed.length}/${results.length} checks passed${skipped.length ? `, ${skipped.length} skipped: ${skipped.map((x) => x.name).join('; ')}` : ''}`);
   
   process.exit(failed.length ? 1 : 0);
 })();

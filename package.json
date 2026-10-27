@@ -12,7 +12,8 @@
     "photos": "node scripts/fetch-photos.mjs",
     "report:docx": "node scripts/report-screenshots.cjs && node scripts/build-report-docx.cjs",
     "submission": "node scripts/build-submission.cjs",
-    "sync:money": "node scripts/sync-money-docs.cjs"
+    "sync:money": "node scripts/sync-money-docs.cjs",
+    "photos:offline": "node scripts/photos-offline.cjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",

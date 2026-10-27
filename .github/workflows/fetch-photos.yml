@@ -1,0 +1,32 @@
+# Manual only: downloads the 12 credited Wikimedia Commons photos into
+# src/assets/photos (≤ 1600 px, ≤ 250 KB), rebuilds the single-file app and
+# commits the result to the branch you run it on. Use it when your own
+# computer has no time / tools to run `npm run photos:offline`.
+# Actions → "Fetch offline photos" → Run workflow → pick the branch (e.g. stage2).
+name: Fetch offline photos
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm i --no-save playwright && npx playwright install --with-deps chromium
+      - run: node scripts/photos-offline.cjs
+      - run: npm run build
+      - name: Commit photos and rebuilt pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add src/assets/photos src/data/photoCredits.json dist docs/index.html index.html
+          git diff --cached --quiet || git commit -m "Add offline copies of the 12 credited Commons photos"
+          git push

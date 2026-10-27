@@ -1,0 +1,122 @@
+[
+  {
+    "tour": "charyn",
+    "local": "charyn-1.jpg",
+    "file": "Charyn Canyon (3991842679).jpg",
+    "author": "Peretz Partensky",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "title": "Charyn Canyon, Valley of Castles",
+    "zh": "查伦大峡谷城堡谷"
+  },
+  {
+    "tour": "charyn",
+    "local": "charyn-2.jpg",
+    "file": "Charyn Canyon.jpg",
+    "author": "Peretz Partensky",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "title": "Charyn Canyon",
+    "zh": "查伦大峡谷"
+  },
+  {
+    "tour": "kolsai",
+    "local": "kolsai-1.jpg",
+    "file": "Lower Kolsay Lake in April.jpg",
+    "author": "Dylanvt",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "title": "Lower Kolsay Lake in April",
+    "zh": "四月的下科尔赛湖"
+  },
+  {
+    "tour": "kolsai",
+    "local": "kolsai-2.jpg",
+    "file": "Scenic Lake Kaindy.jpg",
+    "author": "Inverseharpy",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "title": "Lake Kaindy",
+    "zh": "凯恩迪湖"
+  },
+  {
+    "tour": "kolsai",
+    "local": "kolsai-3.jpg",
+    "file": "IMG 9366-Kaindy-e.jpg",
+    "author": "Jonas Satkauskas",
+    "license": "CC BY-SA 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5/",
+    "title": "Lake Kaindy",
+    "zh": "凯恩迪湖"
+  },
+  {
+    "tour": "kolsai",
+    "local": "kolsai-4.jpg",
+    "file": "Kolsai lake.jpg",
+    "author": "Katariyakartikey",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "title": "Kolsay Lake",
+    "zh": "科尔赛湖"
+  },
+  {
+    "tour": "turkestan",
+    "local": "turkestan-1.jpg",
+    "file": "Mausoleum of Khoja Ahmed Yasawi in Hazrat-e Turkestan, Kazakhstan.jpg",
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "title": "Mausoleum of Khoja Ahmed Yasawi",
+    "zh": "霍贾·艾哈迈德·亚萨维陵墓"
+  },
+  {
+    "tour": "turkestan",
+    "local": "turkestan-2.jpg",
+    "file": "Mausoleum of Khoja Ahmed Yasawi in Turkistan 9.jpg",
+    "author": "Adam Harangozó",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "title": "Mausoleum of Khoja Ahmed Yasawi",
+    "zh": "霍贾·艾哈迈德·亚萨维陵墓"
+  },
+  {
+    "tour": "turkestan",
+    "local": "turkestan-3.jpg",
+    "file": "Mausoleum of Khoja Ahmed Yasavi in Turkestan, Kazakhstan.jpg",
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "title": "Mausoleum of Khoja Ahmed Yasawi",
+    "zh": "霍贾·艾哈迈德·亚萨维陵墓"
+  },
+  {
+    "tour": "burabay",
+    "local": "burabay-1.jpg",
+    "file": "Окжетпес Боровое.jpg",
+    "author": "Dots foto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "title": "Okzhetpes rock, Burabay",
+    "zh": "布拉拜奥日佩斯石"
+  },
+  {
+    "tour": "burabay",
+    "local": "burabay-2.jpg",
+    "file": "Казахстан. Боровое. Вид на озеро с пляжа.jpg",
+    "author": "Evgenyem",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "title": "Lake Burabay from the beach",
+    "zh": "从湖滩看布拉拜湖"
+  },
+  {
+    "tour": "burabay",
+    "local": "burabay-3.jpg",
+    "file": "Burabay 020000, Kazakhstan - panoramio (2).jpg",
+    "author": "alexandrorodrigez",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "title": "Burabay",
+    "zh": "布拉拜"
+  }
+]
