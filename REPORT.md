@@ -32,7 +32,7 @@ Appendix A — Sources · Appendix B — Prototype screens · Appendix C — Tec
 
 **The company.** Saryarqa Routes was founded in 2020 in Astana, has 9 full-time staff and about 25 freelance guides, and sells 2–7-day guided trips to Charyn Canyon, Kolsai Lakes, Turkestan and Burabay. In 2025 it served 3,400 travelers and earned 150,000,000 KZT at an average price of 44,000 KZT per traveler. About 96% of travelers were from Kazakhstan. **[Case fact]**
 
-**The goal.** Within 24 months, 30% of travelers from abroad, with up to 20,000,000 KZT for development and launch in year 1. **[Case fact]**
+**The goal.** Within 24 months, 30% of travelers from abroad. **[Case fact]** Stage 2 rule: total costs must stay within <!--m:cap-->8,000,000<!--/m--> KZT.
 
 **The problem.** The company sells through Instagram messages, WhatsApp and phone, takes Kaspi transfers or cash, and has a one-page, Russian-only website. Foreign guests said: *"It is unclear how to book." "I am not sure the company is trustworthy." "My foreign card does not work." "I do not know what is included."* **[Case fact]** Every one of these complaints breaks the sale before payment.
 
@@ -48,7 +48,7 @@ DISCOVER → PLAN → VERIFY → BOOK → TRAVEL → SHARE ─┐
 
 Each step removes one doubt, and the last step (a shareable postcard sized for Xiaohongshu and WeChat Moments) feeds new travelers back into the first.
 
-**The numbers.** The 12-week MVP and first-year launch fit exactly inside 20,000,000 KZT. Reaching the goal needs about **1,263 extra foreign travelers per year**. With a 30% contribution margin (our assumption), cumulative cash turns positive in **month 32** in the base case and **month 44** if demand is 30% lower. **[Proposal — model]**
+**The numbers.** The 12-week MVP and first-year launch fit exactly inside <!--m:cap-->8,000,000<!--/m--> KZT. Reaching the goal needs about **<!--m:extra-->1,263<!--/m--> extra foreign travelers per year**. With a <!--m:margin-->30%<!--/m--> contribution margin (our assumption), cumulative cash turns positive in **month <!--m:pbBase-->20<!--/m-->** in the base case and **month <!--m:pbDown-->25<!--/m-->** if results are 30% lower. **[Proposal — model]**
 
 **Proof that it works.** A clickable prototype covers the whole loop: tour pages, booking with validation and a simulated declined payment, a bilingual concierge, a trip builder, a trust center, an in-trip screen, a postcard generator and a live payback calculator. An automated test walked through **75 acceptance checks — all passed**, including the 375 px phone width and dark mode.
 
@@ -204,21 +204,23 @@ The rule: **anything that needs a third party's approval or live data goes to "l
 
 ## 4. Costs, payback and impact
 
-### 4.1 Year-1 budget — exactly 20,000,000 KZT **[Proposal — planning assumptions]**
+### 4.1 Year-1 budget — exactly <!--m:cap-->8,000,000<!--/m--> KZT **[Needs confirmation — planning assumptions]**
 
-| Item | Type | KZT | Share |
-|---|---|---:|---:|
-| Design & development | one-time | 8,000,000 | 40.0% |
-| Localization EN / 中文 | one-time | 1,500,000 | 7.5% |
-| Payment integration & testing | one-time | 1,500,000 | 7.5% |
-| Trust content: guide videos, photos | one-time | 1,000,000 | 5.0% |
-| Marketing & acquisition | recurring | 4,500,000 | 22.5% |
-| Hosting, AI usage, maintenance | recurring | 1,500,000 | 7.5% |
-| Pilot & support | recurring | 1,000,000 | 5.0% |
-| Contingency | reserve | 1,000,000 | 5.0% |
-| **Total** | | **20,000,000** | **100%** |
+<!--m:budgetTable-->
+| Item | Type | KZT | Share | Label |
+|---|---|---:|---:|---|
+| Design & development of MVP | one-time | 3,300,000 | 41.3% | Needs confirmation |
+| Localization EN / 中文 + guide videos | one-time | 800,000 | 10.0% | Needs confirmation |
+| Payment integration & testing | one-time | 700,000 | 8.8% | Needs confirmation |
+| AI concierge setup & testing | one-time | 300,000 | 3.8% | Needs confirmation |
+| Marketing & acquisition (Xiaohongshu content, pilot) | recurring | 1,700,000 | 21.3% | Needs confirmation |
+| Hosting + AI usage | recurring | 500,000 | 6.3% | Needs confirmation |
+| Support & pilot | recurring | 300,000 | 3.8% | Needs confirmation |
+| Reserve | reserve | 400,000 | 5.0% | Needs confirmation |
+| **Total** (Stage 2 cap 8,000,000) | | **8,000,000** | **100%** | |
+<!--/m-->
 
-One-time build: **12,000,000 KZT**. Recurring year-1 spend + contingency: **8,000,000 KZT**. After year 1, running cost is assumed at **300,000 KZT/month**.
+One-time build: **<!--m:oneTime-->5,100,000<!--/m--> KZT**. Recurring year-1 spend: **<!--m:recurring-->2,500,000<!--/m--> KZT**. Reserve: **<!--m:reserve-->400,000<!--/m--> KZT**. After year 1, running cost is assumed at **<!--m:run-->250,000<!--/m--> KZT/month**. All numbers come from one config file (`src/data/budget.ts`); the build fails if the lines do not add up to the cap.
 
 ### 4.2 Payback model
 
@@ -228,37 +230,41 @@ One-time build: **12,000,000 KZT**. Recurring year-1 spend + contingency: **8,00
 |---|---|---|
 | Average price per traveler | 44,000 KZT | Case fact |
 | Contribution margin | 30% | Proposal (team assumption) |
-| Contribution per traveler | 44,000 × 30% = **13,200 KZT** | Calculated |
+| Contribution per traveler | 44,000 × 30% = **<!--m:contribution-->13,200<!--/m--> KZT** | Calculated |
 | Extra foreign travelers per year at month 24 | 1,263 | Derived from the case goal (§4.3) |
-| Running cost after year 1 | 300,000 KZT / month | Proposal |
+| Running cost after year 1 | <!--m:run-->250,000<!--/m--> KZT / month | Proposal |
 | Launch | Month 4 | Proposal |
 
 **Formula**
 
-- **Costs:** 12,000,000 ÷ 3 per month in months 1–3; 8,000,000 ÷ 12 per month in months 1–12; 300,000 per month from month 13.
+- **Costs:** <!--m:oneTime-->5,100,000<!--/m--> (one-time) ÷ 3 per month in months 1–3; <!--m:other-->2,900,000<!--/m--> (recurring + reserve) ÷ 12 per month in months 1–12; <!--m:run-->250,000<!--/m--> per month from month 13.
 - **Travelers in month *m*:** (1,263 ÷ 12) × ramp(*m*), with ramp = (*m* − 3) ÷ 21 for months 4–24, then 1 (flat).
-- **Net in month *m*:** travelers × 13,200 − costs.
+- **Net in month *m*:** travelers × <!--m:contribution-->13,200<!--/m--> − costs.
 - **Payback:** first month where cumulative net ≥ 0.
 - **Downside:** same, with travelers × 0.7.
 
 **Results with the default inputs** (defaults were **not** tuned to look good)
 
-| | Base | Downside (× 0.7) |
+<!--m:resultsTable-->
+| | Base | Worse case (−30%, travelers × 0.7) |
 |---|---:|---:|
-| Lowest cumulative cash (month 12) | −17.0M KZT | −17.9M KZT |
-| Cumulative cash at month 24 | −8.3M KZT | −12.9M KZT |
-| **Payback month** | **Month 32** | **Month 44** |
-| Cumulative cash at month 48 | +17.8M KZT | +3.2M KZT |
-| Break-even travelers (20M ÷ 13,200) | 1,516 | 1,516 |
+| Lowest cumulative cash | −6.2M KZT (month 6) | −6.3M KZT (month 8) |
+| Cumulative cash at month 24 | +4.3M KZT | −0.3M KZT |
+| **Payback month** | **Month 20** | **Month 25** |
+| Cumulative cash at month 48 | +31.6M KZT | +17.0M KZT |
+| Break-even travelers (8,000,000 ÷ 13,200) | 607 | 607 |
+<!--/m-->
 
 **Sensitivity: what if our margin assumption is wrong?**
 
+<!--m:sensTable-->
 | Contribution margin | 20% | 25% | **30%** | 35% | 40% |
 |---|---|---|---|---|---|
-| Payback · base | M46 | M37 | **M32** | M29 | M27 |
-| Payback · downside | > M48 | > M48 | **M44** | M38 | M34 |
+| Payback · base | M26 | M23 | **M20** | M19 | M17 |
+| Payback · worse case | M34 | M28 | **M25** | M23 | M21 |
+<!--/m-->
 
-**Reading the model honestly.** The investment pays back within the 48-month horizon in the base case for any margin from 20% upwards. In the downside case it needs a margin of about 30% or more. The margin is therefore the number the team must check first with real cost data from the company (see §8). Judges can move all three sliders on the prototype's Impact page and watch the chart update.
+**Reading the model honestly.** With the smaller 8M budget the investment pays back inside the 48-month horizon in both cases for every margin from 20% upwards (see the table). The margin is the most sensitive input, so it is the number the team must check first with real cost data from the company (see §8). Judges can move all three sliders on the prototype's Impact page and watch the chart update.
 
 ### 4.3 Where 1,263 comes from
 
@@ -391,4 +397,4 @@ Switch **EN / 中文** in the header at any point; try it on a phone.
 - **No backend, no API keys, no runtime network calls** except Google Fonts. Illustrations are inline SVG, so the demo works offline.
 - **Photos:** only freely licensed photos (CC BY, CC BY-SA, CC0, public domain) from Wikimedia Commons, each shown with author and licence; inlined into the single-file build, so they work offline too. No stock photos, no AI-generated images presented as real places.
 - **Accessibility:** labels on every input, visible focus, keyboard-operable controls, `aria-live` chat, larger-text mode, `prefers-reduced-motion` respected.
-- **Automated acceptance test (Playwright): 75 / 75 checks passed** — every loop step, booking validation, decline and success, Chinese answers, the Kolsai + Burabay 8-day plan with the Astana transfer, a budget total of exactly 20,000,000 KZT, payback at months 32 / 44, no horizontal scroll at 375 px on all 12 routes, dark mode, and zero JavaScript errors.
+- **Automated acceptance test (Playwright): 75 / 75 checks passed** — every loop step, booking validation, decline and success, Chinese answers, the Kolsai + Burabay 8-day plan with the Astana transfer, a budget total of exactly <!--m:cap-->8,000,000<!--/m--> KZT, payback at months <!--m:pbBase-->20<!--/m--> / <!--m:pbDown-->25<!--/m-->, no horizontal scroll at 375 px on all 12 routes, dark mode, and zero JavaScript errors.

@@ -2,8 +2,9 @@
 // Builds the ZERTTEX submission package in submission/ with a plain
 // Google Docs look (Arial 11, 1" margins, default heading styles):
 //   1_Main_Report.pdf, 2_Financials_Business_Model.pdf, 3_User_Flow_Wireframes.pdf,
-//   4_References.pdf, 5_AI_Declaration.pdf, Saryarqa_Go_Submission_ALL.pdf
-//   and Saryarqa_Go_Submission_ALL.docx (upload to Google Docs to edit).
+//   4_References.pdf, 5_AI_Declaration.pdf, TeamName_TechnologyProduct.pdf
+//   and TeamName_TechnologyProduct.docx (upload to Google Docs to edit).
+// All money numbers come from src/data/budget.ts via scripts/lib/model.cjs.
 // Needs Playwright + Chromium, pandoc, and screenshots in docs/img.
 //   node scripts/build-submission.cjs
 
@@ -21,34 +22,45 @@ fs.mkdirSync(HTML, { recursive: true });
 const n = (x) => Math.round(x).toLocaleString('en-US');
 const m = (x) => (x / 1e6).toFixed(1) + 'M';
 
-// ---------- payback model (same logic as src/lib/paybackModel.ts) ----------
-const PRICE = 44000;
-const MARGIN = 0.3;
-const EXTRA = 1263;
-const RUN = 300000;
+// ---------- payback model: the ONE config in src/data/budget.ts ----------
+const MODEL = require('./lib/model.cjs');
+const CFG = MODEL.budgetConfig;
+const CAP = MODEL.BUDGET_CAP;
+const PRICE = CFG.model.avgPrice;
+const MARGIN = CFG.model.margin;
+const EXTRA = MODEL.derivation.extra;
+const RUN = CFG.model.runningCostPerMonth;
+const DOWN = CFG.model.downsideFactor;
+const CPT = PRICE * MARGIN;
+const BREAK_EVEN = MODEL.breakEvenTravelers(MARGIN);
 function series(factor, margin = MARGIN) {
-  let cum = 0;
-  const out = [];
-  for (let mo = 1; mo <= 48; mo++) {
-    const cost = (mo <= 3 ? 12e6 / 3 : 0) + (mo <= 12 ? 8e6 / 12 : RUN);
-    const ramp = mo < 4 ? 0 : mo >= 24 ? 1 : (mo - 3) / 21;
-    const trav = ((EXTRA * factor) / 12) * ramp;
-    const contrib = trav * PRICE * margin;
-    cum += contrib - cost;
-    out.push({ mo, trav, contrib, cost, cum });
-  }
-  return out;
+  const s = MODEL.series({ margin, travelersPerYear: EXTRA, runningCost: RUN }, factor);
+  let prev = 0;
+  return s.map((p) => {
+    const contrib = p.travelers * PRICE * margin;
+    const cost = contrib - (p.cumulative - prev);
+    prev = p.cumulative;
+    return { mo: p.month, trav: p.travelers, contrib, cost, cum: p.cumulative };
+  });
 }
-const payback = (s) => (s.find((p) => p.mo >= 4 && p.cum >= 0) || {}).mo || null;
+const payback = (s) => (s.find((p) => p.mo >= CFG.model.launchMonth && p.cum >= 0) || {}).mo || null;
 const base = series(1);
-const down = series(0.7);
+const down = series(DOWN);
+const PB = payback(base);
+const PD = payback(down);
+const lowOf = (s) => s.reduce((a, p) => (p.cum < a.cum ? p : a), s[0]);
 const years = (s) =>
   [1, 2, 3, 4].map((y) => {
     const part = s.slice((y - 1) * 12, y * 12);
     const sum = (k) => part.reduce((a, p) => a + p[k], 0);
     return { y, trav: sum('trav'), contrib: sum('contrib'), cost: sum('cost'), net: sum('contrib') - sum('cost'), cum: part[11].cum };
   });
-const sens = [0.2, 0.25, 0.3, 0.35, 0.4].map((mg) => ({ mg, b: payback(series(1, mg)), d: payback(series(0.7, mg)) }));
+const pbText = (x) => (x ? 'month ' + x : 'after 48');
+const budgetRows = (cols) =>
+  CFG.lines
+    .map((b) => (cols === 4 ? `<tr><td>${b.kind === 'one-time' ? 'Development' : b.kind === 'reserve' ? 'Reserve' : 'Launch'}</td><td>${b.item}</td><td>${b.kind === 'one-time' ? 'one-time' : 'year 1'}</td><td class="r">${n(b.amount)}</td></tr>` : `<tr><td>${b.item}</td><td>${b.kind}</td><td class="r">${n(b.amount)}</td></tr>`))
+    .join('');
+const sens = [0.2, 0.25, 0.3, 0.35, 0.4].map((mg) => ({ mg, b: payback(series(1, mg)), d: payback(series(DOWN, mg)) }));
 
 // Chart in the style of a Google Sheets line chart (default blue / red series).
 function chartSvg() {
@@ -163,11 +175,11 @@ const docPage = (title, body) =>
 // ---------- content ----------
 const main = `
 <p class="title">Saryarqa Go</p>
-<p class="subtitle">ZERTTEX Hackathon 2026, Stage 1. Case 1: Technology Product<br>Team: ____________________</p>
+<p class="subtitle">ZERTTEX Hackathon 2026, Final (Stage 2). Case 1: Technology Product<br>Team: ____________________</p>
 
 <h1>1. Summary</h1>
 <p>Saryarqa Routes is a tour company from Astana. In 2025 it had 3,400 travelers, but about 96% of them were from Kazakhstan, and the company wants 30% of its travelers to come from abroad within 24 months (case data). We think the main reason foreigners do not book is simple: they cannot easily see what a trip includes, they cannot pay with their own card, and they have no way to check that the company is real.</p>
-<p>Our answer is Saryarqa Go, a booking website and app in English and Chinese. We start with independent travelers from China. The first version can be built in 12 weeks within the 20 million KZT budget from the case. With our assumptions it pays back in month 32, or in month 44 if we get 30% fewer travelers than planned.</p>
+<p>Our answer is Saryarqa Go, a booking website and app in English and Chinese. We start with independent travelers from China. The first version can be built in 12 weeks, and all year-1 costs stay within ${n(CAP)} KZT. With our assumptions it pays back in month ${PB}, or in month ${PD} if we get 30% fewer travelers than planned.</p>
 
 <h1>2. The problem</h1>
 <p>Today the company sells tours through Instagram messages, WhatsApp and phone calls. Customers pay by Kaspi transfer or cash, and the website is one page in Russian (case data). This works for local customers, but not for a tourist from Shanghai or Berlin. The case lists four things foreign guests said, and each of them stops a booking before the payment:</p>
@@ -212,16 +224,16 @@ const main = `
 <tr><td>1-2</td><td>Interviews and research; apply to payment providers</td><td>At least 10 interviews with Chinese travelers; applications sent</td></tr>
 <tr><td>3-4</td><td>Design and tour pages in English and Chinese</td><td>4 tour pages checked by 3 or more target users</td></tr>
 <tr><td>5-7</td><td>Booking, inclusion lists, chat, trust page</td><td>A full test booking works in the payment test mode</td></tr>
-<tr><td>8-9</td><td>Trip builder, real payment page, rescheduling</td><td>Staff make a first real test payment</td></tr>
+<tr><td>8-9</td><td>Real payment page, manager inbox, postcard QR</td><td>Staff make a first real test payment</td></tr>
 <tr><td>10-11</td><td>Usability tests and payment checks</td><td>5-8 test sessions with no blocking problems left</td></tr>
 <tr><td>12</td><td>Pilot with real travelers</td><td>Pilot results collected</td></tr>
 </table>
-<p>Everything that depends on another company's approval or on live data comes later: Alipay and WeChat Pay, a smarter AI chat, live weather and road data, GPS sharing, offline audio, and listing on Trip.com or Klook. This way the MVP does not get stuck waiting for someone else.</p>
+<p>Phase 2 comes after the ${n(CAP)} KZT MVP: the trip builder, weather and road rescheduling, family updates, the offline audio guide, live Alipay and WeChat Pay, and listing on Trip.com. This way the MVP stays small and does not get stuck waiting for someone else.</p>
 <p>The app would be built with React and TypeScript, a database with an admin page for the managers, and the payment provider's own payment page, so card data never touches our servers. We plan a small hired team: a designer, two developers and a Chinese translator, with one person from Saryarqa Routes as the product owner (our proposal).</p>
 <p>We already have a working clickable prototype that shows the whole path from choosing a tour to the postcard. Payments in it are only simulated and it collects no card or passport data. It was built with the help of an AI coding assistant; see our AI Declaration.</p>
 
 <h1>7. Costs, payback and impact</h1>
-<p>The year-1 budget is exactly 20,000,000 KZT: 12 million for building the product and 8 million for launch, marketing, support and a reserve. The company earns its normal margin on every additional foreign traveler. We assume a 30% margin on the average price of 44,000 KZT, so 13,200 KZT per traveler (our assumption). The company needs about 1,516 additional travelers in total to earn back 20 million. With our ramp-up plan the money comes back in month 32. If demand is 30% lower, it comes back in month 44. The full calculation is in the separate financial document.</p>
+<p>The year-1 budget is exactly ${n(CAP)} KZT: ${m(MODEL.oneTimeTotal)} for building the product and ${m(MODEL.otherTotal)} for launch, marketing, support and a reserve. The company earns its normal margin on every additional foreign traveler. We assume a ${MARGIN * 100}% margin on the average price of ${n(PRICE)} KZT, so ${n(CPT)} KZT per traveler (our assumption). The company needs about ${n(BREAK_EVEN)} additional travelers in total to earn back ${m(CAP)}. With our ramp-up plan the money comes back in month ${PB}. If demand is 30% lower, it comes back in month ${PD}. The full calculation is in the separate financial document.</p>
 <p>If it works, the company gets a second source of income next to local customers. Travelers get clear prices, a way to pay with their own card, and a guide they have already met. For Kazakhstan, every positive trip that is shared on Chinese social media is a small advertisement for the country, and it brings tourists to regions outside Almaty and Astana.</p>
 
 <h1>8. Risks</h1>
@@ -243,7 +255,7 @@ const fin = `
 
 <h1>1. Business model</h1>
 <p>The traveler pays Saryarqa Routes for the tour, the same way local customers do now. Saryarqa Go itself is not sold to anyone. It is the new sales channel that lets foreign travelers find, understand and pay for the tours.</p>
-<p>In our calculation we count only one source of income: the margin on additional foreign travelers. The average price is 44,000 KZT (case data). We assume that 30% of it is left after paying guides, transport, accommodation and payment fees, so 13,200 KZT per traveler (our assumption). We do not count three other possible sources, so the result is on the careful side:</p>
+<p>In our calculation we count only one source of income: the margin on additional foreign travelers. The average price is 44,000 KZT (case data). We assume that 30% of it is left after paying guides, transport, accommodation and payment fees, so ${n(CPT)} KZT per traveler (our assumption). We do not count three other possible sources, so the result is on the careful side:</p>
 <ul>
 <li>optional extras sold on the tour page, like horse riding, boats or a single room;</li>
 <li>longer trips, because the trip builder makes it easy to combine two or three tours;</li>
@@ -254,23 +266,16 @@ const fin = `
 <h1>2. Budget</h1>
 <table>
 <tr><th>Part</th><th>Item</th><th>When</th><th class="r">KZT</th></tr>
-<tr><td>Development</td><td>Design and development</td><td>one-time</td><td class="r">8,000,000</td></tr>
-<tr><td>Development</td><td>Translation and localization (English, Chinese)</td><td>one-time</td><td class="r">1,500,000</td></tr>
-<tr><td>Development</td><td>Payment integration and testing</td><td>one-time</td><td class="r">1,500,000</td></tr>
-<tr><td>Development</td><td>Guide videos and photos</td><td>one-time</td><td class="r">1,000,000</td></tr>
-<tr><td>Launch</td><td>Marketing (Xiaohongshu, WeChat, partners)</td><td>year 1</td><td class="r">4,500,000</td></tr>
-<tr><td>Launch</td><td>Pilot and customer support</td><td>year 1</td><td class="r">1,000,000</td></tr>
-<tr><td>Maintenance</td><td>Hosting, AI usage, maintenance</td><td>year 1</td><td class="r">1,500,000</td></tr>
-<tr><td>Reserve</td><td>Contingency</td><td>year 1</td><td class="r">1,000,000</td></tr>
-<tr><td colspan="3"><b>Total year 1</b> (the case allows up to 20,000,000)</td><td class="r"><b>20,000,000</b></td></tr>
+${budgetRows(4)}
+<tr><td colspan="3"><b>Total year 1</b> (Stage 2 limit ${n(CAP)})</td><td class="r"><b>${n(MODEL.budgetTotal)}</b></td></tr>
 </table>
-<p>From year 2 we expect running costs of 300,000 KZT per month, or 3,600,000 KZT per year, for hosting, support and keeping the content up to date. All budget numbers are our planning estimates and should be checked with real quotes.</p>
+<p>From year 2 we expect running costs of ${n(RUN)} KZT per month, or ${n(RUN * 12)} KZT per year, for hosting, support and keeping the content up to date. All budget numbers are our planning estimates and should be checked with real quotes.</p>
 
 <h1>3. How many travelers we expect</h1>
-<p>To reach 30% foreign travelers the company needs about 1,263 additional foreign travelers per year (see section 3 of the main report). We launch in month 4 and expect the number to grow step by step until it reaches the full level in month 24 (in month m we get (m - 3) / 21 of the full level). After that we keep it flat, which is also a careful choice.</p>
+<p>To reach 30% foreign travelers the company needs about ${n(EXTRA)} additional foreign travelers per year (see section 3 of the main report). We launch in month 4 and expect the number to grow step by step until it reaches the full level in month 24 (in month m we get (m - 3) / 21 of the full level). After that we keep it flat, which is also a careful choice.</p>
 
 <h1>4. Payback</h1>
-<p>Each month we calculate: additional travelers x 13,200 KZT, minus costs. The 12 million one-time costs are spread over months 1-3, the other 8 million over months 1-12, and from month 13 the cost is 300,000 KZT per month. The payback month is the first month when the total since the start is no longer negative. For the pessimistic (downside) scenario we use 30% fewer travelers and keep everything else the same.</p>
+<p>Each month we calculate: additional travelers x ${n(CPT)} KZT, minus costs. The ${m(MODEL.oneTimeTotal)} one-time costs are spread over months 1-3, the other ${m(MODEL.otherTotal)} over months 1-12, and from month 13 the cost is ${n(RUN)} KZT per month. The payback month is the first month when the total since the start is no longer negative. For the pessimistic (downside) scenario we use 30% fewer travelers and keep everything else the same.</p>
 <img src="IMG:chart" style="width:100%">
 <p class="caption">Figure 1. Cumulative cash flow for the base case and the downside case.</p>
 <table>
@@ -279,11 +284,11 @@ ${yb.map((r, i) => `<tr><td>${r.y}</td><td class="r">${n(r.trav)}</td><td class=
 </table>
 <table>
 <tr><th>Result</th><th class="r">Base case</th><th class="r">Downside (x 0.7)</th></tr>
-<tr><td>Lowest point (month 12)</td><td class="r">${m(Math.min(...base.map((p) => p.cum)))}</td><td class="r">${m(Math.min(...down.map((p) => p.cum)))}</td></tr>
+<tr><td>Lowest point</td><td class="r">${m(lowOf(base).cum)} (month ${lowOf(base).mo})</td><td class="r">${m(lowOf(down).cum)} (month ${lowOf(down).mo})</td></tr>
 <tr><td>Total after 24 months</td><td class="r">${m(base[23].cum)}</td><td class="r">${m(down[23].cum)}</td></tr>
 <tr><td><b>Payback month</b></td><td class="r"><b>${payback(base)}</b></td><td class="r"><b>${payback(down)}</b></td></tr>
 <tr><td>Total after 48 months</td><td class="r">${m(base[47].cum)}</td><td class="r">${m(down[47].cum)}</td></tr>
-<tr><td>Travelers needed to earn back 20M (20,000,000 / 13,200)</td><td class="r">1,516</td><td class="r">1,516</td></tr>
+<tr><td>Travelers needed to earn back ${m(CAP)} (${n(CAP)} / ${n(CPT)})</td><td class="r">${n(BREAK_EVEN)}</td><td class="r">${n(BREAK_EVEN)}</td></tr>
 </table>
 
 <h3>What if our margin is wrong?</h3>
@@ -293,7 +298,7 @@ ${yb.map((r, i) => `<tr><td>${r.y}</td><td class="r">${n(r.trav)}</td><td class=
 <tr><td>Payback, base case</td>${sens.map((s) => `<td class="r">${s.b ? 'month ' + s.b : 'after 48'}</td>`).join('')}</tr>
 <tr><td>Payback, downside</td>${sens.map((s) => `<td class="r">${s.d ? 'month ' + s.d : 'after 48'}</td>`).join('')}</tr>
 </table>
-<p>In the base case the project pays back within four years even with a 20% margin. In the downside case it needs a margin of about 30% or more. So the first thing we would check with the company is its real cost per traveler. If the pilot shows lower demand, we would move more of the marketing to free channels (postcards and our own Xiaohongshu posts), delay paid ads, and keep running costs at 300,000 KZT per month.</p>
+<p>In the base case the project pays back in month ${sens[0].b} even with a 20% margin. In the downside case it pays back in ${pbText(sens[0].d)} with a 20% margin and in month ${sens[2].d} with 30%. So the first thing we would check with the company is its real cost per traveler. If the pilot shows lower demand, we would move more of the marketing to free channels (postcards and our own Xiaohongshu posts), delay paid ads, and keep running costs at ${n(RUN)} KZT per month.</p>
 `;
 
 const flow = `
@@ -354,8 +359,8 @@ const ai = `
 // ---------- single file in the official structure ----------
 const single = `
 <p class="title">Saryarqa Go</p>
-<p class="subtitle">ZERTTEX Hackathon 2026, Stage 1. Case 1: Technology Product<br>Team: ____________________</p>
-<p>Saryarqa Routes wants 30% of its travelers to come from abroad within 24 months, but today about 96% of its 3,400 travelers are from Kazakhstan (case data). We propose Saryarqa Go, a booking platform in English and Chinese for independent travelers from China. It shows exactly what each tour includes, lets travelers meet their guide before paying, and accepts foreign cards. The first version can be built in 12 weeks within the 20 million KZT budget. Clickable prototype: <a href="https://diawx-6669.github.io/ZERttex/">https://diawx-6669.github.io/ZERttex/</a></p>
+<p class="subtitle">ZERTTEX Hackathon 2026, Final (Stage 2). Case 1: Technology Product<br>Team: ____________________</p>
+<p>Saryarqa Routes wants 30% of its travelers to come from abroad within 24 months, but today about 96% of its 3,400 travelers are from Kazakhstan (case data). We propose Saryarqa Go, a booking platform in English and Chinese for independent travelers from China. It shows exactly what each tour includes, lets travelers meet their guide before paying, and accepts foreign cards. The first version can be built in 12 weeks, with all year-1 costs within ${n(CAP)} KZT. Clickable prototype: <a href="https://diawx-6669.github.io/ZERttex/">https://diawx-6669.github.io/ZERttex/</a></p>
 
 <h1>1. Problem and market</h1>
 <h3>Target market: independent travelers from mainland China</h3>
@@ -389,13 +394,13 @@ const single = `
 <p class="caption">Figure 1. Our clickable prototype: each complaint from the case is linked to a feature.</p>
 
 <h1>4. MVP and implementation</h1>
-<p>The MVP includes the tour pages, the inclusion lists, booking with foreign card payment, the trust page, a simple scripted chat with hand-off to a manager, and the trip page. Things that depend on another company's approval or on live data come later: Alipay and WeChat Pay, a smarter AI chat, live weather data, and listing on Trip.com.</p>
+<p>The MVP (paid from the ${n(CAP)} KZT budget) includes the tour pages in English and Chinese with the inclusion lists, booking in three steps with a foreign card on the provider's page, the trust page, a chat that answers only from checked tour data and hands off to a manager, the postcard with a referral QR code, and a manager inbox for staff. Phase 2 comes later: the trip builder, weather and road rescheduling, family updates, the offline audio guide, live Alipay and WeChat Pay, and listing on Trip.com.</p>
 <table>
 <tr><th>Weeks</th><th>What we do</th><th>We know it is done when</th></tr>
 <tr><td>1-2</td><td>Interviews and research; apply to payment providers</td><td>At least 10 interviews with Chinese travelers; applications sent</td></tr>
 <tr><td>3-4</td><td>Design and tour pages in English and Chinese</td><td>4 tour pages checked by 3 or more target users</td></tr>
 <tr><td>5-7</td><td>Booking, inclusion lists, chat, trust page</td><td>A full test booking works in the payment test mode</td></tr>
-<tr><td>8-9</td><td>Trip page, real payment page, rescheduling</td><td>Staff make a first real test payment</td></tr>
+<tr><td>8-9</td><td>Real payment page, manager inbox, postcard QR</td><td>Staff make a first real test payment</td></tr>
 <tr><td>10-11</td><td>Usability tests and payment checks</td><td>5-8 test sessions with no blocking problems left</td></tr>
 <tr><td>12</td><td>Pilot with real travelers</td><td>Pilot results collected</td></tr>
 </table>
@@ -405,24 +410,21 @@ const single = `
 
 <h1>5. Costs, payback and impact</h1>
 <table>
-<tr><th>Part</th><th>Item</th><th class="r">KZT</th></tr>
-<tr><td>Development (one-time)</td><td>Design and development 8.0M; translation 1.5M; payment integration 1.5M; guide videos and photos 1.0M</td><td class="r">12,000,000</td></tr>
-<tr><td>Launch (year 1)</td><td>Marketing on Xiaohongshu and WeChat 4.5M; pilot and support 1.0M</td><td class="r">5,500,000</td></tr>
-<tr><td>Running costs (year 1)</td><td>Hosting, AI usage, maintenance</td><td class="r">1,500,000</td></tr>
-<tr><td>Reserve</td><td>Contingency</td><td class="r">1,000,000</td></tr>
-<tr><td colspan="2"><b>Total year 1</b> (case limit 20,000,000)</td><td class="r"><b>20,000,000</b></td></tr>
+<tr><th>Item</th><th>Type</th><th class="r">KZT</th></tr>
+${budgetRows(3)}
+<tr><td colspan="2"><b>Total year 1</b> (Stage 2 limit ${n(CAP)})</td><td class="r"><b>${n(MODEL.budgetTotal)}</b></td></tr>
 </table>
-<p>From year 2 running costs are 300,000 KZT per month (our estimate). <b>How it earns money:</b> the company keeps its margin on every additional foreign traveler. We assume 30% of the 44,000 KZT average price (case data) is left after guides, transport, hotels and payment fees, so 13,200 KZT per traveler (our assumption). We do not count extras, longer trips or referrals, so the result is careful. Travelers start in month 4 and grow step by step to 1,263 per year by month 24.</p>
+<p>From year 2 running costs are ${n(RUN)} KZT per month (our estimate). <b>How it earns money:</b> the company keeps its margin on every additional foreign traveler. We assume ${MARGIN * 100}% of the ${n(PRICE)} KZT average price (case data) is left after guides, transport, hotels and payment fees, so ${n(CPT)} KZT per traveler (our assumption). We do not count extras, longer trips or referrals, so the result is careful. Travelers start in month 4 and grow step by step to ${n(EXTRA)} per year by month 24.</p>
 <img src="IMG:chart" style="width:92%">
 <p class="caption">Figure 3. Cumulative cash flow. Red line: results 30% worse than planned.</p>
 <table>
 <tr><th>Result</th><th class="r">Base case</th><th class="r">30% worse</th></tr>
-<tr><td>Lowest point (month 12)</td><td class="r">${m(Math.min(...base.map((p) => p.cum)))}</td><td class="r">${m(Math.min(...down.map((p) => p.cum)))}</td></tr>
+<tr><td>Lowest point</td><td class="r">${m(lowOf(base).cum)}</td><td class="r">${m(lowOf(down).cum)}</td></tr>
 <tr><td><b>Payback month</b></td><td class="r"><b>${payback(base)}</b></td><td class="r"><b>${payback(down)}</b></td></tr>
 <tr><td>Total after 48 months</td><td class="r">${m(base[47].cum)}</td><td class="r">${m(down[47].cum)}</td></tr>
-<tr><td>Payback if the margin is 20% / 40%</td><td class="r">month ${sens[0].b} / ${sens[4].b}</td><td class="r">after 48 / month ${sens[4].d}</td></tr>
+<tr><td>Payback if the margin is 20% / 40%</td><td class="r">month ${sens[0].b} / ${sens[4].b}</td><td class="r">${pbText(sens[0].d)} / month ${sens[4].d}</td></tr>
 </table>
-<p>If results are 30% worse, the project still pays back, but in month 44 instead of 32, and only if the margin is about 30% or more. In that case we would move marketing to free channels (postcards, our own Xiaohongshu posts), delay paid ads and keep running costs at the minimum. <b>Scalability:</b> the same platform can add Korean or English-speaking markets with new translations, and new tours can be added by managers without developers.</p>
+<p>If results are 30% worse, the project still pays back, but in month ${PD} instead of ${PB}. In that case we would move marketing to free channels (postcards, our own Xiaohongshu posts), delay paid ads and keep running costs at the minimum. <b>Scalability:</b> the same platform can add Korean or English-speaking markets with new translations, and new tours can be added by managers without developers.</p>
 <p><b>Impact.</b> The company gets a second source of income next to local customers and stops losing foreign guests at the payment step. Travelers get clear prices, their own payment method and a guide they have already met. For Kazakhstan, every good trip shared on Chinese social media is free advertising, and it brings tourists to regions outside Almaty and Astana.</p>
 <table>
 <tr><th>Biggest risks</th><th>What we do about it</th></tr>
@@ -434,7 +436,7 @@ const single = `
 </table>
 
 <h1>6. Conclusion</h1>
-<p>Foreign travelers do not book Saryarqa Routes because they cannot see what is included, cannot pay with their card and cannot check the company. Saryarqa Go fixes all four problems in one product, starting with Chinese travelers who can already visit without a visa. It fits the 20 million KZT budget and pays back in month 32, or month 44 if results are 30% worse. Our next steps: interview at least 10 Chinese travelers, check the real margin with the company, and apply to payment providers in the first week.</p>
+<p>Foreign travelers do not book Saryarqa Routes because they cannot see what is included, cannot pay with their card and cannot check the company. Saryarqa Go fixes all four problems in one product, starting with Chinese travelers who can already visit without a visa. It fits the ${n(CAP)} KZT limit and pays back in month ${PB}, or month ${PD} if results are 30% worse. Our next steps: interview at least 10 Chinese travelers, check the real margin with the company, and apply to payment providers in the first week.</p>
 `;
 
 const docs = [

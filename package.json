@@ -11,7 +11,8 @@
     "test:e2e": "npm run build && node tests/acceptance.cjs",
     "photos": "node scripts/fetch-photos.mjs",
     "report:docx": "node scripts/report-screenshots.cjs && node scripts/build-report-docx.cjs",
-    "submission": "node scripts/build-submission.cjs"
+    "submission": "node scripts/build-submission.cjs",
+    "sync:money": "node scripts/sync-money-docs.cjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",
@@ -23,6 +24,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
+    "docx": "^9.14.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.6.3",

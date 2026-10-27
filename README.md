@@ -26,6 +26,7 @@ DISCOVER → PLAN → VERIFY → BOOK → TRAVEL → SHARE ─┐
 | Download real destination photos (needs network to Wikimedia) | `npm run photos` (then `npm run build`) |
 | Build the ZERTTEX submission (PDFs + Google Docs-ready DOCX) | `npm run submission` → `submission/` |
 | Rebuild the Word report from `REPORT.md` | `npm run report:docx` → `docs/Saryarqa_Go_Report.docx` |
+| Refresh every money number in the Markdown docs from `src/data/budget.ts` | `npm run sync:money` |
 
 Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/ask`, `#/trust`, `#/book`, `#/trip`, `#/postcard`, `#/impact`, `#/about`.
 
@@ -50,7 +51,7 @@ Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/as
 - **Trust Center**: animated guide intro, 3 sample guide profiles, video-call request, verification checklist, refund rules, emergency number.
 - **My trip**: timeline with "Advance demo time", family-sharing switch (off by default, copyable link, stop button), weather/road simulator with reschedule request.
 - **Postcard**: 1–4 photos read with `FileReader` (never uploaded), 4:5 layout for Xiaohongshu / WeChat Moments / Instagram, decorative QR, copyable referral link, "see what your friend sees" back to step 1.
-- **Impact page**: 12-week Gantt, year-1 budget (exactly 20,000,000 KZT), live payback model with 3 sliders and an SVG chart (base: month 32, downside: month 44 at defaults).
+- **Impact page**: 12-week Gantt, year-1 budget (exactly <!--m:cap-->8,000,000<!--/m--> KZT, Stage 2 cap; one config in `src/data/budget.ts`, build fails if lines ≠ cap), live payback model with 3 sliders and an SVG chart (base: month <!--m:pbBase-->20<!--/m-->, 30% lower results: month <!--m:pbDown-->25<!--/m--> at defaults), break-even <!--m:breakEven-->607<!--/m--> travelers.
 - EN / 中文 toggle and A+ larger text (saved in `localStorage`), light + dark theme, works at 375 px, keyboard-operable, `aria-live` chat.
 
 ## What is simulated (and labelled as such)
@@ -113,4 +114,4 @@ Tech: React 18, TypeScript (strict), Vite 6, Tailwind CSS 3, Phosphor icons, `vi
 
 ## Verification
 
-An automated Playwright run walks the full acceptance checklist (75 checks: every loop step, validation, decline/success, Chinese answers, 8-day Kolsai + Burabay plan with the Astana transfer, 20,000,000 KZT total, payback months 32 / 44, no overflow at 375 px on all 12 routes, dark mode, chat drawer from any page, tours filters, map pins, phone tab bar, no JS errors). Result: **75 / 75 passed**.
+An automated Playwright run walks the full acceptance checklist (75 checks: every loop step, validation, decline/success, Chinese answers, 8-day Kolsai + Burabay plan with the Astana transfer, <!--m:cap-->8,000,000<!--/m--> KZT total, payback months <!--m:pbBase-->20<!--/m--> / <!--m:pbDown-->25<!--/m-->, no overflow at 375 px on all 12 routes, dark mode, chat drawer from any page, tours filters, map pins, phone tab bar, no JS errors). Result: **75 / 75 passed**.

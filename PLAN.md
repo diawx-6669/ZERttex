@@ -17,7 +17,7 @@ Rule of the build: **skeleton → full user journey → polish.** A working end-
 - [x] `tours.ts`: 4 sample tours, EN + 中文 names/taglines, 4 inclusion groups, day plan, packing, audio stops
 - [x] `guides.ts`: 3 sample profiles ("Sample profile · not a real person")
 - [x] `i18n.ts`: every UI string for header, home, tours, detail, booking, concierge, trust
-- [x] `budget.ts`: year-1 budget = exactly 20,000,000 KZT
+- [x] `budget.ts`: year-1 budget = exactly <!--m:cap-->8,000,000<!--/m--> KZT (Stage 2 cap, one config)
 - [x] `concierge.ts`: keyword intents EN + 中文, language auto-detect, "I won't guess" fallback
 - [x] `tripBuilder.ts`: rules-based itinerary with Almaty↔Astana↔Turkestan transfers, length check
 - [x] `paybackModel.ts`: 48-month cumulative cash, base + downside (×0.7)

@@ -13,7 +13,8 @@ const {
 const ROOT = path.resolve(__dirname, '..');
 const IMG = path.join(ROOT, 'docs/img');
 const OUT = path.join(ROOT, 'docs/Saryarqa_Go_Report.docx');
-const md = fs.readFileSync(path.join(ROOT, 'REPORT.md'), 'utf8').split('\n');
+// Money markers (<!--m:key-->…<!--/m-->, see scripts/sync-money-docs.cjs) are invisible: strip them.
+const md = fs.readFileSync(path.join(ROOT, 'REPORT.md'), 'utf8').replace(/<!--m:\w+-->\n?|\n?<!--\/m-->/g, '').split('\n');
 
 const C = { night: '12213F', teal: '0E807A', gold: 'A8802E', muted: '5C6270', line: 'DED2BC', sand: 'F8F3E9', zebra: 'FBF8F1' };
 const FONT = 'Arial';
