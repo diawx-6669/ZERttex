@@ -45,7 +45,7 @@ export function Scope({ phase, className = '' }: { phase: 'mvp' | 'p2'; classNam
       data-scope={phase}
       title={t(tip)}
       className={`inline-flex w-fit shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-px align-middle text-[11px] font-semibold leading-tight ${
-        phase === 'mvp' ? 'border-ok/50 bg-ok/10 text-ok' : 'border-dashed border-muted/60 text-muted'
+        phase === 'mvp' ? 'border-ok/60 text-ok' : 'border-dashed border-muted/60 text-muted'
       } ${className}`}
     >
       {phase === 'mvp' ? '●' : '○'} {t(text)}
