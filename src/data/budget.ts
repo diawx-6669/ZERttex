@@ -23,7 +23,7 @@ export const budgetConfig = {
     { item: 'Payment integration & testing', zh: '支付接入与测试', amount: 700_000, kind: 'one-time', note: 'Hosted card checkout, webhooks, test payments', label: 'confirm' },
     { item: 'AI concierge setup & testing', zh: 'AI 助手搭建与测试', amount: 300_000, kind: 'one-time', note: 'Grounding on verified tour data, answer review', label: 'confirm' },
     { item: 'Marketing & acquisition (Xiaohongshu content, pilot)', zh: '营销与获客（小红书内容、试点）', amount: 1_700_000, kind: 'recurring', note: '12 months', label: 'confirm' },
-    { item: 'Hosting + AI usage', zh: '托管 + AI 用量', amount: 400_000, kind: 'recurring', note: '12 months', label: 'confirm' },
+    { item: 'Hosting + AI usage', zh: '托管 + AI 用量', amount: 500_000, kind: 'recurring', note: '12 months', label: 'confirm' },
     { item: 'Support & pilot', zh: '客服与试点', amount: 300_000, kind: 'recurring', note: '12 months', label: 'confirm' },
     { item: 'Reserve', zh: '预备金', amount: 400_000, kind: 'reserve', note: 'Unplanned costs', label: 'confirm' },
   ] as BudgetLine[],
