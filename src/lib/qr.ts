@@ -1,38 +1,33 @@
-// Decorative QR-like pattern. Deterministic from a seed string.
-// NOT a real QR code and NOT scannable — always labelled as a placeholder.
+// Real, scannable QR codes (qrcode-generator, MIT, no dependencies).
+import qrcode from 'qrcode-generator';
+import type { TourId } from '../data/types';
 
-const hash = (str: string) => {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-};
+/** Public prototype. A postcard QR opens the tour page with the referral code. */
+export const SITE_URL = 'https://diawx-6669.github.io/ZERttex/';
 
-export function qrPattern(seed: string, size = 21): boolean[][] {
-  let x = hash(seed) || 1;
-  const rnd = () => {
-    x ^= x << 13;
-    x ^= x >>> 17;
-    x ^= x << 5;
-    return ((x >>> 0) % 1000) / 1000;
-  };
-  const grid = Array.from({ length: size }, () => Array.from({ length: size }, () => rnd() > 0.52));
-  const finder = (r0: number, c0: number) => {
-    for (let r = -1; r <= 7; r++)
-      for (let c = -1; c <= 7; c++) {
-        const rr = r0 + r;
-        const cc = c0 + c;
-        if (rr < 0 || cc < 0 || rr >= size || cc >= size) continue;
-        const edge = r === 0 || r === 6 || c === 0 || c === 6;
-        const core = r >= 2 && r <= 4 && c >= 2 && c <= 4;
-        const inside = r >= 0 && r <= 6 && c >= 0 && c <= 6;
-        grid[rr][cc] = inside && (edge || core);
-      }
-  };
-  finder(0, 0);
-  finder(0, size - 7);
-  finder(size - 7, 0);
-  return grid;
+/** Hash-router link: #/tour/<id>?ref=<code>. The router reads the query from the hash. */
+export const referralUrl = (tour: TourId, ref: string) => `${SITE_URL}#/tour/${tour}?ref=${encodeURIComponent(ref)}`;
+
+/** QR module matrix (true = dark), error correction M. Input should be ASCII (URLs are percent-encoded). */
+export function qrMatrix(text: string): boolean[][] {
+  const qr = qrcode(0, 'M');
+  qr.addData(text, 'Byte');
+  qr.make();
+  const n = qr.getModuleCount();
+  return Array.from({ length: n }, (_, r) => Array.from({ length: n }, (_, c) => qr.isDark(r, c)));
+}
+
+/** Draws the QR with a quiet zone of `quiet` modules into a square at (x, y) of `size` px. */
+export function drawQr(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, size: number, quiet = 2, dark = '#12213f') {
+  const m = qrMatrix(text);
+  const n = m.length + quiet * 2;
+  const cell = size / n;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x, y, size, size);
+  ctx.fillStyle = dark;
+  m.forEach((row, r) =>
+    row.forEach((on, c) => {
+      if (on) ctx.fillRect(Math.floor(x + (c + quiet) * cell), Math.floor(y + (r + quiet) * cell), Math.ceil(cell), Math.ceil(cell));
+    }),
+  );
 }

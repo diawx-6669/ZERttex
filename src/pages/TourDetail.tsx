@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { tourQuestion, useChat } from '../components/Chat';
 import { Icon } from '../components/Icon';
-import { LoopStrip } from '../components/Layout';
+import { LoopStrip, ReferralBanner } from '../components/Layout';
 import { Gallery, Media } from '../components/Media';
 import { Scope, Tag } from '../components/Tag';
 import { AudioGuide, Inclusions, Itinerary, PackingList, TourCard } from '../components/TourParts';
@@ -58,7 +58,7 @@ function SectionTabs() {
   );
 }
 
-export default function TourDetail({ id }: { id?: string }) {
+export default function TourDetail({ id, refCode = null }: { id?: string; refCode?: string | null }) {
   const { t, lang } = useApp();
   const { openChat } = useChat();
   const tour = tourById(id);
@@ -75,6 +75,7 @@ export default function TourDetail({ id }: { id?: string }) {
 
   return (
     <>
+      <ReferralBanner code={refCode} />
       <div className="container-x pt-6">
         <LoopStrip compact current={0} />
       </div>

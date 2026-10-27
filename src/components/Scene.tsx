@@ -16,6 +16,7 @@ type P = { className?: string; title?: string };
 
 const Svg = ({ className, title, children, vb = '0 0 400 320' }: P & { children: React.ReactNode; vb?: string }) => (
   <svg
+    data-scene=""
     viewBox={vb}
     preserveAspectRatio="xMidYMid slice"
     className={'block h-full w-full ' + (className ?? '')}

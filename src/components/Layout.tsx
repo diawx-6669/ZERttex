@@ -403,3 +403,19 @@ export function FloatingActions({ current }: { current: string }) {
     </>
   );
 }
+
+/** Shown when someone arrives from a friend's postcard link or QR code (?ref=CODE). */
+export function ReferralBanner({ code }: { code: string | null }) {
+  const { t } = useApp();
+  if (!code) return null;
+  return (
+    <div className="border-b border-line bg-surface" data-testid="referral-banner">
+      <div className="container-x flex flex-wrap items-center gap-2 py-3 text-sm">
+        <Icon name="heart" className="text-gold" />
+        <span className="font-semibold">{code}</span>
+        <span>{t(ui.home.referral)}</span>
+        <Tag kind="proposal" />
+      </div>
+    </div>
+  );
+}

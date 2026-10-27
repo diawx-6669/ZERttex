@@ -1,5 +1,5 @@
 import { Icon } from '../components/Icon';
-import { LoopStrip, Section } from '../components/Layout';
+import { LoopStrip, ReferralBanner, Section } from '../components/Layout';
 import { Media } from '../components/Media';
 import { RouteMap } from '../components/RouteMap';
 import { Scope, Tag } from '../components/Tag';
@@ -23,16 +23,7 @@ export default function Home({ query }: { query: URLSearchParams }) {
 
   return (
     <>
-      {ref && (
-        <div className="border-b border-line bg-surface">
-          <div className="container-x flex flex-wrap items-center gap-2 py-3 text-sm">
-            <Icon name="heart" className="text-gold" />
-            <span className="font-semibold">{ref}</span>
-            <span>{t(ui.home.referral)}</span>
-            <Tag kind="proposal" />
-          </div>
-        </div>
-      )}
+      <ReferralBanner code={ref} />
 
       {/* Hero: copy left, photo collage right */}
       <section className="container-x grid items-center gap-10 pb-8 pt-10 sm:pt-14 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-[1fr_1.05fr] lg:gap-14 lg:py-12">

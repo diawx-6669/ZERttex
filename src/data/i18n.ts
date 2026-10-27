@@ -296,7 +296,7 @@ export const ui = {
     referral: s('Referral link', '推荐链接'),
     copyLink: s('Copy link', '复制链接'),
     friendOffer: s('Friend gets a discount on first booking', '朋友首单享受优惠'),
-    notScannable: s('QR placeholder · not scannable', '二维码占位 · 无法扫描'),
+    qrHint: s('Scan: opens this tour', '扫码打开此线路'),
     scan: s('Scan to discover Kazakhstan', '扫码探索哈萨克斯坦'),
     friendView: s('See what your friend sees', '查看朋友看到的页面'),
     defaultMsg: s('Wish you were here!', '真希望你也在这里！'),

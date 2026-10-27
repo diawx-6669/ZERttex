@@ -8,16 +8,19 @@ import { tourById, tours } from '../data/tours';
 import type { TourId } from '../data/types';
 import { copyText } from '../lib/format';
 import { navigate } from '../lib/router';
-import { qrPattern } from '../lib/qr';
+import { qrMatrix, referralUrl } from '../lib/qr';
+import { downloadPostcard } from '../lib/postcardPng';
 import { useApp } from '../state';
 
-function QR({ seed }: { seed: string }) {
-  const grid = useMemo(() => qrPattern(seed), [seed]);
+/** Real, scannable QR code (SVG, 2-module quiet zone). */
+export function QR({ text, label }: { text: string; label: string }) {
+  const grid = useMemo(() => qrMatrix(text), [text]);
   const n = grid.length;
+  const d = grid.flatMap((row, r) => row.map((on, c) => (on ? `M${c} ${r}h1v1h-1z` : ''))).join('');
   return (
-    <svg viewBox={`-1 -1 ${n + 2} ${n + 2}`} className="h-full w-full" role="img" aria-label="QR placeholder, not scannable">
-      <rect x="-1" y="-1" width={n + 2} height={n + 2} fill="#fff" />
-      {grid.flatMap((row, r) => row.map((on, c) => (on ? <rect key={`${r}-${c}`} x={c} y={r} width="1.02" height="1.02" fill="#12213f" /> : null)))}
+    <svg viewBox={`-2 -2 ${n + 4} ${n + 4}`} className="h-full w-full" role="img" aria-label={label} data-qr={text} shapeRendering="crispEdges">
+      <rect x="-2" y="-2" width={n + 4} height={n + 4} fill="#fff" />
+      <path d={d} fill="#12213f" />
     </svg>
   );
 }
@@ -36,7 +39,21 @@ export default function Postcard() {
   const code = booking?.code?.replace('SG-', '') ?? '7KQ2';
   const refName = (name.trim() || 'FRIEND').toUpperCase().replace(/[^A-Z0-9一-鿿]/g, '').slice(0, 12) || 'FRIEND';
   const refCode = `${refName}-${code}`;
-  const link = `https://go.saryarqa.example/r/${encodeURIComponent(refCode)}`;
+  const link = referralUrl(dest, refCode);
+  const figRef = useRef<HTMLElement>(null);
+  const [saving, setSaving] = useState(false);
+  const savePng = async () => {
+    setSaving(true);
+    try {
+      await downloadPostcard(
+        { photos, figure: figRef.current, titleEn: tour.name.en, titleZh: tour.name.zh, message: msg || t(ui.postcard.defaultMsg), name: name || 'Li Wei', scanText: t(ui.postcard.scan), qrText: link },
+        `saryarqa-postcard-${dest}.png`,
+      );
+    } catch {
+      toast(t({ en: 'Could not create the PNG. Take a screenshot instead.', zh: '无法生成图片，请直接截图。' }));
+    }
+    setSaving(false);
+  };
 
   const onFiles = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).filter((f) => f.type.startsWith('image/'));
@@ -133,9 +150,9 @@ export default function Postcard() {
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
               <Icon name="heart" size={15} className="text-gold" /> {t(ui.postcard.friendOffer)} <Tag kind="proposal" />
-              <Tag kind="demo" extra={t({ en: 'example domain', zh: '示例域名' })} />
+              <Tag kind="demo" extra={t({ en: 'links to this prototype', zh: '链接到本原型' })} />
             </div>
-            <button type="button" className="btn-ghost btn-sm mt-3 !whitespace-normal text-left" onClick={() => navigate(`/?ref=${encodeURIComponent(refCode)}`)}>
+            <button type="button" className="btn-ghost btn-sm mt-3 !whitespace-normal text-left" onClick={() => navigate(`/tour/${dest}?ref=${encodeURIComponent(refCode)}`)}>
               <Icon name="refresh" size={14} /> {t(ui.postcard.friendView)}
             </button>
           </div>
@@ -143,6 +160,7 @@ export default function Postcard() {
 
         <div className="lg:sticky lg:top-24 lg:self-start">
           <figure
+            ref={figRef}
             className="mx-auto w-full max-w-[440px] overflow-hidden rounded-[22px] bg-[#fbf6ea] text-[#12213f] shadow-2xl ring-1 ring-black/5"
             aria-label={t(ui.postcard.title)}
             data-testid="postcard"
@@ -179,10 +197,10 @@ export default function Postcard() {
                     </div>
                   </div>
                   <div className="flex w-[92px] flex-col items-center gap-1">
-                    <div className="h-[84px] w-[84px] rounded-md border border-[#12213f]/15 p-1">
-                      <QR seed={refCode} />
+                    <div className="h-[84px] w-[84px] rounded-md border border-[#12213f]/15 bg-white">
+                      <QR text={link} label={t({ en: `QR code: opens ${tour.name.en} with your referral code`, zh: `二维码：打开${tour.name.zh}并带上推荐码` })} />
                     </div>
-                    <span className="text-center text-[8.5px] leading-tight text-[#5c6270]">{t(ui.postcard.notScannable)}</span>
+                    <span className="text-center text-[8.5px] leading-tight text-[#5c6270]">{t(ui.postcard.qrHint)}</span>
                   </div>
                 </div>
               </div>
@@ -191,8 +209,13 @@ export default function Postcard() {
           <p className="mt-3 text-center text-xs text-muted">
             4:5 · Xiaohongshu 小红书 · WeChat Moments 朋友圈 · Instagram
           </p>
-          <p className="mt-1 text-center text-xs text-muted" lang={lang === 'zh' ? 'zh-CN' : 'en'}>
-            {t({ en: 'Tip: take a screenshot of the card to share it.', zh: '提示：截图即可分享这张明信片。' })}
+          <div className="mt-3 flex justify-center">
+            <button type="button" className="btn-primary" onClick={savePng} disabled={saving}>
+              <Icon name="upload" size={16} className="rotate-180" /> {t({ en: 'Download PNG', zh: '下载 PNG' })}
+            </button>
+          </div>
+          <p className="mt-2 text-center text-xs text-muted" lang={lang === 'zh' ? 'zh-CN' : 'en'}>
+            {t({ en: '1080 × 1350 px, made in your browser. Nothing is uploaded.', zh: '1080 × 1350 像素，在浏览器中生成，不会上传。' })}
           </p>
         </div>
       </div>

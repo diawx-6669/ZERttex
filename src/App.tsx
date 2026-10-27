@@ -15,6 +15,7 @@ import Trip from './pages/Trip';
 import Postcard from './pages/Postcard';
 import Impact from './pages/Impact';
 import About from './pages/About';
+import PrintPostcards from './pages/PrintPostcards';
 
 export default function App() {
   const route = useRoute();
@@ -30,7 +31,8 @@ export default function App() {
       page = <Tours />;
       break;
     case 'tour':
-      page = <TourDetail id={second} />;
+      // Postcard QR codes: #/tour/<id>?ref=<code>, or the hash-safe #/tour/<id>/r/<code>.
+      page = <TourDetail id={second} refCode={route.query.get('ref') ?? (route.path[2] === 'r' ? decodeURIComponent(route.path[3] ?? '') || null : null)} />;
       break;
     case 'plan':
       page = <Plan />;
@@ -90,6 +92,9 @@ export default function App() {
       io.disconnect();
     };
   }, [route.raw]);
+
+  // Print-only pages render without the app chrome.
+  if (first === 'print') return <PrintPostcards />;
 
   return (
     <div className="flex min-h-screen flex-col pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">

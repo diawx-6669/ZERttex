@@ -7,6 +7,12 @@ const ROOT = path.resolve(__dirname, '..');
 const URL = 'file://' + path.join(ROOT, 'dist/index.html');
 const SHOTS = path.join(ROOT, 'screenshots');
 const PHOTO = path.join(__dirname, 'fixtures/photo.png');
+const jsQR = require('jsqr');
+const { PNG } = require('pngjs');
+const decodePng = (buf) => {
+  const png = PNG.sync.read(buf);
+  return jsQR(new Uint8ClampedArray(png.data), png.width, png.height);
+};
 fs.mkdirSync(SHOTS, { recursive: true });
 
 const results = [];
@@ -196,12 +202,34 @@ const skip = (name, why) => {
   await page.getByRole('button', { name: /Copy link/ }).click();
   await page.waitForTimeout(200);
   const clip = await page.evaluate(() => navigator.clipboard.readText().catch(() => ''));
-  ok('Copy referral link works', clip.includes('go.saryarqa.example/r/'), clip);
-  ok('QR labelled not scannable', (await page.getByText(/not scannable/).count()) >= 1);
+  ok('Copy referral link works', clip.startsWith('https://diawx-6669.github.io/ZERttex/#/tour/'), clip);
+  ok('No "not scannable" label left', (await page.getByText(/not scannable/).count()) === 0);
+  // Decode the on-screen QR (screenshot of the SVG) and the downloaded PNG with jsQR.
+  const qrEl = page.locator('[data-testid="postcard"] svg[data-qr]');
+  // Enlarge the 84px QR to 300px for a reliable decode, then restore it.
+  await qrEl.evaluate((el) => Object.assign(el.parentElement.style, { width: '300px', height: '300px' }));
+  const qrShot = decodePng(await qrEl.screenshot());
+  await qrEl.evaluate((el) => Object.assign(el.parentElement.style, { width: '', height: '' }));
+  ok('On-screen QR decodes to the tour page with ?ref=', !!qrShot && /^https:\/\/diawx-6669\.github\.io\/ZERttex\/#\/tour\/(charyn|kolsai|turkestan|burabay)\?ref=[A-Z0-9-]+$/.test(qrShot.data) && qrShot.data === clip, qrShot ? qrShot.data : 'not decoded');
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: /Download PNG/ }).click()]);
+  const pngPath = path.join(SHOTS, '07b-postcard-download.png');
+  await dl.saveAs(pngPath);
+  const pngBuf = fs.readFileSync(pngPath);
+  const pngMeta = PNG.sync.read(pngBuf);
+  ok('Download PNG: 1080×1350 file', dl.suggestedFilename().endsWith('.png') && pngMeta.width === 1080 && pngMeta.height === 1350, `${dl.suggestedFilename()} ${pngMeta.width}×${pngMeta.height}`);
+  const qrPng = decodePng(pngBuf);
+  ok('Downloaded PNG QR scans to the same tour link', !!qrPng && qrPng.data === clip, qrPng ? qrPng.data : 'not decoded');
+  // Destination change → QR follows
+  await page.locator('label').filter({ hasText: 'Charyn Canyon' }).first().click();
+  await page.waitForTimeout(150);
+  ok('QR follows the chosen destination', (await qrEl.getAttribute('data-qr')).includes('#/tour/charyn?ref='));
+  await page.locator('label').filter({ hasText: 'Kolsai Lakes' }).first().click();
   await shot('07-postcard');
   await page.getByRole('button', { name: /See what your friend sees/ }).click();
   await page.waitForTimeout(300);
-  ok('Postcard leads back to DISCOVER with referral banner', (await page.getByText(/A friend sent you this postcard/).count()) === 1);
+  ok('Postcard leads to the tour page with referral banner', /#\/tour\/\w+\?ref=/.test(page.url()) && (await page.getByText(/A friend sent you this postcard/).count()) === 1, page.url());
+  await go('/tour/burabay/r/LIWEI-7KQ2');
+  ok('Hash-safe referral path #/tour/<id>/r/<code> works', (await page.getByTestId('referral-banner').getByText('LIWEI-7KQ2').count()) === 1 && (await page.locator('h1').textContent()).includes('Burabay'));
 
   // 8. Impact
   await go('/impact');
@@ -339,6 +367,40 @@ const skip = (name, why) => {
   await dp.goto(URL + '#/impact');
   await dp.waitForTimeout(300);
   await dp.screenshot({ path: path.join(SHOTS, '18-dark-impact.png'), fullPage: true });
+
+  // 13. Print-ready A6 postcards (route + PDF)
+  const pr = await browser.newPage({ viewport: { width: 1200, height: 900 } });
+  await pr.goto(URL + '#/print/postcards');
+  await pr.waitForTimeout(600);
+  const cards = pr.locator('[data-card]');
+  ok('Print route renders 4 A6 postcards', (await cards.count()) === 4);
+  for (const tour of ['charyn', 'kolsai', 'turkestan', 'burabay']) {
+    const q = pr.locator(`[data-card="${tour}"] svg[data-qr]`);
+    await q.evaluate((el) => Object.assign(el.parentElement.style, { width: '300px', height: '300px' }));
+    const dec = decodePng(await q.screenshot());
+    ok(`Print postcard QR (${tour}) scans to its tour`, !!dec && dec.data === `https://diawx-6669.github.io/ZERttex/#/tour/${tour}?ref=PRINT-${tour.toUpperCase()}`, dec ? dec.data : 'not decoded');
+  }
+  ok('Print postcards have headline + credit line', (await pr.getByText('Kazakhstan, booked in three clear steps').count()) === 4 && (await pr.locator('[data-credit]').count()) === 4);
+  await pr.close();
+  const pcPdf = path.join(ROOT, 'submission/stage2/postcards.pdf');
+  if (fs.existsSync(pcPdf)) {
+    const { execFileSync } = require('child_process');
+    try {
+      const info = execFileSync('pdfinfo', [pcPdf]).toString();
+      const pages = +(/Pages:\s+(\d+)/.exec(info) || [])[1];
+      const [, w, h] = /Page size:\s+([\d.]+) x ([\d.]+)/.exec(info) || [];
+      const mm = (pt) => (pt / 72) * 25.4;
+      ok('postcards.pdf: 4 pages of 154 × 111 mm (A6 + 3 mm bleed)', pages === 4 && Math.abs(mm(+w) - 154) < 0.6 && Math.abs(mm(+h) - 111) < 0.6, `${pages} pages, ${mm(+w).toFixed(1)} × ${mm(+h).toFixed(1)} mm`);
+      const tmp = path.join(require('os').tmpdir(), 'sg-pc');
+      execFileSync('pdftoppm', ['-r', '200', '-f', '2', '-l', '2', '-png', pcPdf, tmp]);
+      const pngFile = fs.readdirSync(path.dirname(tmp)).filter((f) => f.startsWith('sg-pc') && f.endsWith('.png')).map((f) => path.join(path.dirname(tmp), f))[0];
+      const dec = decodePng(fs.readFileSync(pngFile));
+      fs.unlinkSync(pngFile);
+      ok('postcards.pdf QR (page 2) scans to Kolsai', !!dec && dec.data.endsWith('#/tour/kolsai?ref=PRINT-KOLSAI'), dec ? dec.data : 'not decoded');
+    } catch (e) {
+      skip('postcards.pdf page checks', 'pdfinfo / pdftoppm not installed');
+    }
+  } else ok('postcards.pdf exists', false, 'run npm run postcards');
 
   await browser.close();
   const failed = results.filter((r) => !r.pass);
