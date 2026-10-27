@@ -128,3 +128,11 @@ html { scroll-padding-top: 5rem; }
 @media print {
   header, footer, .no-print { display: none !important; }
 }
+
+/* Judge mode highlight */
+.judge-hl {
+  outline: 4px solid rgb(var(--teal));
+  outline-offset: 6px;
+  border-radius: 12px;
+  transition: outline-color 0.2s;
+}

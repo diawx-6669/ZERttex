@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { ChatDrawer } from './components/Chat';
+import { JudgeMode } from './components/JudgeMode';
 import { FloatingActions, Footer, Header, MobileNav, Toasts } from './components/Layout';
 import { useRoute } from './lib/router';
 import { useApp } from './state';
@@ -113,6 +114,7 @@ export default function App() {
       <FloatingActions current={first} />
       <MobileNav current={first} />
       <ChatDrawer />
+      <JudgeMode />
       <Toasts />
     </div>
   );

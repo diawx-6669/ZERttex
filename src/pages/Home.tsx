@@ -85,7 +85,7 @@ export default function Home({ query }: { query: URLSearchParams }) {
       </Section>
 
       {/* Complaints as an editorial list */}
-      <Section title={t(ui.home.complaintsTitle)} sub={t(ui.home.complaintsSub)}>
+      <Section id="complaints" title={t(ui.home.complaintsTitle)} sub={t(ui.home.complaintsSub)}>
         <ol className="border-b border-line">
           {complaints.map((c, i) => (
             <li key={i} className="border-t border-line">

@@ -81,7 +81,7 @@ Assumptions (ours, not measured): each request sends ≈ 8,000 input tokens (rul
 
 | Case | Input | Output | Total per 1,000 chats |
 |---|---:|---:|---:|
-| No cache hits (every request writes the cache, 1.25×) | 8.0M tok × $0.125 = $1.00 | 0.25M tok × $0.50 = $0.125 | **≈ $1.13** |
-| Mostly cache hits (busy hours) | 8.0M tok × $0.01 = $0.08 | $0.125 | **≈ $0.21** |
+| No cache hits (every request writes the cache, 1.25×) | 8 million tok × $0.125 = $1.00 | 0.25 million tok × $0.50 = $0.125 | **≈ $1.13** |
+| Mostly cache hits (busy hours) | 8 million tok × $0.01 = $0.08 | $0.125 | **≈ $0.21** |
 
 So roughly **$0.2–$1.1 per 1,000 chats**. Even at 10,000 chats a month this fits easily inside the existing "Hosting, AI usage, maintenance" line (1,500,000 KZT for year 1) in `src/data/budget.ts`; no new budget line is needed. Cloudflare Workers' free plan allows 100,000 requests per day (check Cloudflare's current limits).

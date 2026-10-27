@@ -576,6 +576,19 @@ const skip = (name, why) => {
     }
   } else ok('postcards.pdf exists', false, 'run npm run postcards');
 
+  // 15b. Judge mode walkthrough
+  const jp = await browser.newPage({ viewport: { width: 1366, height: 900 } });
+  await jp.goto(URL + '#/impact');
+  await jp.waitForTimeout(400);
+  await jp.getByRole('button', { name: /Judge mode/ }).click();
+  await jp.waitForTimeout(700);
+  ok('Judge mode starts at the problem (home, highlighted)', (await jp.getByTestId('judge-title').textContent()).startsWith('1') && (await jp.locator('.judge-hl').count()) === 1);
+  for (let k = 0; k < 7; k++) { await jp.getByRole('button', { name: 'Next' }).click(); await jp.waitForTimeout(650); }
+  ok('Judge mode reaches step 8 on Impact with a highlight', (await jp.getByTestId('judge-title').textContent()).startsWith('8') && jp.url().endsWith('#/impact') && (await jp.locator('.judge-hl').count()) === 1);
+  await jp.getByRole('button', { name: 'Finish' }).click();
+  ok('Judge mode closes', (await jp.getByTestId('judge-mode').count()) === 0 && (await jp.locator('.judge-hl').count()) === 0);
+  await jp.close();
+
   // 16. Stage 2 deliverables exist
   for (const f of ['Cost_Payback_Sheet.pdf', 'Cost_Payback_Sheet.xlsx', 'SLIDES_CONTENT.md', 'DEMO_SCRIPT.md', 'AI_DECLARATION_STAGE2.md', 'CHANGELOG_STAGE2.md', 'postcards.pdf']) {
     const fp = path.join(ROOT, 'submission/stage2', f);

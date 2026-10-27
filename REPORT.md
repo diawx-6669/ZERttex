@@ -50,7 +50,7 @@ Each step removes one doubt, and the last step (a shareable postcard sized for X
 
 **The numbers.** The 12-week MVP and first-year launch fit exactly inside <!--m:cap-->20,000,000<!--/m--> KZT. Reaching the goal needs about **<!--m:extra-->1,263<!--/m--> extra foreign travelers per year**. With a <!--m:margin-->30%<!--/m--> contribution margin (our assumption), cumulative cash turns positive in **month <!--m:pbBase-->32<!--/m-->** in the base case and **month <!--m:pbDown-->44<!--/m-->** if results are 30% lower. **[Proposal — model]**
 
-**Proof that it works.** A clickable prototype covers the whole loop: tour pages, booking with validation and a simulated declined payment, a bilingual concierge, a trip builder, a trust center, an in-trip screen, a postcard generator and a live payback calculator. An automated test walked through **75 acceptance checks — all passed**, including the 375 px phone width and dark mode.
+**Proof that it works.** A clickable prototype covers the whole loop: tour pages, booking with validation and a simulated declined payment, a bilingual concierge, a trip builder, a trust center, an in-trip screen, a postcard generator and a live payback calculator. An automated test walked through **157 acceptance checks — all passed** (1 more runs once the offline photos are downloaded), including the 375 px phone width and dark mode.
 
 ---
 
@@ -158,7 +158,7 @@ The prototype is not a mock-up: every button works in the browser.
 | Interactive route map (real coordinates, tappable pins) | Working |
 | Real destination photos with author/licence credits, gallery + lightbox | Pipeline working; photos to be downloaded (see §8) |
 
-Automated acceptance run: **75 / 75 checks passed** (see Appendix C).
+Automated acceptance run: **157 / 157 checks passed, 1 skipped (offline photos)** (see Appendix C).
 
 ### 3.2 12-week MVP plan
 
@@ -399,4 +399,4 @@ Switch **EN / 中文** in the header at any point; try it on a phone.
 - **No backend, no API keys, no runtime network calls** except Google Fonts. Illustrations are inline SVG, so the demo works offline.
 - **Photos:** only freely licensed photos (CC BY, CC BY-SA, CC0, public domain) from Wikimedia Commons, each shown with author and licence; inlined into the single-file build, so they work offline too. No stock photos, no AI-generated images presented as real places.
 - **Accessibility:** labels on every input, visible focus, keyboard-operable controls, `aria-live` chat, larger-text mode, `prefers-reduced-motion` respected.
-- **Automated acceptance test (Playwright): 75 / 75 checks passed** — every loop step, booking validation, decline and success, Chinese answers, the Kolsai + Burabay 8-day plan with the Astana transfer, a budget total of exactly <!--m:cap-->20,000,000<!--/m--> KZT, payback at months <!--m:pbBase-->32<!--/m--> / <!--m:pbDown-->44<!--/m-->, no horizontal scroll at 375 px on all 12 routes, dark mode, and zero JavaScript errors.
+- **Automated acceptance test (Playwright): 157 / 157 checks passed, 1 skipped** — every loop step, booking validation, decline and success, Chinese answers, the Kolsai + Burabay 8-day plan with the Astana transfer, a budget total of exactly <!--m:cap-->20,000,000<!--/m--> KZT, payback at months <!--m:pbBase-->32<!--/m--> / <!--m:pbDown-->44<!--/m-->, no horizontal scroll at 375 px on all 12 routes, dark mode, and zero JavaScript errors.

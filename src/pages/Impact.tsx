@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
+import { startJudgeMode } from '../components/JudgeMode';
 import { PageHead, Section } from '../components/Layout';
 import { Scope, Tag } from '../components/Tag';
 import { BUDGET_CAP, budget, budgetConfig, budgetTotal, gantt, gateTotal, inMvp, later, metrics, oneTimeTotal, otherTotal, risks } from '../data/budget';
@@ -96,7 +97,11 @@ export default function Impact() {
 
   return (
     <>
-      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub={`12-week MVP, year-1 budget of exactly ${num(budgetTotal)} KZT, and an honest payback model you can stress-test.`} />
+      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub={`12-week MVP, year-1 budget of exactly ${num(budgetTotal)} KZT, and an honest payback model you can stress-test.`}>
+        <button type="button" className="btn-primary btn-sm" onClick={startJudgeMode}>
+          <Icon name="arrow" size={14} /> Judge mode: 2-minute walkthrough
+        </button>
+      </PageHead>
 
       <Section title="12-week MVP plan" sub="One closed loop shipped end-to-end, then tested with real users.">
         <div className="card overflow-x-auto p-4 sm:p-5">
