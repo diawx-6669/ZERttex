@@ -1,4 +1,5 @@
 import { Icon } from '../components/Icon';
+import { TravelerVoices } from '../components/Interviews';
 import { PageHead, Section } from '../components/Layout';
 import { Tag } from '../components/Tag';
 import { caseFacts, evidence, methodNote } from '../data/facts';
@@ -63,6 +64,8 @@ export default function About() {
           <Icon name="info" className="mt-0.5 text-warn" /> {t(methodNote)}
         </p>
       </Section>
+
+      <TravelerVoices />
 
       <Section title={t({ en: 'Honesty rules we follow', zh: '我们遵守的诚信原则' })}>
         <ul className="grid gap-3 text-sm md:grid-cols-2">

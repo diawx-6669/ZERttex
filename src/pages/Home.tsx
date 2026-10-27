@@ -1,4 +1,5 @@
 import { Icon } from '../components/Icon';
+import { TravelerVoices } from '../components/Interviews';
 import { LoopStrip, ReferralBanner, Section } from '../components/Layout';
 import { Media } from '../components/Media';
 import { RouteMap } from '../components/RouteMap';
@@ -158,6 +159,8 @@ export default function Home({ query }: { query: URLSearchParams }) {
       </Section>
 
       {/* Evidence: big numbers, no cards */}
+      <TravelerVoices />
+
       <Section title={t(ui.home.marketTitle)}>
         <div className="grid border-t border-line md:grid-cols-[1fr_1fr_1.3fr]">
           {evidence.map((e, i) => (

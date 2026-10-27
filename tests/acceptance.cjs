@@ -271,6 +271,15 @@ const skip = (name, why) => {
   ok('Tour page: inclusions In MVP, audio guide Phase 2', (await page.locator('#inc [data-scope="mvp"]').count()) === 1 && (await page.locator('#audio [data-scope="p2"]').count()) === 1);
   ok('Scope badge text says In MVP (8M)', (await page.locator('#inc [data-scope="mvp"]').textContent()).includes('In MVP (8M)'));
 
+  // 9c. Evidence slot: empty until the team adds real interviews; never sample data.
+  const interviewsSrc = fs.readFileSync(path.join(ROOT, 'src/data/interviews.ts'), 'utf8');
+  const interviewsEmpty = /export const interviews: Interview\[\] = \[\];/.test(interviewsSrc);
+  for (const r of ['/', '/about']) {
+    await go(r);
+    const n = await page.getByRole('heading', { name: 'What travelers told us' }).count();
+    ok(`Evidence slot on ${r}: ${interviewsEmpty ? 'hidden while empty' : 'shows real interviews'}`, interviewsEmpty ? n === 0 : n === 1);
+  }
+
   // 10. Language toggle
   await go('/');
   await page.getByRole('button', { name: '中文', exact: true }).first().click();
