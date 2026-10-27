@@ -1,0 +1,15 @@
+name = "saryarqa-ai"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Secret (never in this file):  npx wrangler secret put ANTHROPIC_API_KEY
+# Optional shared rate limit across instances:
+# [[kv_namespaces]]
+# binding = "RATE_KV"
+# id = "<your KV namespace id>"
+
+[vars]
+# Comma-separated CORS allow-list. Leave empty to use the defaults in src/index.ts
+# (https://diawx-6669.github.io, http://localhost:5173).
+ALLOWED_ORIGINS = ""
