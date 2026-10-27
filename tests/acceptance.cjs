@@ -32,6 +32,9 @@ const skip = (name, why) => {
   const ctx = await browser.newContext({ viewport: { width: 1366, height: 900 }, permissions: ['clipboard-read', 'clipboard-write'] });
   // Block Google Fonts so the test is offline-deterministic.
   await ctx.route(/fonts\.(googleapis|gstatic)\.com/, (r) => r.abort());
+  // Scripted-mode checks: force scripted answers even if dist/ was built with VITE_AI_ENDPOINT.
+  const forceScripted = () => { try { localStorage.setItem('sg.scripted', '1'); } catch {} };
+  await ctx.addInitScript(forceScripted);
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -380,12 +383,13 @@ const skip = (name, why) => {
 
   // 14. New screens in scripted mode (no VITE_AI_ENDPOINT in this build)
   const sp = await browser.newPage({ viewport: { width: 1366, height: 900 } });
+  await sp.addInitScript(forceScripted);
   const sErrors = [];
   sp.on('pageerror', (e) => sErrors.push(e.message));
   await sp.goto(URL + '#/ask');
   await sp.waitForTimeout(500);
-  ok('Scripted build: mode badge says "Scripted demo"', (await sp.locator('[data-ai-mode="scripted"]').count()) >= 1 && (await sp.locator('[data-ai-mode="live"]').count()) === 0);
-  ok('Scripted build: footer says no AI server', (await sp.getByText('(no AI server in this build)').count()) === 1);
+  ok('Scripted mode: badge says "Scripted demo"', (await sp.locator('[data-ai-mode="scripted"]').count()) >= 1 && (await sp.locator('[data-ai-mode="live"]').count()) === 0);
+  ok('Scripted mode: footer shows no AI server, or the stage switch is on', (await sp.getByText('(no AI server in this build)').count()) === 1 || (await sp.getByTestId('force-scripted').isChecked()));
   await sp.fill('#chat-input', 'Is Kolsai available on 3 May?');
   await sp.keyboard.press('Enter');
   await sp.waitForTimeout(900);
