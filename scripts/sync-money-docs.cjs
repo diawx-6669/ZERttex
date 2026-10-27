@@ -26,13 +26,14 @@ const sens = [0.2, 0.25, 0.3, 0.35, 0.4].map((mg) => {
   const input = { ...r.input, margin: mg };
   return { mg, b: M.paybackMonth(M.series(input)), d: M.paybackMonth(M.series(input, M.DOWNSIDE)) };
 });
-const labelName = { case: 'Case fact', verified: 'Verified source', proposal: 'Proposal', demo: 'Demo data', confirm: 'Needs confirmation' };
 
 const values = {
   cap: n(M.BUDGET_CAP),
   capM: `${M.BUDGET_CAP / 1e6}M`,
   total: n(M.budgetTotal),
   oneTime: n(M.oneTimeTotal),
+  gate1: n(M.gateTotal(1)),
+  gate2: n(M.gateTotal(2)),
   other: n(M.otherTotal),
   recurring: n(M.recurringTotal),
   reserve: n(M.reserveTotal),
@@ -51,10 +52,10 @@ const values = {
   m48Base: mm(at(r.base, 48)),
   m48Down: mm(at(r.down, 48)),
   budgetTable: [
-    '| Item | Type | KZT | Share | Label |',
+    '| Item | Type | KZT | Share | Gate |',
     '|---|---|---:|---:|---|',
-    ...C.lines.map((b) => `| ${b.item} | ${b.kind} | ${n(b.amount)} | ${((b.amount / M.budgetTotal) * 100).toFixed(1)}% | ${labelName[b.label]} |`),
-    `| **Total** (Stage 2 cap ${n(M.BUDGET_CAP)}) | | **${n(M.budgetTotal)}** | **100%** | |`,
+    ...C.lines.map((b) => `| ${b.item} | ${b.kind} | ${n(b.amount)} | ${((b.amount / M.budgetTotal) * 100).toFixed(1)}% | ${b.gate} |`),
+    `| **Total** (case limit ${n(M.BUDGET_CAP)}) | | **${n(M.budgetTotal)}** | **100%** | |`,
   ].join('\n'),
   resultsTable: [
     '| | Base | Worse case (−30%, travelers × 0.7) |',

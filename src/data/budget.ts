@@ -3,29 +3,31 @@
 // generators (scripts/*) all read from `budgetConfig`. Change a number here,
 // rebuild, and every screen and document follows.
 //
-// Stage 2 rule: total costs must stay within 8,000,000 KZT. The build fails
-// (vite.config.ts → budgetGuard) if the lines do not add up to BUDGET_CAP.
+// Case rule: development and launch in year 1 within 20,000,000 KZT. The build
+// fails (vite.config.ts → budgetGuard) if the lines do not add up to BUDGET_CAP.
 
 import type { TagKind } from './types';
 
-export const BUDGET_CAP = 8_000_000;
+export const BUDGET_CAP = 20_000_000;
 
 export type BudgetKind = 'one-time' | 'recurring' | 'reserve';
-export type BudgetLine = { item: string; zh: string; amount: number; kind: BudgetKind; note: string; label: TagKind };
+/** Staged spending: gate 1 funds the MVP + pilot; gate 2 is released only if pilot metrics are met. */
+export type BudgetGate = 1 | 2;
+export type BudgetLine = { item: string; zh: string; amount: number; kind: BudgetKind; gate: BudgetGate; label: TagKind };
 
 export const budgetConfig = {
   cap: BUDGET_CAP,
   currency: 'KZT',
-  /** Year-1 lines. Planning assumptions: every line is "Needs confirmation" until the team has 2 quotes. */
+  /** Year-1 lines (Stage 1 planning assumptions, team proposal). AI usage is inside "Hosting, AI usage, maintenance". */
   lines: [
-    { item: 'Design & development of MVP', zh: 'MVP 设计与开发', amount: 3_300_000, kind: 'one-time', note: 'Booking site, tour pages, Trust Center, manager inbox', label: 'confirm' },
-    { item: 'Localization EN / 中文 + guide videos', zh: '英文/中文本地化 + 导游视频', amount: 800_000, kind: 'one-time', note: 'Translation of 4 tours, short guide intro videos', label: 'confirm' },
-    { item: 'Payment integration & testing', zh: '支付接入与测试', amount: 700_000, kind: 'one-time', note: 'Hosted card checkout, webhooks, test payments', label: 'confirm' },
-    { item: 'AI concierge setup & testing', zh: 'AI 助手搭建与测试', amount: 300_000, kind: 'one-time', note: 'Grounding on verified tour data, answer review', label: 'confirm' },
-    { item: 'Marketing & acquisition (Xiaohongshu content, pilot)', zh: '营销与获客（小红书内容、试点）', amount: 1_700_000, kind: 'recurring', note: '12 months', label: 'confirm' },
-    { item: 'Hosting + AI usage', zh: '托管 + AI 用量', amount: 500_000, kind: 'recurring', note: '12 months', label: 'confirm' },
-    { item: 'Support & pilot', zh: '客服与试点', amount: 300_000, kind: 'recurring', note: '12 months', label: 'confirm' },
-    { item: 'Reserve', zh: '预备金', amount: 400_000, kind: 'reserve', note: 'Unplanned costs', label: 'confirm' },
+    { item: 'Design & development', zh: '设计与开发', amount: 8_000_000, kind: 'one-time', gate: 1, label: 'proposal' },
+    { item: 'Localization EN / 中文', zh: '英文/中文本地化', amount: 1_500_000, kind: 'one-time', gate: 1, label: 'proposal' },
+    { item: 'Payment integration & testing', zh: '支付接入与测试', amount: 1_500_000, kind: 'one-time', gate: 1, label: 'proposal' },
+    { item: 'Trust content: guide videos, photos', zh: '信任内容：导游视频、照片', amount: 1_000_000, kind: 'one-time', gate: 1, label: 'proposal' },
+    { item: 'Marketing & acquisition', zh: '营销与获客', amount: 4_500_000, kind: 'recurring', gate: 2, label: 'proposal' },
+    { item: 'Hosting, AI usage, maintenance', zh: '托管、AI 用量、维护', amount: 1_500_000, kind: 'recurring', gate: 1, label: 'proposal' },
+    { item: 'Pilot & support', zh: '试点与客服', amount: 1_000_000, kind: 'recurring', gate: 1, label: 'proposal' },
+    { item: 'Contingency', zh: '预备金', amount: 1_000_000, kind: 'reserve', gate: 2, label: 'proposal' },
   ] as BudgetLine[],
   model: {
     /** Case fact. */
@@ -33,7 +35,7 @@ export const budgetConfig = {
     /** Team assumption. */
     margin: 0.3,
     /** Team assumption: KZT per month from month 13. */
-    runningCostPerMonth: 250_000,
+    runningCostPerMonth: 300_000,
     /** One-time lines are spent over months 1..oneTimeMonths; the rest over months 1..otherMonths. */
     oneTimeMonths: 3,
     otherMonths: 12,
@@ -59,8 +61,9 @@ export const budgetTotal = sumOf();
 export const oneTimeTotal = sumOf('one-time');
 export const recurringTotal = sumOf('recurring');
 export const reserveTotal = sumOf('reserve');
-/** Everything that is not one-time (recurring + reserve), spread over months 1-12. */
+/** Everything that is not one-time (recurring + contingency), spread over months 1-12. */
 export const otherTotal = budgetTotal - oneTimeTotal;
+export const gateTotal = (g: BudgetGate) => budget.filter((b) => b.gate === g).reduce((s, b) => s + b.amount, 0);
 
 /** Throws if the budget lines do not add up to the cap. Used at build time. */
 export function assertBudget() {
@@ -70,30 +73,31 @@ export function assertBudget() {
 export const gantt: { label: string; start: number; end: number; detail: string }[] = [
   { label: 'Research & validation', start: 1, end: 2, detail: '10+ interviews with Chinese-speaking travelers; competitor scan' },
   { label: 'UX + tour pages', start: 3, end: 4, detail: 'Wireframes, EN/中文 tour pages, design system' },
-  { label: 'Booking, inclusions, concierge, trust', start: 5, end: 7, detail: 'Core flow, Trust Center content, AI concierge with handoff' },
-  { label: 'Checkout, manager inbox, postcard', start: 8, end: 9, detail: 'Hosted checkout sandbox, staff inbox, referral QR' },
+  { label: 'Booking, inclusions, concierge, trust', start: 5, end: 7, detail: 'Core flow and Trust Center content' },
+  { label: 'Trip builder, checkout, weather/reschedule', start: 8, end: 9, detail: 'Hosted checkout sandbox, reschedule workflow' },
   { label: 'Usability tests + payment-provider checks', start: 10, end: 11, detail: '5-8 test sessions; provider due diligence' },
   { label: 'Pilot with real users', start: 12, end: 12, detail: 'Limited launch, measure success metrics' },
 ];
 
-/** What the 8,000,000 KZT pays for. Mirrors the "In MVP (8M)" badges in the app. */
+/** In MVP: built in the 12 weeks. Mirrors the "In MVP" badges in the app. */
 export const inMvp = [
   'EN / 中文 tour pages with "What\'s included" breakdown',
   '3-step booking with international card via hosted checkout',
-  'Concierge: AI answers from verified data, with human handoff',
+  'Scripted bilingual concierge with human handoff',
   'Trust Center: guide videos, verification checklist, refund policy',
-  'Postcard + referral QR code',
-  'Manager inbox: handoff questions, AI summary, reply drafts staff approve',
+  'Rules-based trip builder',
+  'My trip: timeline, check-ins, reschedule requests',
+  'Postcard + referral link',
 ];
 
-/** Not paid for by the 8M budget. Mirrors the "Phase 2" badges in the app. */
+/** Phase 2: after the pilot. Mirrors the "Phase 2" badges in the app. */
 export const later = [
-  'Trip builder (rules-based, AI reads free text)',
-  'Weather / road alerts and rescheduling',
-  'Family updates during the trip',
-  'Offline audio guide',
+  'Live LLM concierge with retrieval over verified tour data',
   'Live Alipay / WeChat Pay after provider approval',
-  'Listing on Trip.com',
+  'Live weather and road feeds',
+  'GPS-based family sharing',
+  'Offline audio downloads',
+  'Listing on Trip.com / Klook',
 ];
 
 export const risks: { risk: string; mitigation: string }[] = [

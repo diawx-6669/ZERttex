@@ -58,7 +58,7 @@ const years = (s) =>
 const pbText = (x) => (x ? 'month ' + x : 'after 48');
 const budgetRows = (cols) =>
   CFG.lines
-    .map((b) => (cols === 4 ? `<tr><td>${b.kind === 'one-time' ? 'Development' : b.kind === 'reserve' ? 'Reserve' : 'Launch'}</td><td>${b.item}</td><td>${b.kind === 'one-time' ? 'one-time' : 'year 1'}</td><td class="r">${n(b.amount)}</td></tr>` : `<tr><td>${b.item}</td><td>${b.kind}</td><td class="r">${n(b.amount)}</td></tr>`))
+    .map((b) => (cols === 4 ? `<tr><td>${b.kind === 'one-time' ? 'Development' : b.kind === 'reserve' ? 'Reserve' : /Hosting/.test(b.item) ? 'Maintenance' : 'Launch'}</td><td>${b.item}</td><td>${b.kind === 'one-time' ? 'one-time' : 'year 1'}</td><td class="r">${n(b.amount)}</td></tr>` : `<tr><td>${b.item}</td><td>${b.kind}</td><td class="r">${n(b.amount)}</td></tr>`))
     .join('');
 const sens = [0.2, 0.25, 0.3, 0.35, 0.4].map((mg) => ({ mg, b: payback(series(1, mg)), d: payback(series(DOWN, mg)) }));
 
@@ -179,7 +179,7 @@ const main = `
 
 <h1>1. Summary</h1>
 <p>Saryarqa Routes is a tour company from Astana. In 2025 it had 3,400 travelers, but about 96% of them were from Kazakhstan, and the company wants 30% of its travelers to come from abroad within 24 months (case data). We think the main reason foreigners do not book is simple: they cannot easily see what a trip includes, they cannot pay with their own card, and they have no way to check that the company is real.</p>
-<p>Our answer is Saryarqa Go, a booking website and app in English and Chinese. We start with independent travelers from China. The first version can be built in 12 weeks, and all year-1 costs stay within ${n(CAP)} KZT. With our assumptions it pays back in month ${PB}, or in month ${PD} if we get 30% fewer travelers than planned.</p>
+<p>Our answer is Saryarqa Go, a booking website and app in English and Chinese. We start with independent travelers from China. The first version can be built in 12 weeks within the ${n(CAP)} KZT budget from the case. With our assumptions it pays back in month ${PB}, or in month ${PD} if we get 30% fewer travelers than planned.</p>
 
 <h1>2. The problem</h1>
 <p>Today the company sells tours through Instagram messages, WhatsApp and phone calls. Customers pay by Kaspi transfer or cash, and the website is one page in Russian (case data). This works for local customers, but not for a tourist from Shanghai or Berlin. The case lists four things foreign guests said, and each of them stops a booking before the payment:</p>
@@ -224,11 +224,11 @@ const main = `
 <tr><td>1-2</td><td>Interviews and research; apply to payment providers</td><td>At least 10 interviews with Chinese travelers; applications sent</td></tr>
 <tr><td>3-4</td><td>Design and tour pages in English and Chinese</td><td>4 tour pages checked by 3 or more target users</td></tr>
 <tr><td>5-7</td><td>Booking, inclusion lists, chat, trust page</td><td>A full test booking works in the payment test mode</td></tr>
-<tr><td>8-9</td><td>Real payment page, manager inbox, postcard QR</td><td>Staff make a first real test payment</td></tr>
+<tr><td>8-9</td><td>Trip builder, real payment page, rescheduling</td><td>Staff make a first real test payment</td></tr>
 <tr><td>10-11</td><td>Usability tests and payment checks</td><td>5-8 test sessions with no blocking problems left</td></tr>
 <tr><td>12</td><td>Pilot with real travelers</td><td>Pilot results collected</td></tr>
 </table>
-<p>Phase 2 comes after the ${n(CAP)} KZT MVP: the trip builder, weather and road rescheduling, family updates, the offline audio guide, live Alipay and WeChat Pay, and listing on Trip.com. This way the MVP stays small and does not get stuck waiting for someone else.</p>
+<p>Everything that depends on another company's approval or on live data comes later: Alipay and WeChat Pay, a smarter AI chat, live weather and road data, GPS sharing, offline audio, and listing on Trip.com or Klook. This way the MVP does not get stuck waiting for someone else.</p>
 <p>The app would be built with React and TypeScript, a database with an admin page for the managers, and the payment provider's own payment page, so card data never touches our servers. We plan a small hired team: a designer, two developers and a Chinese translator, with one person from Saryarqa Routes as the product owner (our proposal).</p>
 <p>We already have a working clickable prototype that shows the whole path from choosing a tour to the postcard. Payments in it are only simulated and it collects no card or passport data. It was built with the help of an AI coding assistant; see our AI Declaration.</p>
 
@@ -267,7 +267,7 @@ const fin = `
 <table>
 <tr><th>Part</th><th>Item</th><th>When</th><th class="r">KZT</th></tr>
 ${budgetRows(4)}
-<tr><td colspan="3"><b>Total year 1</b> (Stage 2 limit ${n(CAP)})</td><td class="r"><b>${n(MODEL.budgetTotal)}</b></td></tr>
+<tr><td colspan="3"><b>Total year 1</b> (the case allows up to ${n(CAP)})</td><td class="r"><b>${n(MODEL.budgetTotal)}</b></td></tr>
 </table>
 <p>From year 2 we expect running costs of ${n(RUN)} KZT per month, or ${n(RUN * 12)} KZT per year, for hosting, support and keeping the content up to date. All budget numbers are our planning estimates and should be checked with real quotes.</p>
 
@@ -298,7 +298,7 @@ ${yb.map((r, i) => `<tr><td>${r.y}</td><td class="r">${n(r.trav)}</td><td class=
 <tr><td>Payback, base case</td>${sens.map((s) => `<td class="r">${s.b ? 'month ' + s.b : 'after 48'}</td>`).join('')}</tr>
 <tr><td>Payback, downside</td>${sens.map((s) => `<td class="r">${s.d ? 'month ' + s.d : 'after 48'}</td>`).join('')}</tr>
 </table>
-<p>In the base case the project pays back in month ${sens[0].b} even with a 20% margin. In the downside case it pays back in ${pbText(sens[0].d)} with a 20% margin and in month ${sens[2].d} with 30%. So the first thing we would check with the company is its real cost per traveler. If the pilot shows lower demand, we would move more of the marketing to free channels (postcards and our own Xiaohongshu posts), delay paid ads, and keep running costs at ${n(RUN)} KZT per month.</p>
+<p>In the base case the project pays back within four years even with a 20% margin (month ${sens[0].b}). In the downside case it needs a margin of about 30% or more (month ${sens[2].d} at 30%, ${pbText(sens[0].d)} at 20%). So the first thing we would check with the company is its real cost per traveler. If the pilot shows lower demand, we would move more of the marketing to free channels (postcards and our own Xiaohongshu posts), delay paid ads, and keep running costs at ${n(RUN)} KZT per month.</p>
 `;
 
 const flow = `
@@ -394,13 +394,13 @@ const single = `
 <p class="caption">Figure 1. Our clickable prototype: each complaint from the case is linked to a feature.</p>
 
 <h1>4. MVP and implementation</h1>
-<p>The MVP (paid from the ${n(CAP)} KZT budget) includes the tour pages in English and Chinese with the inclusion lists, booking in three steps with a foreign card on the provider's page, the trust page, a chat that answers only from checked tour data and hands off to a manager, the postcard with a referral QR code, and a manager inbox for staff. Phase 2 comes later: the trip builder, weather and road rescheduling, family updates, the offline audio guide, live Alipay and WeChat Pay, and listing on Trip.com.</p>
+<p>The MVP includes the tour pages, the inclusion lists, booking with foreign card payment, the trust page, a simple scripted chat with hand-off to a manager, and the trip page. Things that depend on another company's approval or on live data come later: Alipay and WeChat Pay, a smarter AI chat, live weather data, and listing on Trip.com.</p>
 <table>
 <tr><th>Weeks</th><th>What we do</th><th>We know it is done when</th></tr>
 <tr><td>1-2</td><td>Interviews and research; apply to payment providers</td><td>At least 10 interviews with Chinese travelers; applications sent</td></tr>
 <tr><td>3-4</td><td>Design and tour pages in English and Chinese</td><td>4 tour pages checked by 3 or more target users</td></tr>
 <tr><td>5-7</td><td>Booking, inclusion lists, chat, trust page</td><td>A full test booking works in the payment test mode</td></tr>
-<tr><td>8-9</td><td>Real payment page, manager inbox, postcard QR</td><td>Staff make a first real test payment</td></tr>
+<tr><td>8-9</td><td>Trip page, real payment page, rescheduling</td><td>Staff make a first real test payment</td></tr>
 <tr><td>10-11</td><td>Usability tests and payment checks</td><td>5-8 test sessions with no blocking problems left</td></tr>
 <tr><td>12</td><td>Pilot with real travelers</td><td>Pilot results collected</td></tr>
 </table>
@@ -412,7 +412,7 @@ const single = `
 <table>
 <tr><th>Item</th><th>Type</th><th class="r">KZT</th></tr>
 ${budgetRows(3)}
-<tr><td colspan="2"><b>Total year 1</b> (Stage 2 limit ${n(CAP)})</td><td class="r"><b>${n(MODEL.budgetTotal)}</b></td></tr>
+<tr><td colspan="2"><b>Total year 1</b> (case limit ${n(CAP)})</td><td class="r"><b>${n(MODEL.budgetTotal)}</b></td></tr>
 </table>
 <p>From year 2 running costs are ${n(RUN)} KZT per month (our estimate). <b>How it earns money:</b> the company keeps its margin on every additional foreign traveler. We assume ${MARGIN * 100}% of the ${n(PRICE)} KZT average price (case data) is left after guides, transport, hotels and payment fees, so ${n(CPT)} KZT per traveler (our assumption). We do not count extras, longer trips or referrals, so the result is careful. Travelers start in month 4 and grow step by step to ${n(EXTRA)} per year by month 24.</p>
 <img src="IMG:chart" style="width:92%">
@@ -424,7 +424,7 @@ ${budgetRows(3)}
 <tr><td>Total after 48 months</td><td class="r">${m(base[47].cum)}</td><td class="r">${m(down[47].cum)}</td></tr>
 <tr><td>Payback if the margin is 20% / 40%</td><td class="r">month ${sens[0].b} / ${sens[4].b}</td><td class="r">${pbText(sens[0].d)} / month ${sens[4].d}</td></tr>
 </table>
-<p>If results are 30% worse, the project still pays back, but in month ${PD} instead of ${PB}. In that case we would move marketing to free channels (postcards, our own Xiaohongshu posts), delay paid ads and keep running costs at the minimum. <b>Scalability:</b> the same platform can add Korean or English-speaking markets with new translations, and new tours can be added by managers without developers.</p>
+<p>If results are 30% worse, the project still pays back, but in month ${PD} instead of ${PB}, and only if the margin is about 30% or more. In that case we would move marketing to free channels (postcards, our own Xiaohongshu posts), delay paid ads and keep running costs at the minimum. <b>Scalability:</b> the same platform can add Korean or English-speaking markets with new translations, and new tours can be added by managers without developers.</p>
 <p><b>Impact.</b> The company gets a second source of income next to local customers and stops losing foreign guests at the payment step. Travelers get clear prices, their own payment method and a guide they have already met. For Kazakhstan, every good trip shared on Chinese social media is free advertising, and it brings tourists to regions outside Almaty and Astana.</p>
 <table>
 <tr><th>Biggest risks</th><th>What we do about it</th></tr>
@@ -436,7 +436,7 @@ ${budgetRows(3)}
 </table>
 
 <h1>6. Conclusion</h1>
-<p>Foreign travelers do not book Saryarqa Routes because they cannot see what is included, cannot pay with their card and cannot check the company. Saryarqa Go fixes all four problems in one product, starting with Chinese travelers who can already visit without a visa. It fits the ${n(CAP)} KZT limit and pays back in month ${PB}, or month ${PD} if results are 30% worse. Our next steps: interview at least 10 Chinese travelers, check the real margin with the company, and apply to payment providers in the first week.</p>
+<p>Foreign travelers do not book Saryarqa Routes because they cannot see what is included, cannot pay with their card and cannot check the company. Saryarqa Go fixes all four problems in one product, starting with Chinese travelers who can already visit without a visa. It fits the ${n(CAP)} KZT budget and pays back in month ${PB}, or month ${PD} if results are 30% worse. Our next steps: interview at least 10 Chinese travelers, check the real margin with the company, and apply to payment providers in the first week.</p>
 `;
 
 const docs = [

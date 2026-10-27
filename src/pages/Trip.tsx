@@ -91,7 +91,7 @@ export default function Trip() {
 
   return (
     <>
-      <PageHead loop={4} scope="p2" title={t(ui.trip.title)}>
+      <PageHead loop={4} scope="mvp" title={t(ui.trip.title)}>
         {sample && (
           <span className="inline-flex flex-wrap items-center gap-2 rounded-xl bg-gold/15 px-3 py-2 text-sm">
             <Icon name="info" size={15} className="text-gold" /> {t(ui.trip.sample)} <Tag kind="demo" />

@@ -153,6 +153,7 @@ const skip = (name, why) => {
   await page.waitForTimeout(150);
   await page.getByRole('button', { name: /Pay \(test mode\)/ }).click();
   ok('Step 3 requires method + agreement', (await page.getByText('Choose a payment method.').count()) === 1 && (await page.getByText(/Please confirm you have read/).count()) === 1);
+  ok('Alipay / WeChat Pay marked Phase 2', (await page.locator('[data-scope="p2"]').count()) === 2);
   await page.locator('label').filter({ hasText: 'International card' }).click();
   await page.locator('label').filter({ hasText: 'I have read what is included' }).click();
   await page.locator('label').filter({ hasText: 'Demo: simulate a declined payment' }).click();
@@ -233,22 +234,22 @@ const skip = (name, why) => {
 
   // 8. Impact
   await go('/impact');
-  ok('Budget total exactly 8,000,000', (await page.getByTestId('budget-total').textContent()) === '8,000,000');
+  ok('Budget total exactly 20,000,000', (await page.getByTestId('budget-total').textContent()) === '20,000,000');
   const lineSum = await page.evaluate(() => [...document.querySelectorAll('[data-testid="budget-amount"]')].reduce((s, td) => s + Number(td.textContent.replace(/,/g, '')), 0));
-  ok('Budget lines add up to 8,000,000', lineSum === 8000000, String(lineSum));
-  ok('Budget lines labelled Needs confirmation', (await page.locator('tbody').first().getByText('Needs confirmation').count()) === 8);
-  ok('Default payback base = Month 20', (await page.getByText('Month 20').count()) >= 1);
-  ok('Default payback downside = Month 25', (await page.getByText('Month 25').count()) >= 1);
-  ok('Payback table shows base and −30%', (await page.getByTestId('payback-table').getByText('M20').count()) === 1 && (await page.getByTestId('payback-table').getByText('M25').count()) === 1);
-  ok('Break-even travelers 607 (8M ÷ 13,200)', (await page.getByText('607', { exact: true }).count()) >= 1);
-  ok('No 20,000,000 left on Impact', !(await page.content()).includes('20,000,000'));
-  ok('Impact lists: MVP (8M) and Phase 2 badges', (await page.locator('[data-scope="mvp"]').count()) >= 1 && (await page.locator('[data-scope="p2"]').count()) >= 1);
-  ok('Impact MVP list matches 8M scope', (await page.getByText('Manager inbox: handoff questions').count()) === 1 && (await page.getByText('Trip builder (rules-based').count()) === 1);
+  ok('Budget lines add up to 20,000,000', lineSum === 20000000, String(lineSum));
+  ok('Staged spending: Gate 1 14,500,000 + Gate 2 5,500,000 (Proposal)', (await page.getByTestId('gate-1').textContent()) === '14,500,000' && (await page.getByTestId('gate-2').textContent()) === '5,500,000' && (await page.getByTestId('staged-spending').getByText('Proposal').count()) === 1);
+  ok('Default payback base = Month 32', (await page.getByText('Month 32').count()) >= 1);
+  ok('Default payback downside = Month 44', (await page.getByText('Month 44').count()) >= 1);
+  ok('Payback table shows base and −30%', (await page.getByTestId('payback-table').getByText('M32').count()) === 1 && (await page.getByTestId('payback-table').getByText('M44').count()) === 1);
+  ok('Break-even travelers 1,516 (20M ÷ 13,200)', (await page.getByText('1,516', { exact: true }).count()) >= 1);
+  ok('No 8M cap wording left on Impact', !/Stage 2 (cap|rule|limit)|In MVP \(8M\)|within 8,000,000/.test(await page.content()));
+  ok('Impact lists: In MVP and Phase 2 badges', (await page.locator('[data-scope="mvp"]').count()) >= 1 && (await page.locator('[data-scope="p2"]').count()) >= 1);
+  ok('Impact MVP / later lists from budget.ts', (await page.getByText('Rules-based trip builder').count()) === 1 && (await page.getByText('Live LLM concierge with retrieval').count()) === 1);
   await shot('08-impact');
   await page.locator('#s-margin').fill('40');
   await page.waitForTimeout(150);
   const after = await page.locator('text=/Month \\d+/').allTextContents();
-  ok('Sliders update KPIs live', !after.includes('Month 20'), after.join(', '));
+  ok('Sliders update KPIs live', !after.includes('Month 32'), after.join(', '));
 
   // 9. Trust center
   await go('/trust');
@@ -261,15 +262,15 @@ const skip = (name, why) => {
   ok('Video call request (simulated)', (await page.getByText(/Request sent \(simulated\)/).count()) >= 1);
   await shot('09-trust');
 
-  // 9b. Scope badges: In MVP (8M) vs Phase 2
+  // 9b. Scope badges: In MVP vs Phase 2
   const scopeOf = async (r) => { await go(r); return page.locator('h1').locator('xpath=preceding-sibling::*[@data-scope][1]').getAttribute('data-scope').catch(() => null); };
-  for (const [r, want] of [['/tours', 'mvp'], ['/book?tour=kolsai', 'mvp'], ['/ask', 'mvp'], ['/trust', 'mvp'], ['/postcard', 'mvp'], ['/plan', 'p2'], ['/trip', 'p2']]) {
+  for (const [r, want] of [['/tours', 'mvp'], ['/book?tour=kolsai', 'mvp'], ['/ask', 'mvp'], ['/trust', 'mvp'], ['/postcard', 'mvp'], ['/plan', 'mvp'], ['/trip', 'mvp']]) {
     const got = await scopeOf(r);
     ok(`Scope badge on ${r}: ${want}`, got === want, String(got));
   }
   await go('/tour/kolsai');
-  ok('Tour page: inclusions In MVP, audio guide Phase 2', (await page.locator('#inc [data-scope="mvp"]').count()) === 1 && (await page.locator('#audio [data-scope="p2"]').count()) === 1);
-  ok('Scope badge text says In MVP (8M)', (await page.locator('#inc [data-scope="mvp"]').textContent()).includes('In MVP (8M)'));
+  ok('Tour page: inclusions and audio guide In MVP', (await page.locator('#inc [data-scope="mvp"]').count()) === 1 && (await page.locator('#audio [data-scope="mvp"]').count()) === 1);
+  ok('Scope badge text says "In MVP" (no 8M)', (await page.locator('#inc [data-scope="mvp"]').textContent()).trim().endsWith('In MVP'));
 
   // 9c. Evidence slot: empty until the team adds real interviews; never sample data.
   const interviewsSrc = fs.readFileSync(path.join(ROOT, 'src/data/interviews.ts'), 'utf8');

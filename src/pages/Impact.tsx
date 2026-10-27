@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { PageHead, Section } from '../components/Layout';
 import { Scope, Tag } from '../components/Tag';
-import { BUDGET_CAP, budget, budgetConfig, budgetTotal, gantt, inMvp, later, metrics, oneTimeTotal, otherTotal, recurringTotal, reserveTotal, risks } from '../data/budget';
+import { BUDGET_CAP, budget, budgetConfig, budgetTotal, gantt, gateTotal, inMvp, later, metrics, oneTimeTotal, otherTotal, risks } from '../data/budget';
 import { kzt, millions, num } from '../lib/format';
 import { AVG_PRICE, DEFAULT_MARGIN, DEFAULT_RUNNING, DOWNSIDE, MONTHS, breakEvenTravelers, contributionPerTraveler, derivation, paybackMonth, series, type PaybackSeries } from '../lib/paybackModel';
 
@@ -96,7 +96,7 @@ export default function Impact() {
 
   return (
     <>
-      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub={`12-week MVP, year-1 budget of exactly ${num(budgetTotal)} KZT (Stage 2 cap: ${num(BUDGET_CAP)} KZT), and an honest payback model you can stress-test.`} />
+      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub={`12-week MVP, year-1 budget of exactly ${num(budgetTotal)} KZT, and an honest payback model you can stress-test.`} />
 
       <Section title="12-week MVP plan" sub="One closed loop shipped end-to-end, then tested with real users.">
         <div className="card overflow-x-auto p-4 sm:p-5">
@@ -123,7 +123,7 @@ export default function Impact() {
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div className="card p-5">
-            <h3 className="mb-3 flex flex-wrap items-center gap-2 text-lg font-bold"><Icon name="check" className="text-ok" /> Paid from the {millions(BUDGET_CAP)} budget (12 weeks) <Scope phase="mvp" /></h3>
+            <h3 className="mb-3 flex flex-wrap items-center gap-2 text-lg font-bold"><Icon name="check" className="text-ok" /> In MVP (12 weeks) <Scope phase="mvp" /></h3>
             <ul className="space-y-1.5 text-sm">
               {inMvp.map((x) => (
                 <li key={x} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-ok" />{x}</li>
@@ -131,7 +131,7 @@ export default function Impact() {
             </ul>
           </div>
           <div className="card p-5">
-            <h3 className="mb-3 flex flex-wrap items-center gap-2 text-lg font-bold"><Icon name="clock" className="text-gold" /> After the pilot <Scope phase="p2" /></h3>
+            <h3 className="mb-3 flex flex-wrap items-center gap-2 text-lg font-bold"><Icon name="clock" className="text-gold" /> Later phases <Scope phase="p2" /></h3>
             <ul className="space-y-1.5 text-sm">
               {later.map((x) => (
                 <li key={x} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />{x}</li>
@@ -141,14 +141,14 @@ export default function Impact() {
         </div>
       </Section>
 
-      <Section title="Year-1 budget" sub={`Planning assumptions. Stage 2 rule: total costs must stay within ${num(BUDGET_CAP)} KZT. The build fails if these lines do not add up to the cap.`}>
+      <Section title="Year-1 budget" sub={`Planning assumptions. The case allows up to ${num(BUDGET_CAP)} KZT for development and launch. The build fails if these lines do not add up to it.`}>
         <div className="card overflow-x-auto">
           <table className="w-full min-w-[520px] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-xs text-muted">
                 <th className="px-4 py-3">Item</th>
                 <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Label</th>
+                <th className="px-4 py-3">Gate</th>
                 <th className="px-4 py-3 text-right">KZT</th>
                 <th className="px-4 py-3 text-right">Share</th>
               </tr>
@@ -156,9 +156,9 @@ export default function Impact() {
             <tbody>
               {budget.map((b) => (
                 <tr key={b.item} className="border-b border-line/70">
-                  <td className="px-4 py-2.5"><div className="font-medium">{b.item}</div><div className="text-xs text-muted">{b.note}</div></td>
+                  <td className="px-4 py-2.5 font-medium">{b.item}</td>
                   <td className="px-4 py-2.5 text-muted">{b.kind}</td>
-                  <td className="px-4 py-2.5"><Tag kind={b.label} /></td>
+                  <td className="px-4 py-2.5 text-muted" data-gate={b.gate}>Gate {b.gate}</td>
                   <td className="num px-4 py-2.5 text-right" data-testid="budget-amount">{num(b.amount)}</td>
                   <td className="num px-4 py-2.5 text-right text-muted">{((b.amount / budgetTotal) * 100).toFixed(1)}%</td>
                 </tr>
@@ -174,7 +174,29 @@ export default function Impact() {
           </table>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted">
-          <Tag kind="confirm" extra="planning assumptions, 2 quotes per line before spending" /> One-time: <span className="num">{kzt(oneTimeTotal)}</span> · Recurring (12 months): <span className="num">{kzt(recurringTotal)}</span> · Reserve: <span className="num">{kzt(reserveTotal)}</span>
+          <Tag kind="proposal" extra="planning assumptions" /> One-time: <span className="num">{kzt(oneTimeTotal)}</span> · Recurring + contingency: <span className="num">{kzt(otherTotal)}</span> · AI usage is inside "Hosting, AI usage, maintenance"
+        </div>
+        <div className="card mt-4 p-5 text-sm" data-testid="staged-spending">
+          <h3 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-bold">Staged spending <Tag kind="proposal" /></h3>
+          <p className="text-muted">
+            The {num(BUDGET_CAP)} KZT is a cap, not a target. <b className="text-ink">Gate 1</b> funds the MVP and the pilot. The rest is released only if the pilot meets its metrics (booking completion, concierge answers without handoff, referral bookings; see below).
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {([1, 2] as const).map((g) => (
+              <div key={g} className="rounded-xl border border-line p-3">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="font-semibold">{g === 1 ? 'Gate 1 · MVP + pilot' : 'Gate 2 · only if pilot metrics are met'}</span>
+                  <span className="num font-semibold" data-testid={`gate-${g}`}>{num(gateTotal(g))}</span>
+                </div>
+                <ul className="mt-1.5 space-y-0.5 text-muted">
+                  {budget.filter((b) => b.gate === g).map((b) => (
+                    <li key={b.item} className="flex justify-between gap-2"><span>{b.item}</span><span className="num">{num(b.amount)}</span></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-xs text-muted">The payback model below still assumes the full {num(BUDGET_CAP)} KZT is spent (the careful case).</p>
         </div>
       </Section>
 

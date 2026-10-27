@@ -48,7 +48,7 @@ export default function Plan() {
 
   return (
     <>
-      <PageHead loop={1} scope="p2" title={t(ui.plan.title)} sub={t(ui.plan.sub)}>
+      <PageHead loop={1} scope="mvp" title={t(ui.plan.title)} sub={t(ui.plan.sub)}>
         <span className="inline-flex items-center gap-1.5 rounded border border-dashed border-teal/60 px-2 py-0.5 text-sm font-medium text-teal">
           <Icon name="info" size={13} /> {t(ui.plan.rules)}
         </span>
