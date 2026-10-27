@@ -199,15 +199,20 @@ const ok = (name, cond, info = '') => {
 
   // 8. Impact
   await go('/impact');
-  ok('Budget total exactly 20,000,000', (await page.getByTestId('budget-total').textContent()) === '20,000,000');
-  ok('Default payback base = Month 32', (await page.getByText('Month 32').count()) >= 1);
-  ok('Default payback downside = Month 44', (await page.getByText('Month 44').count()) >= 1);
-  ok('Break-even travelers 1,516', (await page.getByText('1,516').count()) >= 1);
+  ok('Budget total exactly 8,000,000', (await page.getByTestId('budget-total').textContent()) === '8,000,000');
+  const lineSum = await page.evaluate(() => [...document.querySelectorAll('[data-testid="budget-amount"]')].reduce((s, td) => s + Number(td.textContent.replace(/,/g, '')), 0));
+  ok('Budget lines add up to 8,000,000', lineSum === 8000000, String(lineSum));
+  ok('Budget lines labelled Needs confirmation', (await page.locator('tbody').first().getByText('Needs confirmation').count()) === 8);
+  ok('Default payback base = Month 20', (await page.getByText('Month 20').count()) >= 1);
+  ok('Default payback downside = Month 25', (await page.getByText('Month 25').count()) >= 1);
+  ok('Payback table shows base and −30%', (await page.getByTestId('payback-table').getByText('M20').count()) === 1 && (await page.getByTestId('payback-table').getByText('M25').count()) === 1);
+  ok('Break-even travelers 607 (8M ÷ 13,200)', (await page.getByText('607', { exact: true }).count()) >= 1);
+  ok('No 20,000,000 left on Impact', !(await page.content()).includes('20,000,000'));
   await shot('08-impact');
   await page.locator('#s-margin').fill('40');
   await page.waitForTimeout(150);
   const after = await page.locator('text=/Month \\d+/').allTextContents();
-  ok('Sliders update KPIs live', !after.includes('Month 32'), after.join(', '));
+  ok('Sliders update KPIs live', !after.includes('Month 20'), after.join(', '));
 
   // 9. Trust center
   await go('/trust');

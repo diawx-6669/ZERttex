@@ -13,7 +13,7 @@ export const caseFacts: { label: string; value: string }[] = [
   { label: 'Payment', value: 'Kaspi transfer or cash' },
   { label: 'Website', value: 'One page, Russian only' },
   { label: 'Goal', value: 'Within 24 months, 30% of travelers from abroad' },
-  { label: 'Budget', value: 'Up to 20,000,000 KZT for development and launch in year 1' },
+  { label: 'Budget (Stage 2 rule)', value: 'Total costs within 8,000,000 KZT' },
 ];
 
 export type Complaint = { quote: L; answer: L; feature: L; route: string };

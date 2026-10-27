@@ -2,9 +2,12 @@ import { useMemo, useState } from 'react';
 import { Icon } from '../components/Icon';
 import { PageHead, Section } from '../components/Layout';
 import { Tag } from '../components/Tag';
-import { budget, budgetTotal, gantt, inMvp, later, metrics, oneTimeTotal, otherTotal, risks } from '../data/budget';
+import { BUDGET_CAP, budget, budgetConfig, budgetTotal, gantt, inMvp, later, metrics, oneTimeTotal, otherTotal, recurringTotal, reserveTotal, risks } from '../data/budget';
 import { kzt, millions, num } from '../lib/format';
-import { AVG_PRICE, MONTHS, breakEvenTravelers, contributionPerTraveler, derivation, paybackMonth, series, type PaybackSeries } from '../lib/paybackModel';
+import { AVG_PRICE, DEFAULT_MARGIN, DEFAULT_RUNNING, DOWNSIDE, MONTHS, breakEvenTravelers, contributionPerTraveler, derivation, paybackMonth, series, type PaybackSeries } from '../lib/paybackModel';
+
+const M = budgetConfig.model;
+const DEF_MARGIN = Math.round(DEFAULT_MARGIN * 100);
 
 // Judges' page. English only, as allowed by the brief.
 
@@ -74,24 +77,26 @@ function Slider({ id, label, value, min, max, step, onChange, display, tag }: { 
 }
 
 export default function Impact() {
-  const [margin, setMargin] = useState(30);
+  const [margin, setMargin] = useState(DEF_MARGIN);
   const [trav, setTrav] = useState(derivation.extra);
-  const [run, setRun] = useState(300_000);
+  const [run, setRun] = useState<number>(DEFAULT_RUNNING);
 
   const { base, down, pbBase, pbDown } = useMemo(() => {
     const input = { margin: margin / 100, travelersPerYear: trav, runningCost: run };
     const base = series(input);
-    const down = series(input, 0.7);
+    const down = series(input, DOWNSIDE);
     return { base, down, pbBase: paybackMonth(base), pbDown: paybackMonth(down) };
   }, [margin, trav, run]);
 
   const cpt = contributionPerTraveler(margin / 100);
   const be = breakEvenTravelers(margin / 100);
-  const isDefault = margin === 30 && trav === derivation.extra && run === 300_000;
+  const isDefault = margin === DEF_MARGIN && trav === derivation.extra && run === DEFAULT_RUNNING;
+  const at = (s: PaybackSeries, m: number) => s[Math.min(m, s.length) - 1].cumulative;
+  const low = (s: PaybackSeries) => s.reduce((a, p) => (p.cumulative < a.cumulative ? p : a), s[0]);
 
   return (
     <>
-      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub="12-week MVP, year-1 budget of exactly 20,000,000 KZT, and an honest payback model you can stress-test." />
+      <PageHead eyebrow={<>For judges · ZERTTEX 2026 · Case 1</>} title="Impact, plan and payback" sub={`12-week MVP, year-1 budget of exactly ${num(budgetTotal)} KZT (Stage 2 cap: ${num(BUDGET_CAP)} KZT), and an honest payback model you can stress-test.`} />
 
       <Section title="12-week MVP plan" sub="One closed loop shipped end-to-end, then tested with real users.">
         <div className="card overflow-x-auto p-4 sm:p-5">
@@ -136,13 +141,14 @@ export default function Impact() {
         </div>
       </Section>
 
-      <Section title="Year-1 budget" sub="Planning assumptions. The case allows up to 20,000,000 KZT for development and launch.">
+      <Section title="Year-1 budget" sub={`Planning assumptions. Stage 2 rule: total costs must stay within ${num(BUDGET_CAP)} KZT. The build fails if these lines do not add up to the cap.`}>
         <div className="card overflow-x-auto">
           <table className="w-full min-w-[520px] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-xs text-muted">
                 <th className="px-4 py-3">Item</th>
                 <th className="px-4 py-3">Type</th>
+                <th className="px-4 py-3">Label</th>
                 <th className="px-4 py-3 text-right">KZT</th>
                 <th className="px-4 py-3 text-right">Share</th>
               </tr>
@@ -150,16 +156,17 @@ export default function Impact() {
             <tbody>
               {budget.map((b) => (
                 <tr key={b.item} className="border-b border-line/70">
-                  <td className="px-4 py-2.5 font-medium">{b.item}</td>
+                  <td className="px-4 py-2.5"><div className="font-medium">{b.item}</div><div className="text-xs text-muted">{b.note}</div></td>
                   <td className="px-4 py-2.5 text-muted">{b.kind}</td>
-                  <td className="num px-4 py-2.5 text-right">{num(b.amount)}</td>
+                  <td className="px-4 py-2.5"><Tag kind={b.label} /></td>
+                  <td className="num px-4 py-2.5 text-right" data-testid="budget-amount">{num(b.amount)}</td>
                   <td className="num px-4 py-2.5 text-right text-muted">{((b.amount / budgetTotal) * 100).toFixed(1)}%</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr className="bg-night text-nightInk">
-                <td className="px-4 py-3 font-bold" colSpan={2}>Total</td>
+                <td className="px-4 py-3 font-bold" colSpan={3}>Total</td>
                 <td className="num px-4 py-3 text-right font-bold" data-testid="budget-total">{num(budgetTotal)}</td>
                 <td className="num px-4 py-3 text-right">100%</td>
               </tr>
@@ -167,28 +174,28 @@ export default function Impact() {
           </table>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted">
-          <Tag kind="proposal" extra="planning assumptions" /> One-time: <span className="num">{kzt(oneTimeTotal)}</span> · Recurring + contingency: <span className="num">{kzt(otherTotal)}</span>
+          <Tag kind="confirm" extra="planning assumptions, 2 quotes per line before spending" /> One-time: <span className="num">{kzt(oneTimeTotal)}</span> · Recurring (12 months): <span className="num">{kzt(recurringTotal)}</span> · Reserve: <span className="num">{kzt(reserveTotal)}</span>
         </div>
       </Section>
 
       <Section title="Payback model" sub="Move the sliders. Chart and KPIs update live. Defaults are not tuned to look good.">
         <div className="grid gap-5 lg:grid-cols-[320px_1fr]">
           <div className="card space-y-6 p-5">
-            <Slider id="s-margin" label="Contribution margin" value={margin} min={10} max={50} step={1} onChange={setMargin} display={`${margin}%`} tag="Team assumption (default 30%)" />
+            <Slider id="s-margin" label="Contribution margin" value={margin} min={10} max={50} step={1} onChange={setMargin} display={`${margin}%`} tag={`Team assumption (default ${DEF_MARGIN}%)`} />
             <Slider id="s-trav" label="Extra foreign travelers / year by month 24" value={trav} min={300} max={2500} step={1} onChange={setTrav} display={num(trav)} tag={`Derived from the 30% goal (default ${num(derivation.extra)})`} />
-            <Slider id="s-run" label="Running cost after year 1 / month" value={run} min={100_000} max={1_500_000} step={50_000} onChange={setRun} display={kzt(run)} tag="Team assumption (default 300,000 KZT)" />
-            <button type="button" className="btn-ghost btn-sm w-full" disabled={isDefault} onClick={() => { setMargin(30); setTrav(derivation.extra); setRun(300_000); }}>
+            <Slider id="s-run" label="Running cost after year 1 / month" value={run} min={100_000} max={1_500_000} step={50_000} onChange={setRun} display={kzt(run)} tag={`Team assumption (default ${num(DEFAULT_RUNNING)} KZT)`} />
+            <button type="button" className="btn-ghost btn-sm w-full" disabled={isDefault} onClick={() => { setMargin(DEF_MARGIN); setTrav(derivation.extra); setRun(DEFAULT_RUNNING); }}>
               <Icon name="refresh" size={14} /> Reset to defaults
             </button>
             <Tag kind="proposal" extra="model, not a forecast" />
           </div>
-          <div className="space-y-5">
+          <div className="min-w-0 space-y-5">
             <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
               {[
                 { k: 'Contribution / traveler', v: kzt(cpt), s: `${num(AVG_PRICE)} × ${margin}%` },
-                { k: 'Break-even travelers', v: Number.isFinite(be) ? num(be) : 'n/a', s: '20M ÷ contribution' },
+                { k: 'Break-even travelers', v: Number.isFinite(be) ? num(be) : 'n/a', s: `${millions(BUDGET_CAP)} ÷ contribution` },
                 { k: 'Payback · base', v: pbBase ? `Month ${pbBase}` : '> 48 mo', s: 'cumulative cash ≥ 0', accent: 'text-teal' },
-                { k: 'Payback · downside', v: pbDown ? `Month ${pbDown}` : '> 48 mo', s: 'travelers × 0.7', accent: 'text-warn' },
+                { k: 'Payback · downside', v: pbDown ? `Month ${pbDown}` : '> 48 mo', s: `travelers × ${DOWNSIDE} (−30%)`, accent: 'text-warn' },
               ].map((x) => (
                 <div key={x.k} className="card p-4">
                   <div className="text-xs text-muted">{x.k}</div>
@@ -199,11 +206,28 @@ export default function Impact() {
             </div>
             <div className="card p-4 sm:p-5">
               <div className="mb-2 flex flex-wrap items-center gap-4 text-sm">
-                <span className="font-semibold">Cumulative cash, 48 months</span>
+                <span className="font-semibold">Cumulative cash, {MONTHS} months</span>
                 <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded bg-teal" /> Base</span>
-                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dashed border-warn" /> Downside (× 0.7)</span>
+                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dashed border-warn" /> Worse case (× {DOWNSIDE})</span>
               </div>
               <Chart base={base} down={down} pbBase={pbBase} pbDown={pbDown} />
+            </div>
+            <div className="card overflow-x-auto">
+              <table className="w-full min-w-[420px] text-sm" data-testid="payback-table">
+                <thead>
+                  <tr className="border-b border-line text-left text-xs text-muted">
+                    <th className="px-4 py-2.5">Cumulative cash</th>
+                    <th className="px-4 py-2.5 text-right">Base</th>
+                    <th className="px-4 py-2.5 text-right">Worse case (−30%)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-line/70"><td className="px-4 py-2">Lowest point</td><td className="num px-4 py-2 text-right">{millions(low(base).cumulative)} (M{low(base).month})</td><td className="num px-4 py-2 text-right">{millions(low(down).cumulative)} (M{low(down).month})</td></tr>
+                  <tr className="border-b border-line/70"><td className="px-4 py-2">Month 24</td><td className="num px-4 py-2 text-right">{millions(at(base, 24))}</td><td className="num px-4 py-2 text-right">{millions(at(down, 24))}</td></tr>
+                  <tr className="border-b border-line/70"><td className="px-4 py-2">Month {MONTHS}</td><td className="num px-4 py-2 text-right">{millions(at(base, MONTHS))}</td><td className="num px-4 py-2 text-right">{millions(at(down, MONTHS))}</td></tr>
+                  <tr><td className="px-4 py-2 font-semibold">Payback month</td><td className="num px-4 py-2 text-right font-semibold text-teal">{pbBase ? `M${pbBase}` : `> M${MONTHS}`}</td><td className="num px-4 py-2 text-right font-semibold text-warn">{pbDown ? `M${pbDown}` : `> M${MONTHS}`}</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -212,10 +236,11 @@ export default function Impact() {
           <div className="card p-5 text-sm">
             <h3 className="mb-2 text-lg font-bold">How the model works</h3>
             <ul className="space-y-1.5 text-muted">
-              <li>• One-time 12.0M KZT is spent over months 1-3; the other 8.0M over months 1-12.</li>
-              <li>• From month 13, running cost is charged monthly (slider).</li>
-              <li>• Launch at month 4. Extra foreign travelers ramp linearly: month m gets (m − 3) / 21 of the year-2 run rate, reaching 100% at month 24, then flat.</li>
-              <li>• Contribution per traveler = 44,000 KZT × margin.</li>
+              <li>• One-time {millions(oneTimeTotal)} KZT is spent over months 1-{M.oneTimeMonths}; the other {millions(otherTotal)} (recurring + reserve) over months 1-{M.otherMonths}.</li>
+              <li>• From month {M.otherMonths + 1}, running cost is charged monthly (slider).</li>
+              <li>• Launch at month {M.launchMonth}. Extra foreign travelers ramp linearly: month m gets (m − {M.launchMonth - 1}) / {M.rampEndMonth - M.launchMonth + 1} of the year-2 run rate, reaching 100% at month {M.rampEndMonth}, then flat.</li>
+              <li>• Contribution per traveler = {num(AVG_PRICE)} KZT × margin.</li>
+              <li>• Worse case: {Math.round((1 - DOWNSIDE) * 100)}% fewer extra travelers (× {DOWNSIDE}), same costs.</li>
               <li>• Monthly net = travelers × contribution − costs. Payback = first month the cumulative total is ≥ 0.</li>
             </ul>
           </div>

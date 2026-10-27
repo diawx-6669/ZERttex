@@ -1,17 +1,25 @@
-// Payback model for the Impact page. Planning assumptions only.
+// Payback model for the Impact page and the submission documents.
+// Planning assumptions only. Every input comes from budgetConfig (src/data/budget.ts).
 //
 // Cash out:
-//   • one-time 12,000,000 KZT spread evenly over months 1-3
-//   • the other 8,000,000 KZT spread evenly over months 1-12
-//   • from month 13: running cost per month (slider)
+//   • one-time lines spread evenly over months 1-3
+//   • everything else (recurring + reserve) spread evenly over months 1-12
+//   • from month 13: running cost per month
 // Cash in:
 //   • launch at month 4
-//   • extra foreign travelers ramp linearly from launch to the year-2 run rate
+//   • extra foreign travelers ramp linearly from launch to the yearly run rate
 //     at month 24, then stay flat. Ramp factor for month m (4…24) = (m − 3) / 21
-//   • contribution per traveler = 44,000 KZT × contribution margin
+//   • contribution per traveler = average price × contribution margin
+// Downside: travelers × 0.7 (30% lower results).
 
-export const AVG_PRICE = 44_000;
-export const MONTHS = 48;
+import { BUDGET_CAP, budgetConfig, oneTimeTotal, otherTotal } from '../data/budget';
+
+const M = budgetConfig.model;
+export const AVG_PRICE = M.avgPrice;
+export const MONTHS = M.horizonMonths;
+export const DEFAULT_MARGIN = M.margin;
+export const DEFAULT_RUNNING = M.runningCostPerMonth;
+export const DOWNSIDE = M.downsideFactor;
 
 export type PaybackInput = {
   margin: number; // 0..1
@@ -28,22 +36,22 @@ export function contributionPerTraveler(margin: number) {
 }
 
 export function ramp(m: number) {
-  if (m < 4) return 0;
-  if (m >= 24) return 1;
-  return (m - 3) / 21;
+  if (m < M.launchMonth) return 0;
+  if (m >= M.rampEndMonth) return 1;
+  return (m - (M.launchMonth - 1)) / (M.rampEndMonth - (M.launchMonth - 1));
 }
 
 export function series(input: PaybackInput, factor = 1): PaybackSeries {
-  const oneTime = input.oneTime ?? 12_000_000;
-  const other = input.other ?? 8_000_000;
+  const oneTime = input.oneTime ?? oneTimeTotal;
+  const other = input.other ?? otherTotal;
   const cpt = contributionPerTraveler(input.margin);
   const monthlyRun = (input.travelersPerYear * factor) / 12;
   let cum = 0;
   const out: PaybackSeries = [];
   for (let m = 1; m <= MONTHS; m++) {
     let cost = 0;
-    if (m <= 3) cost += oneTime / 3;
-    if (m <= 12) cost += other / 12;
+    if (m <= M.oneTimeMonths) cost += oneTime / M.oneTimeMonths;
+    if (m <= M.otherMonths) cost += other / M.otherMonths;
     else cost += input.runningCost;
     const travelers = monthlyRun * ramp(m);
     cum += travelers * cpt - cost;
@@ -52,25 +60,45 @@ export function series(input: PaybackInput, factor = 1): PaybackSeries {
   return out;
 }
 
-/** First month where cumulative cash is ≥ 0 (after launch), or null if not within 48 months. */
+/** First month where cumulative cash is ≥ 0 (after launch), or null if not within the horizon. */
 export function paybackMonth(s: PaybackSeries): number | null {
-  const hit = s.find((p) => p.month >= 4 && p.cumulative >= 0);
+  const hit = s.find((p) => p.month >= M.launchMonth && p.cumulative >= 0);
   return hit ? hit.month : null;
 }
 
-export function breakEvenTravelers(margin: number, investment = 20_000_000) {
+export function breakEvenTravelers(margin: number, investment = BUDGET_CAP) {
   const cpt = contributionPerTraveler(margin);
   return cpt > 0 ? Math.ceil(investment / cpt) : Infinity;
 }
 
 // Derivation of the default 1,263 extra foreign travelers (shown on the page).
 export const derivation = (() => {
-  const travelers2025 = 3400;
-  const foreignToday = Math.round(travelers2025 * 0.04); // 136
+  const c = budgetConfig.caseFacts;
+  const travelers2025 = c.travelers2025;
+  const foreignToday = Math.round(travelers2025 * c.foreignShareToday); // 136
   const domestic = travelers2025 - foreignToday; // 3,264
-  const total = Math.round(domestic / 0.7); // 4,663
-  const foreignNeeded = Math.round(total * 0.3); // 1,399
+  const total = Math.round(domestic / (1 - c.goalForeignShare)); // 4,663
+  const foreignNeeded = Math.round(total * c.goalForeignShare); // 1,399
   const extra = foreignNeeded - foreignToday; // 1,263
-  const revPerTraveler = 150_000_000 / travelers2025; // 44,117.6
+  const revPerTraveler = c.revenue2025 / travelers2025; // 44,117.6
   return { travelers2025, foreignToday, domestic, total, foreignNeeded, extra, revPerTraveler };
 })();
+
+/** Default scenario, base and downside, used by the Impact page tests and the submission generators. */
+export function defaultResults() {
+  const input = { margin: DEFAULT_MARGIN, travelersPerYear: derivation.extra, runningCost: DEFAULT_RUNNING };
+  const base = series(input);
+  const down = series(input, DOWNSIDE);
+  const low = (s: PaybackSeries) => s.reduce((a, p) => (p.cumulative < a.cumulative ? p : a), s[0]);
+  return {
+    input,
+    base,
+    down,
+    pbBase: paybackMonth(base),
+    pbDown: paybackMonth(down),
+    lowBase: low(base),
+    lowDown: low(down),
+    breakEven: breakEvenTravelers(DEFAULT_MARGIN),
+    contribution: contributionPerTraveler(DEFAULT_MARGIN),
+  };
+}

@@ -77,7 +77,7 @@ export const ui = {
     marketTitle: s('Why Chinese-speaking travelers', '为什么面向中文游客'),
     marketSub: s('Published figures with sources. Read the method note.', '附来源的公开数据，请留意统计口径说明。'),
     goalTitle: s('The goal', '目标'),
-    goalText: s('Within 24 months, 30% of travelers from abroad, with a year-1 budget of up to 20,000,000 KZT.', '24个月内，境外游客占比达到30%，第一年预算不超过2000万坚戈。'),
+    goalText: s('Within 24 months, 30% of travelers from abroad, with total costs within 8,000,000 KZT.', '24个月内，境外游客占比达到30%，总成本不超过800万坚戈。'),
     referral: s('A friend sent you this postcard. Your first booking discount is a proposal for the real app.', '朋友给您寄来这张明信片。首单优惠为正式版提案。'),
   },
   tour: {
