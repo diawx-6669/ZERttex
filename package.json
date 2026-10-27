@@ -15,7 +15,9 @@
     "sync:money": "node scripts/sync-money-docs.cjs",
     "photos:offline": "node scripts/photos-offline.cjs",
     "postcards": "node scripts/build-postcards.cjs",
-    "grounding": "node scripts/build-grounding.cjs"
+    "grounding": "node scripts/build-grounding.cjs",
+    "cost-sheet": "node scripts/build-cost-sheet.cjs",
+    "stage2": "npm run build && npm run cost-sheet && npm run postcards && npm run sync:money"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",

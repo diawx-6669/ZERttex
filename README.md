@@ -1,6 +1,6 @@
 # Saryarqa Go — Discover Kazakhstan. Book with confidence.
 
-Hackathon prototype for **ZERTTEX Hackathon 2026 · Stage 1 · Case 1 "Technology Product"**.
+Hackathon prototype for **ZERTTEX Hackathon 2026 · Final (Stage 2) · Case 1 "Technology Product"**. Stage 2 changes: [`submission/stage2/CHANGELOG_STAGE2.md`](submission/stage2/CHANGELOG_STAGE2.md).
 Saryarqa Routes (fictional case company, Astana) wants 30% of its travelers to come from abroad within 24 months.
 Saryarqa Go is the international booking app that gets them there, starting with Chinese-speaking independent travelers.
 
@@ -50,7 +50,7 @@ Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/as
 - **Audio guide** via the browser Web Speech API (`zh-CN` / `en-US`), with a text fallback when no voice exists.
 - **Trust Center**: animated guide intro, 3 sample guide profiles, video-call request, verification checklist, refund rules, emergency number.
 - **My trip**: timeline with "Advance demo time", family-sharing switch (off by default, copyable link, stop button), weather/road simulator with reschedule request.
-- **Postcard**: 1–4 photos read with `FileReader` (never uploaded), 4:5 layout for Xiaohongshu / WeChat Moments / Instagram, decorative QR, copyable referral link, "see what your friend sees" back to step 1.
+- **Postcard**: 1–4 photos read with `FileReader` (never uploaded), 4:5 layout for Xiaohongshu / WeChat Moments / Instagram, real scannable QR to `#/tour/<id>?ref=<code>`, Download PNG (1080 × 1350), "Suggest a caption" (3 中文 + 3 EN), print-ready A6 postcards at `#/print/postcards`, copyable referral link, "see what your friend sees" back to step 1.
 - **Impact page**: 12-week Gantt, year-1 budget (exactly <!--m:cap-->20,000,000<!--/m--> KZT, the case limit; one config in `src/data/budget.ts`, build fails if lines ≠ cap), live payback model with 3 sliders and an SVG chart (base: month <!--m:pbBase-->32<!--/m-->, 30% lower results: month <!--m:pbDown-->44<!--/m--> at defaults), break-even <!--m:breakEven-->1,516<!--/m--> travelers.
 - EN / 中文 toggle and A+ larger text (saved in `localStorage`), light + dark theme, works at 375 px, keyboard-operable, `aria-live` chat.
 
@@ -60,7 +60,8 @@ Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/as
 |---|---|---|
 | Payments | No money moves; striped **TEST MODE** banner; no card-number fields, no passport data | TEST MODE |
 | Alipay / WeChat Pay | Selectable, marked "Planned · requires provider approval" | Proposal |
-| Concierge, trip builder | Keyword / rules logic, not an LLM | "Demo · scripted, not live AI" |
+| Concierge, trip builder, captions, manager drafts | Scripted rules by default. With `VITE_AI_ENDPOINT` set, live Claude (Haiku 5.5) through `worker/`, grounded only on verified data; silent fallback to scripted on any error or > 8 s; footer switch "Scripted demo only" | "Live AI · beta" or "Scripted demo" badge; every AI output tagged "AI-generated" |
+| Manager inbox (`#/manager`) | Handoffs stored in this browser only; sending is simulated and needs manager approval | "For Saryarqa Routes staff · demo", seed rows Demo data |
 | Tour prices and details | Made up for the demo | Demo data |
 | Guides | Sample profiles, not real people | Demo data · Sample profile |
 | Weather and road | 4 simulated conditions | Demo data |
@@ -68,6 +69,14 @@ Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/as
 | Refund guarantee, family sharing, referral discount | Team proposals | Proposal |
 
 Every label in the UI is one of exactly five: **Case fact · Verified source · Proposal · Demo data · Needs confirmation**. The legend is in the footer of every page.
+
+## Stage 2 additions
+
+- **One money config** `src/data/budget.ts` (cap 20,000,000 KZT, build guard), staged spending Gate 1 / Gate 2, `npm run sync:money` for the docs, `npm run cost-sheet` → `submission/stage2/Cost_Payback_Sheet.xlsx` (live formulas) + `.pdf` (one A4 page).
+- **In MVP / Phase 2** badges on pages and sections.
+- **Live AI (optional)**: `worker/` Cloudflare Worker, see [`worker/README.md`](worker/README.md). `npm run grounding` rebuilds the verified data the AI may use.
+- **Manager inbox** `#/manager`, **real QR**, **A6 postcards** (`npm run postcards`), **offline photos** (`npm run photos:offline`), empty **interviews** slot (`src/data/interviews.ts`).
+- Stage 2 deliverables in `submission/stage2/`: Cost and Payback Sheet, SLIDES_CONTENT, DEMO_SCRIPT, AI declaration draft, changelog, postcards.
 
 ## What production would need
 
@@ -118,8 +127,8 @@ docs/Saryarqa_Go_Report.docx · .pdf   the report as Word / PDF with screenshots
 PLAN.md · REPORT.md · REPORT_NOTES.md
 ```
 
-Tech: React 18, TypeScript (strict), Vite 6, Tailwind CSS 3, Phosphor icons, `vite-plugin-singlefile`. No backend, no API keys, no runtime network calls except Google Fonts.
+Tech: React 18, TypeScript (strict), Vite 6, Tailwind CSS 3, Phosphor icons, `vite-plugin-singlefile`. No API keys in the browser (the optional AI key lives only in the Worker), no runtime network calls except Google Fonts.
 
 ## Verification
 
-An automated Playwright run walks the full acceptance checklist (75 checks: every loop step, validation, decline/success, Chinese answers, 8-day Kolsai + Burabay plan with the Astana transfer, <!--m:cap-->20,000,000<!--/m--> KZT total, payback months <!--m:pbBase-->32<!--/m--> / <!--m:pbDown-->44<!--/m-->, no overflow at 375 px on all 12 routes, dark mode, chat drawer from any page, tours filters, map pins, phone tab bar, no JS errors). Result: **75 / 75 passed**.
+An automated Playwright run walks the full acceptance checklist (155 checks, including Stage 2: QR decoding, mocked live AI with invalid JSON / errors / timeout, manager inbox, deliverables; every loop step, validation, decline/success, Chinese answers, 8-day Kolsai + Burabay plan with the Astana transfer, <!--m:cap-->20,000,000<!--/m--> KZT total, payback months <!--m:pbBase-->32<!--/m--> / <!--m:pbDown-->44<!--/m-->, no overflow at 375 px on all 12 routes, dark mode, chat drawer from any page, tours filters, map pins, phone tab bar, no JS errors). Result: **154 passed, 1 skipped** (offline photos run once the files are downloaded). `cd worker && npm test`: 21 Worker checks against a mock Claude API.

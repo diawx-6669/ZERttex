@@ -576,6 +576,22 @@ const skip = (name, why) => {
     }
   } else ok('postcards.pdf exists', false, 'run npm run postcards');
 
+  // 16. Stage 2 deliverables exist
+  for (const f of ['Cost_Payback_Sheet.pdf', 'Cost_Payback_Sheet.xlsx', 'SLIDES_CONTENT.md', 'DEMO_SCRIPT.md', 'AI_DECLARATION_STAGE2.md', 'CHANGELOG_STAGE2.md', 'postcards.pdf']) {
+    const fp = path.join(ROOT, 'submission/stage2', f);
+    ok(`submission/stage2/${f} exists`, fs.existsSync(fp) && fs.statSync(fp).size > 500);
+  }
+  try {
+    const info = require('child_process').execFileSync('pdfinfo', [path.join(ROOT, 'submission/stage2/Cost_Payback_Sheet.pdf')]).toString();
+    ok('Cost_Payback_Sheet.pdf is exactly one A4 page', /Pages:\s+1\b/.test(info) && /A4/.test(info));
+  } catch {
+    skip('Cost_Payback_Sheet.pdf page count', 'pdfinfo not installed');
+  }
+  const xlsx = fs.readFileSync(path.join(ROOT, 'submission/stage2/Cost_Payback_Sheet.xlsx'));
+  const sheetXml = require('child_process').execFileSync('unzip', ['-p', path.join(ROOT, 'submission/stage2/Cost_Payback_Sheet.xlsx'), 'xl/worksheets/sheet1.xml']).toString();
+  ok('Cost_Payback_Sheet.xlsx uses real formulas', xlsx.length > 0 && (sheetXml.match(/<f>/g) || []).length >= 15);
+  ok('Money docs in sync with budget.ts', (() => { try { require('child_process').execFileSync('node', [path.join(ROOT, 'scripts/sync-money-docs.cjs'), '--check']); return true; } catch { return false; } })());
+
   await browser.close();
   const failed = results.filter((r) => !r.pass);
   console.log(`\n${results.length - failed.length}/${results.length} checks passed${skipped.length ? `, ${skipped.length} skipped: ${skipped.map((x) => x.name).join('; ')}` : ''}`);
