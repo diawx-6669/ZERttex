@@ -245,6 +245,7 @@ const skip = (name, why) => {
   ok('Default payback worse case −30% = Month 28', (await page.getByText('Month 28').count()) >= 1);
   ok('Payback table shows target and −30%', (await page.getByTestId('payback-table').getByText('M22').count()) === 1 && (await page.getByTestId('payback-table').getByText('M28').count()) === 1);
   ok('Stress test shows no payback in 48 months', (await page.getByText(/Stress test .*no payback in 48 mo/).count()) >= 1);
+  ok('First-year costs: one-time 4,800,000 + operating 3,200,000 = 8,000,000', (await page.getByTestId('fy-one-time').textContent()) === '4,800,000' && (await page.getByTestId('fy-operating').textContent()) === '3,200,000' && (await page.getByTestId('fy-total').textContent()) === '8,000,000');
   ok('Break-even travelers 607 (8M ÷ 13,200)', (await page.getByText('607', { exact: true }).count()) >= 1);
   ok('No old 20M-spent / 32 / 44 wording on Impact', !/Month 32|Month 44|year-1 budget of exactly 20,000,000/.test(await page.content()));
   ok('Impact lists: In MVP and Phase 2 badges', (await page.locator('[data-scope="mvp"]').count()) >= 1 && (await page.locator('[data-scope="p2"]').count()) >= 1);

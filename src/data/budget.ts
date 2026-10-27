@@ -34,7 +34,7 @@ export type BudgetLine = {
 
 const L = (item: string, zh: string, amount: number, group: BudgetGroup, start: number, end: number, why: string): BudgetLine => ({
   item, zh, amount, group, start, end, why,
-  kind: group === 'Reserve' ? 'reserve' : group === 'Build' || group === 'Validation' ? 'one-time' : 'recurring',
+  kind: group === 'Build' || group === 'Validation' || item.startsWith('Printed postcards') ? 'one-time' : group === 'Reserve' ? 'reserve' : 'recurring',
   gate: 1,
   label: 'proposal',
 });
@@ -90,7 +90,7 @@ export const budgetConfig = {
     launchMonth: 4,
     /** Ramp reaches the full yearly rate at this month, then stays flat. */
     rampEndMonth: 24,
-    /** Required worse case: 30% lower results (70% of the company target path). */
+    /** Required worst case: 30% lower results (70% of the company target path). */
     downsideFactor: 0.7,
     /** Stress test: 40% of the target path, 25% margin, launch 2 months late. */
     stress: { volume: 0.4, margin: 0.25, delay: 2 },
@@ -118,6 +118,17 @@ export const reserveTotal = sumOf('reserve');
 export const otherTotal = budgetTotal - oneTimeTotal;
 /** Gate 1 = Phase 1 lines; gate 2 = the rest of the cap, released after the stage gate. */
 export const gateTotal = (g: BudgetGate) => (g === 1 ? budgetTotal : BUDGET_CAP - budgetTotal);
+
+/** Rules (Stage 2): total first-year costs = one-time costs + 12 months of operating costs.
+ *  Operating = everything that is not one-time (hosting, support, marketing, contingency reserve). */
+export const firstYearOneTime = oneTimeTotal;
+export const firstYearOperating = budgetTotal - oneTimeTotal;
+export const firstYearTotal = firstYearOneTime + firstYearOperating;
+/** Operating cost in month m (1..12) from the Phase 1 lines; from month 13 the running cost. */
+export function operatingInMonth(m: number) {
+  if (m > 12) return budgetConfig.model.runningCostPerMonth;
+  return budget.filter((b) => b.kind !== 'one-time').reduce((s, b) => (m >= b.start && m <= b.end ? s + b.amount / (b.end - b.start + 1) : s), 0);
+}
 
 /** Spend in month m (1..12) from the Phase 1 lines. */
 export function spendInMonth(m: number) {

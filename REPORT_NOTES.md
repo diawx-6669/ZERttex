@@ -76,7 +76,7 @@ The app shows the same split as a small pill badge on pages and sections: **● 
 | **Phase 1 total** (case cap 20,000,000; Phase 2 up to 12,000,000 only after the month-9 stage gate) | | | **8,000,000** |
 <!--/m-->
 
-One-time: <!--m:oneTime-->4,700,000<!--/m--> KZT. Recurring (12 months): <!--m:recurring-->2,680,000<!--/m--> KZT. Reserve: <!--m:reserve-->620,000<!--/m--> KZT. Source of truth: `src/data/budget.ts` (`npm run sync:money` refreshes this file).
+One-time: <!--m:oneTime-->4,800,000<!--/m--> KZT. Recurring (12 months): <!--m:recurring-->2,580,000<!--/m--> KZT. Reserve: <!--m:reserve-->620,000<!--/m--> KZT. Source of truth: `src/data/budget.ts` (`npm run sync:money` refreshes this file).
 
 ---
 

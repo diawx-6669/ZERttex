@@ -71,16 +71,21 @@ th { text-align: left; background: #F1EEE6; font-size: 7.8pt; } .r { text-align:
 <p class="sub">ZERTTEX Hackathon 2026 · Case 1 Technology Product · all amounts in KZT · planning assumptions, not a forecast · same model and numbers as Cost_Payback_Sheet.xlsx (live formulas) and the prototype's Impact page</p>
 <div class="grid">
 <div>
-<h2>1. One-time costs: build + validation (Phase 1) ${lab('p')}</h2>
-<table><tr><th>Item</th><th class="c">Months</th><th class="r">KZT</th></tr>${rowsGroup(['Build', 'Validation'])}<tr class="tot"><td>One-time total</td><td></td><td class="r">${n(gsum(['Build', 'Validation']))}</td></tr></table>
-<h2>2. Launch, monthly operations, reserve (year 1)</h2>
-<table><tr><th>Item</th><th class="c">Months</th><th class="r">KZT</th></tr>${rowsGroup(['Launch', 'Operations', 'Reserve'])}
-<tr class="tot"><td>Launch + operations + reserve</td><td></td><td class="r">${n(gsum(['Launch', 'Operations', 'Reserve']))}</td></tr>
-<tr class="tot key"><td>Phase 1 total, 12 months ${lab('p')}</td><td></td><td class="r">${n(M.budgetTotal)}</td></tr>
-<tr><td>Case cap ${lab('case')} · Phase 2, only after the month-${C.model.stageGateMonth} stage gate</td><td></td><td class="r">${n(M.BUDGET_CAP)} · ≤ ${n(M.PHASE2_MAX)}</td></tr>
-<tr><td>Per month from month 13: ${C.runningItems.map((x) => `${x.item.split(' (')[0].toLowerCase()} ${n(x.amount)}`).join(' + ')} ${lab('a')}</td><td></td><td class="r">${n(C.model.runningCostPerMonth)}</td></tr></table>
-<p class="note">Not paid from the budget (stated): unpaid team work; Saryarqa Routes staff (product owner, manager, guides); per-transaction payment fees (inside the margin). Reasons for every line: Cost_Payback_Sheet.xlsx → Budget_8M, column G.</p>
-<h2>3. Revenue assumptions</h2>
+<h2>1. One-time costs ${lab('p')}</h2>
+<table><tr><th>Item</th><th class="c">Months</th><th class="r">KZT</th></tr>${C.lines.filter((b) => b.kind === 'one-time').map((b) => `<tr><td>${b.item}</td><td class="c">${mo(b)}</td><td class="r">${n(b.amount)}</td></tr>`).join('')}<tr class="tot"><td>One-time total</td><td></td><td class="r">${n(M.firstYearOneTime)}</td></tr></table>
+<h2>2. Monthly operating costs ${lab('a')}</h2>
+<table><tr><th>Item</th><th class="c">Months</th><th class="r">KZT / month</th></tr>${C.lines.filter((b) => b.kind !== 'one-time').map((b) => `<tr><td>${b.item}</td><td class="c">${mo(b)}</td><td class="r">${n(b.amount / (b.end - b.start + 1))}</td></tr>`).join('')}
+<tr class="tot"><td>Operating cost per month: M1–2 / M3 / M4–12</td><td></td><td class="r">${n(M.operatingInMonth(1))} / ${n(M.operatingInMonth(3))} / ${n(M.operatingInMonth(4))}</td></tr>
+<tr><td>From month 13: ${C.runningItems.map((x) => `${x.item.split(' (')[0].toLowerCase()} ${n(x.amount)}`).join(' + ')}</td><td></td><td class="r">${n(C.model.runningCostPerMonth)}</td></tr></table>
+<h2>3. Total first-year costs</h2>
+<table>
+<tr><td>One-time costs</td><td class="r">${n(M.firstYearOneTime)}</td></tr>
+<tr><td>+ 12 months of operating costs</td><td class="r">${n(M.firstYearOperating)}</td></tr>
+<tr class="tot key"><td>= Total first-year costs (Phase 1)</td><td class="r">${n(M.firstYearTotal)}</td></tr>
+<tr><td>Case budget limit ${lab('case')}</td><td class="r">${n(M.BUDGET_CAP)}</td></tr>
+<tr><td>Phase 2, only after the month-${C.model.stageGateMonth} stage gate ${lab('p')}</td><td class="r">≤ ${n(M.PHASE2_MAX)}</td></tr></table>
+<p class="note">Not paid from the budget (stated): unpaid team work; Saryarqa Routes staff; per-transaction payment fees (inside the margin). Reasons for every line: Cost_Payback_Sheet.xlsx → Budget_8M, column G.</p>
+<h2>4. Revenue assumptions</h2>
 <table>
 <tr><td>Average price per traveler</td><td class="r">${n(C.model.avgPrice)}</td><td>${lab('case')}</td></tr>
 <tr><td>Contribution margin (after guides, transport, hotels, fees)</td><td class="r">${Math.round(C.model.margin * 100)}%</td><td>${lab('a')}</td></tr>
@@ -91,7 +96,7 @@ th { text-align: left; background: #F1EEE6; font-size: 7.8pt; } .r { text-align:
 </table>
 </div>
 <div>
-<h2>4. Payback: company target vs required worse case (−30%)</h2>
+<h2>5. Payback: company target vs worst case (−30% results)</h2>
 <table><tr><th></th><th class="r">Target 100%</th><th class="r">−30%</th><th class="r">Stress*</th></tr>
 <tr><td>Lowest cumulative cash</td><td class="r">${mm(r.lowBase.cumulative)} (M${r.lowBase.month})</td><td class="r">${mm(r.lowDown.cumulative)} (M${r.lowDown.month})</td><td class="r">${mm(r.lowStress.cumulative)} (M${r.lowStress.month})</td></tr>
 <tr><td>Cumulative cash, month 24</td><td class="r">${mm(at(r.base, 24))}</td><td class="r">${mm(at(r.down, 24))}</td><td class="r">${mm(at(r.stress, 24))}</td></tr>
@@ -100,11 +105,11 @@ th { text-align: left; background: #F1EEE6; font-size: 7.8pt; } .r { text-align:
 <tr><td>Break-even travelers (${n(M.budgetTotal)} ÷ ${n(r.contribution)})</td><td class="r" colspan="3">${n(r.breakEven)}</td></tr></table>
 <p class="note">*Stress test: ${Math.round(C.model.stress.volume * 100)}% of the target path, ${Math.round(C.model.stress.margin * 100)}% margin, launch ${C.model.stress.delay} months late → the month-${C.model.stageGateMonth} stage gate stops paid ads and keeps Phase 2 closed.</p>
 ${chart()}
-<p class="note"><span style="color:#0E807A">━ company target</span> &nbsp; <span style="color:#C0392B">╍ worse case (−30%)</span> &nbsp; <span style="color:#888">┈ stress test</span> &nbsp; cumulative cash, 48 months</p>
+<p class="note"><span style="color:#0E807A">━ company target</span> &nbsp; <span style="color:#C0392B">╍ worst case (−30%)</span> &nbsp; <span style="color:#888">┈ stress test</span> &nbsp; cumulative cash, 48 months</p>
 <table><tr><th>Margin</th>${sens.map((s) => `<th class="r">${Math.round(s.mg * 100)}%</th>`).join('')}</tr>
 <tr><td>Payback, target</td>${sens.map((s) => `<td class="r">${pb(s.b)}</td>`).join('')}</tr>
 <tr><td>Payback, −30%</td>${sens.map((s) => `<td class="r">${pb(s.d)}</td>`).join('')}</tr></table>
-<h2>5. Where ${n(d.extra)} comes from</h2>
+<h2>6. Where ${n(d.extra)} comes from</h2>
 <table>
 <tr><td>~4% of ${n(d.travelers2025)} travelers are foreign today ${lab('case')}</td><td class="r">≈ ${n(d.foreignToday)}</td></tr>
 <tr><td>Keep the domestic travelers</td><td class="r">${n(d.domestic)}</td></tr>

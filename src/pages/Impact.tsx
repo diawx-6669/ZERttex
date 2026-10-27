@@ -3,7 +3,7 @@ import { Icon } from '../components/Icon';
 import { startJudgeMode } from '../components/JudgeMode';
 import { PageHead, Section } from '../components/Layout';
 import { Scope, Tag } from '../components/Tag';
-import { BUDGET_CAP, PHASE2_MAX, budget, budgetConfig, budgetGroups, budgetTotal, gantt, groupTotal, inMvp, later, metrics, risks } from '../data/budget';
+import { BUDGET_CAP, PHASE2_MAX, budget, budgetConfig, budgetGroups, budgetTotal, firstYearOneTime, firstYearOperating, firstYearTotal, gantt, groupTotal, inMvp, later, metrics, operatingInMonth, risks } from '../data/budget';
 import { kzt, millions, num } from '../lib/format';
 import { AVG_PRICE, DEFAULT_MARGIN, DEFAULT_RUNNING, DOWNSIDE, MONTHS, STRESS, breakEvenTravelers, contributionPerTraveler, derivation, paybackMonth, series, type PaybackSeries } from '../lib/paybackModel';
 
@@ -40,7 +40,7 @@ function Chart({ base, down, stress, pbBase, pbDown }: { base: PaybackSeries; do
     );
   };
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={`Cumulative cash over 48 months. Payback at company target month ${pbBase ?? 'beyond 48'}, worse case −30% month ${pbDown ?? 'beyond 48'}, stress test none within 48 months.`}>
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label={`Cumulative cash over 48 months. Payback at company target month ${pbBase ?? 'beyond 48'}, worst case −30% month ${pbDown ?? 'beyond 48'}, stress test none within 48 months.`}>
       {ticks.map((v) => (
         <g key={v}>
           <line x1={pad.l} x2={W - pad.r} y1={y(v)} y2={y(v)} stroke="rgb(var(--line))" strokeWidth={v === 0 ? 1.6 : 1} />
@@ -186,6 +186,29 @@ export default function Impact() {
             <span key={g}>{g}: <span className="num text-ink">{millions(groupTotal(g))}</span></span>
           ))}
         </div>
+        <div className="card mt-4 p-5 text-sm" data-testid="first-year">
+          <h3 className="mb-3 text-lg font-bold">Total first-year costs</h3>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {[
+              { k: 'One-time costs', v: firstYearOneTime, s: 'build, validation, printed QR cards' },
+              { k: 'Operating costs, 12 months', v: firstYearOperating, s: 'hosting, Chinese support, marketing, reserve' },
+              { k: 'Total first year', v: firstYearTotal, s: `case limit ${num(BUDGET_CAP)} KZT` },
+            ].map((x) => (
+              <div key={x.k} className="rounded-xl border border-line p-3">
+                <div className="text-xs text-muted">{x.k}</div>
+                <div className="num text-xl font-semibold" data-testid={`fy-${x.k.split(' ')[0].toLowerCase()}`}>{num(x.v)}</div>
+                <div className="text-xs text-muted">{x.s}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full min-w-[420px] text-sm" data-testid="monthly-operating">
+              <thead><tr className="border-b border-line text-left text-xs text-muted"><th className="py-2 pr-3">Monthly operating costs</th><th className="py-2 pr-3 text-right">Months 1–2</th><th className="py-2 pr-3 text-right">Month 3</th><th className="py-2 pr-3 text-right">Months 4–12</th><th className="py-2 text-right">From month 13</th></tr></thead>
+              <tbody><tr><td className="py-2 pr-3">KZT per month</td>{[1, 3, 4, 13].map((m) => (<td key={m} className="num py-2 pr-3 text-right">{num(operatingInMonth(m))}</td>))}</tr></tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-muted">One-time + 12 months of operating costs = {num(firstYearOneTime)} + {num(firstYearOperating)} = {num(firstYearTotal)} KZT, within the {num(BUDGET_CAP)} KZT case limit.</p>
+        </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           <div className="card p-5 text-sm" data-testid="staged-spending">
             <h3 className="mb-2 flex flex-wrap items-center gap-2 text-lg font-bold">Staged spending <Tag kind="proposal" /></h3>
@@ -233,7 +256,7 @@ export default function Impact() {
                 { k: 'Contribution / traveler', v: kzt(cpt), s: `${num(AVG_PRICE)} × ${margin}%` },
                 { k: 'Break-even travelers', v: Number.isFinite(be) ? num(be) : 'n/a', s: `${millions(budgetTotal)} ÷ contribution` },
                 { k: 'Payback · company target', v: pbBase ? `Month ${pbBase}` : '> 48 mo', s: '100% of the 30% goal path', accent: 'text-teal' },
-                { k: 'Payback · worse case −30%', v: pbDown ? `Month ${pbDown}` : '> 48 mo', s: `travelers × ${DOWNSIDE} (required scenario)`, accent: 'text-warn' },
+                { k: 'Payback · worst case −30%', v: pbDown ? `Month ${pbDown}` : '> 48 mo', s: `travelers × ${DOWNSIDE} (required scenario)`, accent: 'text-warn' },
               ].map((x) => (
                 <div key={x.k} className="card p-4">
                   <div className="text-xs text-muted">{x.k}</div>
@@ -246,7 +269,7 @@ export default function Impact() {
               <div className="mb-2 flex flex-wrap items-center gap-4 text-sm">
                 <span className="font-semibold">Cumulative cash, {MONTHS} months</span>
                 <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded bg-teal" /> Company target</span>
-                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dashed border-warn" /> Worse case −30%</span>
+                <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dashed border-warn" /> Worst case −30%</span>
                 <span className="flex items-center gap-1.5"><span className="h-1 w-6 rounded border-t-2 border-dotted border-muted" /> Stress test ({Math.round(STRESS.volume * 100)}%, margin {Math.round(STRESS.margin * 100)}%, +{STRESS.delay} mo): {pbStress ? `M${pbStress}` : 'no payback in 48 mo'}</span>
               </div>
               <Chart base={base} down={down} stress={stress} pbBase={pbBase} pbDown={pbDown} />
@@ -257,7 +280,7 @@ export default function Impact() {
                   <tr className="border-b border-line text-left text-xs text-muted">
                     <th className="px-4 py-2.5">Cumulative cash</th>
                     <th className="px-4 py-2.5 text-right">Company target</th>
-                    <th className="px-4 py-2.5 text-right">Worse case (−30%)</th>
+                    <th className="px-4 py-2.5 text-right">Worst case (−30%)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -279,7 +302,7 @@ export default function Impact() {
               <li>• From month 13: running costs + marketing per month (slider, default {num(DEFAULT_RUNNING)} KZT).</li>
               <li>• Launch at month {M.launchMonth}. Extra foreign travelers ramp linearly: month m gets (m − {M.launchMonth - 1}) / {M.rampEndMonth - M.launchMonth + 1} of the year-2 run rate, reaching 100% at month {M.rampEndMonth}, then flat.</li>
               <li>• Contribution per traveler = {num(AVG_PRICE)} KZT × margin.</li>
-              <li>• Worse case (required): {Math.round((1 - DOWNSIDE) * 100)}% fewer extra travelers (× {DOWNSIDE}), same costs. Stress test: {Math.round(STRESS.volume * 100)}% of the path, {Math.round(STRESS.margin * 100)}% margin, launch {STRESS.delay} months late.</li>
+              <li>• Worst case (required): {Math.round((1 - DOWNSIDE) * 100)}% fewer extra travelers (× {DOWNSIDE}), same costs. Stress test: {Math.round(STRESS.volume * 100)}% of the path, {Math.round(STRESS.margin * 100)}% margin, launch {STRESS.delay} months late.</li>
               <li>• Monthly net = travelers × contribution − costs. Payback = first month the cumulative total is ≥ 0.</li>
             </ul>
           </div>
