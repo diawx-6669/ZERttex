@@ -184,6 +184,8 @@ export function Footer() {
             <a className="underline-offset-4 hover:underline" href={href('/impact')}>{t(ui.nav.impact)}</a>
             <a className="underline-offset-4 hover:underline" href={href('/postcard')}>{t(ui.nav.postcard)}</a>
             <a className="underline-offset-4 hover:underline" href={href('/manager')}>{t({ en: 'Manager inbox (staff demo)', zh: '经理收件箱（员工演示）' })}</a>
+            <a className="underline-offset-4 hover:underline" href={href('/pilot')}>{t({ en: 'Pilot dashboard', zh: '试点数据看板' })}</a>
+            <a className="underline-offset-4 hover:underline" href={href('/partners')}>{t({ en: 'For hostels & hotels', zh: '青旅与酒店合作' })}</a>
           </div>
           <AiSwitch />
         </div>

@@ -28,7 +28,7 @@ DISCOVER → PLAN → VERIFY → BOOK → TRAVEL → SHARE ─┐
 | Rebuild the Word report from `REPORT.md` | `npm run report:docx` → `docs/Saryarqa_Go_Report.docx` |
 | Refresh every money number in the Markdown docs from `src/data/budget.ts` | `npm run sync:money` |
 
-Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/ask`, `#/trust`, `#/book`, `#/trip`, `#/postcard`, `#/impact`, `#/about`.
+Hash routes work on any static host: `#/tours`, `#/tour/kolsai`, `#/plan`, `#/ask`, `#/trust`, `#/book`, `#/trip`, `#/postcard`, `#/impact`, `#/pilot`, `#/partners`, `#/about`.
 
 ## What works for real (in the browser)
 
@@ -76,6 +76,10 @@ Every label in the UI is one of exactly five: **Case fact · Verified source · 
 - **In MVP / Phase 2** badges on pages and sections.
 - **Live AI (optional)**: `worker/` Cloudflare Worker, see [`worker/README.md`](worker/README.md). `npm run grounding` rebuilds the verified data the AI may use.
 - **Manager inbox** `#/manager`, **real QR**, **A6 postcards** (`npm run postcards`), **offline photos** (`npm run photos:offline`), empty **interviews** slot (`src/data/interviews.ts`).
+- **Pilot dashboard** `#/pilot` (for the company, Demo data): funnel visit → chat → booking started → paid → postcard shared → friend booked, with how each step is measured; month-9 checkpoint (≈21 paid bookings/month = go, ≈8 = stop paid ads, both from the payback model) with a what-if slider; cost per paid booking vs the marketing budget line.
+- **Seats left** on every tour date (Demo data, `src/data/availability.ts`): "18 November: 4 of 12 seats left" under the booking date, "Upcoming dates" cards on tour pages (open the booking with that date), booking blocked if travelers > seats left.
+- **Partners page** `#/partners` for hostels and hotels: QR card at reception (live preview, real QR with a partner code, A6 PNG download), 5% of the tour price per traveler (Proposal), earnings calculator; printing is the existing "Printed postcards + QR cards" budget line.
+- **Demo video** (48 s) on the home page: `media/saryarqa-go-demo.mp4`, mirrored to `docs/media/` by the build; falls back to the GitHub Pages copy when opened from `dist/`.
 - Stage 2 deliverables in `submission/stage2/`: Cost and Payback Sheet, SLIDES_CONTENT, DEMO_SCRIPT, AI declaration draft, changelog, postcards.
 
 ## What production would need

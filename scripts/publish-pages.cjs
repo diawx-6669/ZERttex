@@ -7,4 +7,7 @@ const root = path.resolve(__dirname, '..');
 const built = path.join(root, 'dist/app.html');
 for (const out of ['dist/index.html', 'index.html', 'docs/index.html']) fs.copyFileSync(built, path.join(root, out));
 for (const out of ['.nojekyll', 'docs/.nojekyll']) fs.writeFileSync(path.join(root, out), '');
+// Demo video + poster (media/ at the root): GitHub Pages may serve /docs, so mirror them there.
+fs.mkdirSync(path.join(root, 'docs/media'), { recursive: true });
+for (const f of fs.readdirSync(path.join(root, 'media'))) fs.copyFileSync(path.join(root, 'media', f), path.join(root, 'docs/media', f));
 console.log('pages files written');

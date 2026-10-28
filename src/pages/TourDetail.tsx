@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { UpcomingDates } from '../components/Availability';
 import { tourQuestion, useChat } from '../components/Chat';
 import { Icon } from '../components/Icon';
 import { LoopStrip, ReferralBanner } from '../components/Layout';
@@ -127,6 +128,8 @@ export default function TourDetail({ id, refCode = null }: { id?: string; refCod
               ))}
             </ul>
           </section>
+
+          <UpcomingDates tour={tour.id} />
 
           <Gallery tour={tour.id} />
 

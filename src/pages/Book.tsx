@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
+import { SeatsLine } from '../components/Availability';
 import { Icon } from '../components/Icon';
 import { PageHead, Stepper, TestModeBanner } from '../components/Layout';
 import { Scope, Tag } from '../components/Tag';
+import { seatsLeft } from '../data/availability';
 import { ui } from '../data/i18n';
 import { tourById, tours } from '../data/tours';
 import type { L, TourId } from '../data/types';
@@ -44,7 +46,10 @@ export default function Book({ query }: { query: URLSearchParams }) {
   // Prefill from ?tour= unless we came from the trip builder.
   useEffect(() => {
     const qt = query.get('tour') as TourId | null;
-    if (qt && tourById(qt) && !draft.fromPlan) resetDraft([{ tourId: qt, date: defaultTripDate() }]);
+    // ?date= comes from the "Upcoming dates" cards on tour pages.
+    const qd = query.get('date');
+    const date = qd && /^\d{4}-\d{2}-\d{2}$/.test(qd) && qd >= minDate ? qd : defaultTripDate();
+    if (qt && tourById(qt) && !draft.fromPlan) resetDraft([{ tourId: qt, date }]);
     if (!qt && !draft.fromPlan && draft.items.every((i) => !i.tourId)) resetDraft();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -60,6 +65,10 @@ export default function Book({ query }: { query: URLSearchParams }) {
       draft.items.forEach((it, i) => {
         if (!it.tourId) e[`tour${i}`] = t(ui.book.errTour);
         if (!it.date || it.date < minDate) e[`date${i}`] = t(ui.book.errDate);
+        else if (it.tourId && draft.travelers > seatsLeft(it.tourId, it.date)) {
+          const left = seatsLeft(it.tourId, it.date);
+          e[`date${i}`] = t({ en: `Only ${left} seats left on this date. Choose another date or fewer travelers.`, zh: `该日期仅剩 ${left} 个名额。请换一个日期或减少人数。` });
+        }
       });
       if (draft.travelers < 1 || draft.travelers > 12) e.travelers = t(ui.book.errTravelers);
     }
@@ -224,6 +233,7 @@ export default function Book({ query }: { query: URLSearchParams }) {
                           {...a11y(`date${i}`)}
                         />
                         {errors[`date${i}`] ? err(`date${i}`) : <p className="mt-1.5 text-xs text-muted">{t(ui.book.dateHint)}</p>}
+                        {it.tourId && it.date >= minDate && <SeatsLine tour={it.tourId} date={it.date} travelers={draft.travelers} />}
                       </div>
                       {draft.items.length > 1 && (
                         <button

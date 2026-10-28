@@ -18,6 +18,8 @@ import Impact from './pages/Impact';
 import About from './pages/About';
 import PrintPostcards from './pages/PrintPostcards';
 import Manager from './pages/Manager';
+import Pilot from './pages/Pilot';
+import Partners from './pages/Partners';
 
 export default function App() {
   const route = useRoute();
@@ -62,6 +64,12 @@ export default function App() {
       break;
     case 'manager':
       page = <Manager />;
+      break;
+    case 'pilot':
+      page = <Pilot />;
+      break;
+    case 'partners':
+      page = <Partners />;
       break;
     default:
       page = (

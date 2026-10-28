@@ -103,6 +103,7 @@ export default function Impact() {
         <button type="button" className="btn-primary btn-sm" onClick={startJudgeMode}>
           <Icon name="arrow" size={14} /> Judge mode: 2-minute walkthrough
         </button>
+        <a href="#/pilot" className="btn-ghost btn-sm"><Icon name="chart" size={14} /> Pilot dashboard: how we measure it</a>
       </PageHead>
 
       <Section title="12-week MVP plan" sub="One closed loop shipped end-to-end, then tested with real users.">

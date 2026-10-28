@@ -1,3 +1,4 @@
+import { DemoVideo } from '../components/DemoVideo';
 import { Icon } from '../components/Icon';
 import { TravelerVoices } from '../components/Interviews';
 import { LoopStrip, ReferralBanner, Section } from '../components/Layout';
@@ -82,6 +83,12 @@ export default function Home({ query }: { query: URLSearchParams }) {
 
       <Section title={t(ui.loop.title)}>
         <LoopStrip />
+      </Section>
+
+      <Section id="demo" title={t({ en: 'See the whole loop in 48 seconds', zh: '48 秒看完整个闭环' })} sub={t({ en: 'Tour → guide video call → payment with a foreign card → postcard with a QR code.', zh: '线路 → 导游视频通话 → 外国银行卡支付 → 带二维码的明信片。' })}>
+        <div className="mx-auto max-w-4xl">
+          <DemoVideo />
+        </div>
       </Section>
 
       {/* Complaints as an editorial list */}
