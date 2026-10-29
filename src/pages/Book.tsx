@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { SeatsLine } from '../components/Availability';
 import { GroupPay } from '../components/GroupPay';
+import { Confetti } from '../components/Motion';
 import { Icon } from '../components/Icon';
 import { QR } from '../components/QR';
 import { WeChatSignIn } from '../components/Share';
@@ -509,6 +510,7 @@ function Success() {
   if (!booking) return null;
   return (
     <>
+      <Confetti />
       <PageHead loop={3} title={t(ui.book.successTitle)} />
       <div className="container-x mt-4">
         <TestModeBanner />

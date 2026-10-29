@@ -175,3 +175,90 @@ html { scroll-padding-top: 5rem; }
   border-radius: 12px;
   transition: outline-color 0.2s;
 }
+
+/* ===================== Motion layer =====================
+   Everything below runs only under html.motion (set in main.tsx when the visitor
+   has not asked for reduced motion and the page is not driven by automation),
+   so tests and screenshots stay deterministic. Only transform / opacity animate. */
+
+/* Buttons: a light sweep on hover. */
+.btn { position: relative; overflow: hidden; isolation: isolate; }
+html.motion .btn::after {
+  content: ''; position: absolute; inset: -2px; z-index: -1; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.45) 48%, transparent 66%);
+  transform: translateX(-120%);
+}
+html.motion .btn:not(:disabled):hover::after { transform: translateX(120%); transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+/* Scroll progress bar under the header. */
+.scroll-bar { transform-origin: left; transform: scaleX(var(--scroll, 0)); }
+
+/* Hero: words rise one by one, the yellow marker draws itself. */
+html.motion .word { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+html.motion .word > span { display: inline-block; animation: word-up 0.8s cubic-bezier(0.2, 0.9, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 90ms + 120ms); }
+@keyframes word-up { from { transform: translateY(105%) rotate(4deg); } to { transform: none; } }
+html.motion .mark-draw { animation: mark-draw 0.7s cubic-bezier(0.7, 0, 0.2, 1) 0.55s both; transform-origin: left center; }
+@keyframes mark-draw { from { clip-path: inset(0 100% 0 0); transform: rotate(-1deg) scale(0.96); } to { clip-path: inset(0 0 0 0); transform: rotate(-1deg); } }
+html.motion .pop-in { animation: pop-in 0.6s cubic-bezier(0.3, 1.5, 0.5, 1) both; animation-delay: var(--d, 0s); }
+@keyframes pop-in { from { opacity: 0; transform: translateY(14px) scale(0.85); } to { opacity: 1; transform: none; } }
+
+/* Floating collage pieces (parallax is applied on the parent, float on the child). */
+html.motion .float-a { animation: float-a 7s ease-in-out infinite; }
+html.motion .float-b { animation: float-b 6s ease-in-out -2s infinite; }
+html.motion .float-c { animation: float-c 8s ease-in-out -4s infinite; }
+@keyframes float-a { 0%, 100% { transform: translateY(0) rotate(-1.5deg); } 50% { transform: translateY(-10px) rotate(-0.6deg); } }
+@keyframes float-b { 0%, 100% { transform: translateY(0) rotate(1.5deg); } 50% { transform: translateY(-14px) rotate(3deg); } }
+@keyframes float-c { 0%, 100% { transform: translateY(0) rotate(3deg); } 50% { transform: translateY(-8px) rotate(0deg); } }
+.parallax { transform: translate3d(calc(var(--mx, 0) * var(--depth, 10px)), calc(var(--my, 0) * var(--depth, 10px)), 0); transition: transform 0.25s ease-out; }
+
+/* Soft colour fields drifting behind the hero (radial gradients, no blur filter). */
+.blob { position: absolute; border-radius: 9999px; pointer-events: none; opacity: 0.55; }
+html.motion .blob { animation: blob 18s ease-in-out infinite alternate; }
+@keyframes blob { 0% { transform: translate(0, 0) scale(1); } 33% { transform: translate(40px, -30px) scale(1.12); } 66% { transform: translate(-30px, 25px) scale(0.92); } 100% { transform: translate(20px, 10px) scale(1.05); } }
+.spotlight { background: radial-gradient(420px circle at var(--sx, 50%) var(--sy, 40%), rgb(var(--teal) / 0.12), transparent 60%); }
+
+/* Two crossing ticker bands. */
+.marquee { display: flex; width: max-content; }
+html.motion .marquee { animation: marquee 38s linear infinite; }
+html.motion .marquee.reverse { animation-direction: reverse; animation-duration: 46s; }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* Chat demo: typing caret, check badge. */
+html.motion .caret::after { content: '▍'; margin-left: 1px; animation: caret 0.8s steps(1) infinite; }
+@keyframes caret { 50% { opacity: 0; } }
+
+/* Seats sticker wobble once in a while. */
+html.motion .wobble { animation: wobble 5s ease-in-out 2s infinite; }
+@keyframes wobble { 0%, 86%, 100% { transform: rotate(3deg) scale(1); } 89% { transform: rotate(-3deg) scale(1.06); } 92% { transform: rotate(5deg) scale(1.06); } 95% { transform: rotate(1deg) scale(1); } }
+
+/* Tour cards: 3D tilt and a light that follows the cursor. */
+.tilt { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.2s ease-out, box-shadow 0.15s; }
+.tilt-glare { background: radial-gradient(360px circle at var(--gx, 50%) var(--gy, 0%), rgb(255 255 255 / 0.35), transparent 55%); opacity: 0; transition: opacity 0.2s; }
+.tilt:hover .tilt-glare { opacity: 1; }
+
+/* Section titles: a yellow bar draws under the title when the section comes in. */
+.sec-title::after { content: ''; display: block; margin-top: 0.6rem; height: 8px; width: 64px; border-radius: 3px; border: 2px solid rgb(var(--edge)); background: rgb(var(--sun)); }
+html.js-reveal [data-reveal] .sec-title::after { transform: scaleX(0); transform-origin: left; transition: transform 0.7s cubic-bezier(0.7, 0, 0.2, 1) 0.25s; }
+html.js-reveal [data-reveal].in .sec-title::after { transform: scaleX(1); }
+
+/* Children of a revealed section arrive one after another. */
+/* "translate" (not "transform") so it composes with the card tilt. */
+html.js-reveal [data-reveal] .stagger > * { opacity: 0; translate: 0 22px; transition: opacity 0.6s ease-out, translate 0.6s cubic-bezier(0.2, 0.9, 0.2, 1), transform 0.2s ease-out; }
+html.js-reveal [data-reveal].in .stagger > * { opacity: 1; translate: none; }
+html.js-reveal [data-reveal].in .stagger > *:nth-child(2) { transition-delay: 0.08s; }
+html.js-reveal [data-reveal].in .stagger > *:nth-child(3) { transition-delay: 0.16s; }
+html.js-reveal [data-reveal].in .stagger > *:nth-child(4) { transition-delay: 0.24s; }
+html.js-reveal [data-reveal].in .stagger > *:nth-child(5) { transition-delay: 0.32s; }
+html.js-reveal [data-reveal].in .stagger > *:nth-child(6) { transition-delay: 0.4s; }
+
+/* Loop strip: a pulse travels from step to step. */
+html.motion .loop-dot { animation: loop-dot 3.6s ease-in-out infinite; animation-delay: calc(var(--i) * 0.6s); }
+@keyframes loop-dot { 0%, 20%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgb(var(--teal) / 0); } 8% { transform: scale(1.9); box-shadow: 0 0 0 6px rgb(var(--teal) / 0.25); } }
+
+/* Confetti after a booking. */
+.confetti { position: fixed; inset: 0; pointer-events: none; z-index: 80; overflow: hidden; }
+.confetti i { position: absolute; top: -12px; width: 10px; height: 14px; border: 2px solid rgb(var(--edge)); animation: confetti var(--t, 2.4s) cubic-bezier(0.2, 0.6, 0.4, 1) var(--d, 0s) forwards; }
+@keyframes confetti { to { transform: translate3d(var(--x, 0), 105vh, 0) rotate(var(--r, 540deg)); } }
+
+/* Header lifts when the page scrolls. */
+header.scrolled { box-shadow: 0 4px 0 0 rgb(var(--shadow) / 0.9); }

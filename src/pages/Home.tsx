@@ -1,4 +1,6 @@
+import type { CSSProperties, ReactNode } from 'react';
 import { useChat } from '../components/Chat';
+import { CountUp, LiveChatDemo, Marquee, SeatsCountdown, useParallax } from '../components/Motion';
 import { DemoVideo } from '../components/DemoVideo';
 import { Icon } from '../components/Icon';
 import { TravelerVoices } from '../components/Interviews';
@@ -16,6 +18,7 @@ import { useApp } from '../state';
 export default function Home({ query }: { query: URLSearchParams }) {
   const { t, lang } = useApp();
   const { openChat } = useChat();
+  const heroRef = useParallax<HTMLElement>();
   const ref = query.get('ref');
 
   const facts = [
@@ -29,72 +32,113 @@ export default function Home({ query }: { query: URLSearchParams }) {
     <>
       <ReferralBanner code={ref} />
 
-      {/* Hero: headline with a yellow marker, collage of tour, live chat and seats (same brand as the deck and video) */}
-      <section className="container-x grid items-center gap-12 pb-10 pt-10 sm:pt-14 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-[1fr_1.02fr] lg:gap-10 lg:py-12">
-        <div className="rise max-w-xl">
-          <div className="mb-6 flex flex-wrap gap-2">
-            <span className="sticker !bg-sun">EN · 中文</span>
-            <span className="sticker !bg-surface">{t({ en: 'Small groups · from Almaty, Astana, Turkestan', zh: '小团 · 阿拉木图、阿斯塔纳、突厥斯坦出发' })}</span>
-          </div>
-          <h1 className="text-[2.75rem] font-black leading-[0.98] sm:text-7xl" data-testid="hero-title" aria-label={t(ui.home.title)}>
-            {lang === 'zh' ? (
-              <>哈萨克斯坦，<br /><span className="mark my-2 -rotate-1">三步</span>轻松预订。</>
-            ) : (
-              <>Kazakhstan, <span className="mark my-2 -rotate-1">booked</span><br />in three clear steps.</>
-            )}
-          </h1>
-          <p className="mt-6 max-w-[46ch] text-lg text-muted sm:text-xl">{t(ui.home.lead)}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a href={href('/tours')} className="btn-primary px-6 text-base">
-              {t(ui.home.ctaTours)} <Icon name="arrow" />
-            </a>
-            <button type="button" className="btn-sun px-6 text-base" onClick={() => openChat(lang === 'zh' ? '查伦峡谷两个人多少钱？' : 'How much is Charyn Canyon for two?')}>
-              <Icon name="chat" /> {t({ en: 'Ask in 中文 or English', zh: '用中文提问' })}
-            </button>
-          </div>
-          <ul className="mt-9 grid grid-cols-2 gap-x-5 gap-y-3 text-sm font-semibold sm:max-w-lg">
-            {[
-              { i: 'card' as const, l: { en: 'Your own foreign card', zh: '使用外国银行卡' } },
-              { i: 'video' as const, l: { en: 'Meet your guide first', zh: '出发前先见导游' } },
-              { i: 'shieldCheck' as const, l: { en: 'AI that cannot invent prices', zh: 'AI 不会编造价格' } },
-              { i: 'globe' as const, l: { en: 'No Google: built for China', zh: '无 Google 依赖，面向中国' } },
-            ].map((x) => (
-              <li key={x.i} className="flex items-center gap-2">
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[8px] border-2 border-edge bg-surface"><Icon name={x.i} size={15} /></span>
-                {t(x.l)}
-              </li>
-            ))}
-          </ul>
+      {/* Hero: words rise, marker draws, collage floats with mouse parallax, the chat plays itself */}
+      <section ref={heroRef} className="relative isolate overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden>
+          <div className="blob left-[-8%] top-[8%] h-[520px] w-[520px]" style={{ background: 'radial-gradient(circle, rgb(var(--teal) / 0.35), transparent 65%)' }} />
+          <div className="blob right-[-6%] top-[-10%] h-[560px] w-[560px]" style={{ background: 'radial-gradient(circle, rgb(var(--sun) / 0.55), transparent 65%)', animationDelay: '-6s' }} />
+          <div className="blob bottom-[-20%] left-[35%] h-[480px] w-[480px]" style={{ background: 'radial-gradient(circle, rgb(var(--pink) / 0.3), transparent 65%)', animationDelay: '-11s' }} />
+          <div className="spotlight absolute inset-0" />
         </div>
-
-        <div className="relative mx-auto w-full max-w-[560px] pb-10 lg:pb-0">
-          <figure className="relative -rotate-[1.5deg] overflow-hidden rounded-[18px] border-2 border-edge bg-surface2 shadow-hard-lg">
-            <div className="grain relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5]">
-              <Media tour="kolsai" eager credit />
+        <div className="container-x grid items-center gap-12 pb-12 pt-10 sm:pt-14 lg:min-h-[calc(100dvh-4rem)] lg:grid-cols-[1fr_1.02fr] lg:gap-10 lg:py-12">
+          <div className="max-w-xl">
+            <div className="mb-6 flex flex-wrap gap-2">
+              <span className="sticker pop-in !bg-sun" style={{ '--d': '0.05s' } as CSSProperties}>EN · 中文</span>
+              <span className="sticker pop-in !bg-surface" style={{ '--d': '0.15s' } as CSSProperties}>{t({ en: 'Small groups · from Almaty, Astana, Turkestan', zh: '小团 · 阿拉木图、阿斯塔纳、突厥斯坦出发' })}</span>
             </div>
-            <figcaption className="flex items-center justify-between gap-2 border-t-2 border-edge bg-surface px-4 py-2.5 text-sm font-bold">
-              <span>{t({ en: 'Kolsai Lakes & Kaindy', zh: '科尔赛湖与凯恩迪湖' })}</span>
-              <span className="num font-mono text-xs">69,000 KZT</span>
-            </figcaption>
-          </figure>
-
-          {/* Live chat bubble: the concierge answers from verified data, numbers checked */}
-          <div className="absolute -left-3 top-8 w-[min(290px,78%)] rotate-[1.5deg] rounded-[14px] border-2 border-edge bg-surface p-3 text-[13px] shadow-hard sm:-left-10 lg:-left-16" aria-hidden>
-            <div className="mb-2 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-wider text-muted">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-ok" /> Live AI · 中文
+            <h1 className="text-[2.75rem] font-black leading-[0.98] sm:text-7xl" data-testid="hero-title" aria-label={t(ui.home.title)}>
+              <span aria-hidden>
+                {lang === 'zh' ? (
+                  <>
+                    <W i={0}>哈萨克斯坦，</W>
+                    <br />
+                    <span className="mark mark-draw my-2 -rotate-1">三步</span>
+                    <W i={3}>轻松预订。</W>
+                  </>
+                ) : (
+                  <>
+                    <W i={0}>Kazakhstan,</W>{' '}
+                    <span className="mark mark-draw my-2 -rotate-1">booked</span>
+                    <br />
+                    <W i={2}>in</W> <W i={3}>three</W> <W i={4}>clear</W> <W i={5}>steps.</W>
+                  </>
+                )}
+              </span>
+            </h1>
+            <p className="pop-in mt-6 max-w-[46ch] text-lg text-muted sm:text-xl" style={{ '--d': '0.7s' } as CSSProperties}>{t(ui.home.lead)}</p>
+            <div className="pop-in mt-8 flex flex-wrap gap-3" style={{ '--d': '0.85s' } as CSSProperties}>
+              <a href={href('/tours')} className="btn-primary px-6 text-base">
+                {t(ui.home.ctaTours)} <Icon name="arrow" />
+              </a>
+              <button type="button" className="btn-sun px-6 text-base" onClick={() => openChat(lang === 'zh' ? '查伦峡谷两个人多少钱？' : 'How much is Charyn Canyon for two?')}>
+                <Icon name="chat" /> {t({ en: 'Ask in 中文 or English', zh: '用中文提问' })}
+              </button>
             </div>
-            <p className="ml-auto w-fit rounded-[10px] rounded-br-sm bg-teal px-2.5 py-1.5 text-tealInk" lang="zh-CN">查伦峡谷两个人多少钱？</p>
-            <p className="mt-2 rounded-[10px] rounded-bl-sm border-2 border-edge bg-surface2 px-2.5 py-1.5" lang="zh-CN">每人 54,000 坚戈，两人共 108,000 坚戈。门票待确认。</p>
-            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-ok"><Icon name="shieldCheck" size={12} /> 价格核对通过</p>
+            <ul className="mt-9 grid grid-cols-2 gap-x-5 gap-y-3 text-sm font-semibold sm:max-w-lg">
+              {[
+                { i: 'card' as const, l: { en: 'Your own foreign card', zh: '使用外国银行卡' } },
+                { i: 'video' as const, l: { en: 'Meet your guide first', zh: '出发前先见导游' } },
+                { i: 'shieldCheck' as const, l: { en: 'AI that cannot invent prices', zh: 'AI 不会编造价格' } },
+                { i: 'globe' as const, l: { en: 'No Google: built for China', zh: '无 Google 依赖，面向中国' } },
+              ].map((x, k) => (
+                <li key={x.i} className="pop-in flex items-center gap-2" style={{ '--d': `${1 + k * 0.08}s` } as CSSProperties}>
+                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-[8px] border-2 border-edge bg-surface"><Icon name={x.i} size={15} /></span>
+                  {t(x.l)}
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Seats left sticker */}
-          <div className="absolute -bottom-2 right-2 rotate-[3deg] rounded-[12px] border-2 border-edge bg-sun px-3.5 py-2.5 text-sunInk shadow-hard sm:right-6 lg:-right-4" aria-hidden>
-            <div className="font-mono text-[10px] font-bold uppercase tracking-wider">18 Nov · Kolsai</div>
-            <div className="text-lg font-black leading-tight">{t({ en: '4 of 12 seats left', zh: '剩 4 / 12 个名额' })}</div>
-          </div>
+          <div className="relative mx-auto w-full max-w-[560px] pb-10 lg:pb-0">
+            <div className="parallax" style={{ '--depth': '-14px' } as CSSProperties}>
+              <div className="pop-in" style={{ '--d': '0.3s' } as CSSProperties}>
+              <figure className="float-a relative overflow-hidden rounded-[18px] border-2 border-edge bg-surface2 shadow-hard-lg">
+                <div className="grain relative aspect-[4/5] sm:aspect-[5/4] lg:aspect-[4/5]">
+                  <div className="kenburns h-full w-full"><Media tour="kolsai" eager credit /></div>
+                </div>
+                <figcaption className="flex items-center justify-between gap-2 border-t-2 border-edge bg-surface px-4 py-2.5 text-sm font-bold">
+                  <span>{t({ en: 'Kolsai Lakes & Kaindy', zh: '科尔赛湖与凯恩迪湖' })}</span>
+                  <span className="num font-mono text-xs">69,000 KZT</span>
+                </figcaption>
+              </figure>
+              </div>
+            </div>
 
-          <div className="sticker absolute -top-3 right-6 rotate-[4deg]" aria-hidden>{t({ en: 'Foreign cards · Alipay+ planned', zh: '支持外卡 · 支付宝筹备中' })}</div>
+            <div className="parallax absolute -left-3 top-8 z-[2] w-[min(300px,80%)] sm:-left-10 lg:-left-16" style={{ '--depth': '22px' } as CSSProperties}>
+              <div className="pop-in" style={{ '--d': '0.9s' } as CSSProperties}>
+                <div className="float-b">
+                  <LiveChatDemo />
+                </div>
+              </div>
+            </div>
+
+            <div className="parallax absolute -bottom-2 right-2 z-[2] sm:right-6 lg:-right-4" style={{ '--depth': '30px' } as CSSProperties}>
+              <div className="pop-in" style={{ '--d': '1.2s' } as CSSProperties}>
+                <div className="wobble rotate-[3deg] rounded-[12px] border-2 border-edge bg-sun px-3.5 py-2.5 text-sunInk shadow-hard" aria-hidden>
+                  <div className="font-mono text-[10px] font-bold uppercase tracking-wider">18 Nov · Kolsai</div>
+                  <div className="num text-lg font-black leading-tight"><SeatsCountdown /></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="parallax absolute -top-3 right-6 z-[2]" style={{ '--depth': '18px' } as CSSProperties}>
+              <div className="pop-in" style={{ '--d': '1.05s' } as CSSProperties}>
+                <div className="float-c">
+                  <div className="sticker" aria-hidden>{t({ en: 'Foreign cards · Alipay+ planned', zh: '支持外卡 · 支付宝筹备中' })}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Two crossing ticker bands */}
+      <section className="relative -mt-2 overflow-hidden py-6" aria-label={t({ en: 'Destinations', zh: '目的地' })}>
+        <div className="-mx-4 -rotate-[1.5deg] border-y-2 border-edge bg-ink py-3 text-bg">
+          <Marquee className="font-display text-2xl font-black uppercase tracking-tight sm:text-3xl" items={['Charyn Canyon', '查伦大峡谷', 'Kolsai Lakes', '科尔赛湖', 'Turkestan', '突厥斯坦', 'Burabay', '布拉拜']} />
+        </div>
+        <div className="-mx-4 -mt-1 rotate-[1deg] border-y-2 border-edge bg-sun py-2.5 text-sunInk">
+          <Marquee reverse className="font-mono text-sm font-bold uppercase tracking-wider" items={[t({ en: 'Foreign cards', zh: '外卡支付' }), t({ en: 'Guide on video before you pay', zh: '付款前视频见导游' }), t({ en: 'Prices checked by code', zh: '价格由代码核对' }), t({ en: 'Opens without Google', zh: '无需 Google' }), t({ en: 'WeChat · Xiaohongshu', zh: '微信 · 小红书' }), t({ en: 'Translator in the trip', zh: '旅途翻译' })]} />
         </div>
       </section>
 
@@ -106,8 +150,8 @@ export default function Home({ query }: { query: URLSearchParams }) {
               key={i}
               className={`py-6 sm:py-8 ${i % 2 ? 'border-l-2 border-sunInk/80 pl-5' : 'pr-5'} ${i > 1 ? 'border-t-2 border-sunInk/80 sm:border-t-0' : ''} ${i === 2 ? 'sm:border-l-2 sm:pl-8' : ''} ${i > 0 ? 'sm:pl-8' : ''}`}
             >
-              <div className="num font-display text-4xl font-black tracking-tight sm:text-6xl">
-                {f.v}
+              <div className="font-display text-4xl font-black tracking-tight sm:text-6xl">
+                <CountUp value={f.v} />
               </div>
               <div className="mt-1 font-mono text-xs font-bold uppercase tracking-wider">{t(f.l)}</div>
             </div>
@@ -130,7 +174,7 @@ export default function Home({ query }: { query: URLSearchParams }) {
 
       {/* Complaints as an editorial list */}
       <Section id="complaints" title={t(ui.home.complaintsTitle)} sub={t(ui.home.complaintsSub)}>
-        <ol className="border-b border-line">
+        <ol className="stagger border-b border-line">
           {complaints.map((c, i) => (
             <li key={i} className="border-t border-line">
               <a href={href(c.route)} className="group grid gap-3 py-7 sm:grid-cols-[1.1fr_1fr_auto] sm:items-baseline sm:gap-10">
@@ -158,7 +202,7 @@ export default function Home({ query }: { query: URLSearchParams }) {
           </a>
         }
       >
-        <div className="grid gap-x-6 gap-y-12 lg:grid-cols-3">
+        <div className="stagger grid gap-x-6 gap-y-12 lg:grid-cols-3">
           <div className="lg:col-span-2 lg:row-span-2">
             <TourCard tour={tours[1]} featured />
           </div>
@@ -185,7 +229,7 @@ export default function Home({ query }: { query: URLSearchParams }) {
       {/* Map with context */}
       {/* China channels: where Chinese travelers find and share us */}
       <Section title={t({ en: 'Inside WeChat and Xiaohongshu', zh: '在微信和小红书里找到我们' })} sub={t({ en: 'For Chinese travelers these are what WhatsApp and Instagram are elsewhere. We meet them there.', zh: '对中国旅客来说，微信和小红书就是日常入口。我们就在那里。' })}>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="stagger grid gap-4 md:grid-cols-3">
           {[
             { dot: 'bg-[#07c160]', h: { en: 'WeChat share + QR', zh: '微信分享与二维码' }, p: { en: 'Every tour and postcard has a QR to scan in WeChat and a one-tap hint inside WeChat’s browser.', zh: '每条线路和明信片都有可在微信扫码的二维码；在微信内打开时提示一键分享。' }, phase: 'mvp' as const, to: '/tour/kolsai' },
             { dot: 'bg-[#ff2442]', h: { en: 'Xiaohongshu notes', zh: '小红书笔记' }, p: { en: 'Ready Chinese captions with the link, the postcard picture, and “open Xiaohongshu”.', zh: '现成的中文文案（含链接）、明信片图片，一键打开小红书。' }, phase: 'mvp' as const, to: '/postcard' },
@@ -226,7 +270,7 @@ export default function Home({ query }: { query: URLSearchParams }) {
       <TravelerVoices />
 
       <Section title={t(ui.home.marketTitle)}>
-        <div className="grid border-t border-line md:grid-cols-[1fr_1fr_1.3fr]">
+        <div className="stagger grid border-t border-line md:grid-cols-[1fr_1fr_1.3fr]">
           {evidence.map((e, i) => (
             <figure key={e.url} className={`py-8 md:py-10 ${i > 0 ? 'border-t border-line md:border-l md:border-t-0 md:pl-8' : 'md:pr-8'}`}>
               <div className="num whitespace-nowrap font-display text-5xl font-bold text-teal xl:text-6xl">
@@ -266,5 +310,14 @@ export default function Home({ query }: { query: URLSearchParams }) {
         </div>
       </section>
     </>
+  );
+}
+
+/** One word of the hero title that rises into place (index sets the delay). */
+function W({ i, children }: { i: number; children: ReactNode }) {
+  return (
+    <span className="word">
+      <span style={{ '--i': i } as CSSProperties}>{children}</span>
+    </span>
   );
 }

@@ -8,6 +8,9 @@ import { takeKeyFromUrl } from './lib/ai';
 
 takeKeyFromUrl();
 
+// Motion layer (index.css): on for people who did not ask for reduced motion; off under automation.
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && !navigator.webdriver) document.documentElement.classList.add('motion');
+
 // Offline support (sw.js): only on the real https site, never in tests or file://.
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));

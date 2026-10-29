@@ -8,12 +8,14 @@ import { speak, stopSpeaking } from '../lib/speech';
 import { useApp } from '../state';
 import { Icon } from './Icon';
 import { Media } from './Media';
+import { tiltHandlers } from './Motion';
 import { Tag } from './Tag';
 
 export function TourCard({ tour, featured = false }: { tour: Tour; featured?: boolean }) {
   const { t, lang } = useApp();
   return (
-    <article className="card group relative flex h-full flex-col overflow-hidden transition-[transform,box-shadow] duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
+    <article className="card tilt group relative flex h-full flex-col overflow-hidden hover:shadow-hard-lg" {...tiltHandlers}>
+      <span className="tilt-glare pointer-events-none absolute inset-0 z-[3]" aria-hidden />
       <div className={`grain relative overflow-hidden border-b-2 border-edge bg-surface2 ${featured ? 'aspect-[4/3] lg:aspect-auto lg:flex-1' : 'aspect-[4/3]'}`}>
         <div className="h-full w-full transition duration-700 ease-out group-hover:scale-[1.04]">
           <Media tour={tour.id} credit={false} eager={featured} />

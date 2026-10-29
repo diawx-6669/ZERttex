@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { tagExplain, tagText, ui } from '../data/i18n';
 import { href } from '../lib/router';
 import { useApp } from '../state';
@@ -276,7 +276,7 @@ export function LoopStrip({ current, compact = false }: { current?: number; comp
           <li key={s.key} className="relative">
             <a href={href(s.route)} className="group block pr-4">
               <span className="relative z-[1] mb-4 hidden h-[23px] w-[23px] place-items-center rounded-full border-2 border-teal bg-bg lg:grid" aria-hidden>
-                <span className="h-2 w-2 rounded-full bg-teal transition group-hover:scale-150" />
+                <span className="loop-dot h-2 w-2 rounded-full bg-teal transition group-hover:scale-150" style={{ '--i': steps.indexOf(s) } as CSSProperties} />
               </span>
               <span className="block font-display text-2xl font-bold transition-colors group-hover:text-teal">
                 {t(s.label)}
@@ -305,11 +305,11 @@ export function PageHead({ eyebrow, title, sub, children, loop, scope }: { eyebr
           <LoopStrip compact current={loop} />
         </div>
       )}
-      {eyebrow && <div className="eyebrow mb-3 flex flex-wrap items-center gap-2">{eyebrow}</div>}
+      {eyebrow && <div className="eyebrow pop-in mb-3 flex flex-wrap items-center gap-2">{eyebrow}</div>}
       {scope && <Scope phase={scope} className="mb-2" />}
-      <h1 className="max-w-3xl text-[2rem] font-extrabold sm:text-5xl">{title}</h1>
-      {sub && <p className="mt-3 max-w-[60ch] text-lg text-muted">{sub}</p>}
-      {children && <div className="mt-3 flex flex-wrap items-center gap-2">{children}</div>}
+      <h1 className="pop-in max-w-3xl text-[2rem] font-black sm:text-6xl" style={{ '--d': '0.05s' } as CSSProperties}>{title}</h1>
+      {sub && <p className="pop-in mt-3 max-w-[60ch] text-lg text-muted" style={{ '--d': '0.15s' } as CSSProperties}>{sub}</p>}
+      {children && <div className="pop-in mt-3 flex flex-wrap items-center gap-2" style={{ '--d': '0.25s' } as CSSProperties}>{children}</div>}
     </div>
   );
 }
@@ -319,7 +319,7 @@ export function Section({ title, sub, children, id, right }: { title: string; su
     <section id={id} className="container-x mt-20 sm:mt-28" data-reveal>
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="max-w-3xl text-[1.75rem] font-extrabold sm:text-4xl">{title}</h2>
+          <h2 className="sec-title max-w-3xl text-[1.75rem] font-extrabold sm:text-4xl">{title}</h2>
           {sub && <p className="mt-3 max-w-[60ch] text-lg text-muted">{sub}</p>}
         </div>
         {right}
