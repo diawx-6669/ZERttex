@@ -1,1 +1,134 @@
-{}
+{
+  "charyn-1.jpg": {
+    "author": "Peretz Partensky",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Charyn_Canyon_(3991842679).jpg",
+    "title": "Charyn Canyon, Valley of Castles",
+    "alt": {
+      "en": "Charyn Canyon, Valley of Castles",
+      "zh": "查伦大峡谷城堡谷"
+    }
+  },
+  "charyn-2.jpg": {
+    "author": "Peretz Partensky",
+    "license": "CC BY-SA 2.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Charyn_Canyon.jpg",
+    "title": "Charyn Canyon",
+    "alt": {
+      "en": "Charyn Canyon",
+      "zh": "查伦大峡谷"
+    }
+  },
+  "kolsai-1.jpg": {
+    "author": "Dylanvt",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Lower_Kolsay_Lake_in_April.jpg",
+    "title": "Lower Kolsay Lake in April",
+    "alt": {
+      "en": "Lower Kolsay Lake in April",
+      "zh": "四月的下科尔赛湖"
+    }
+  },
+  "kolsai-2.jpg": {
+    "author": "Inverseharpy",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Scenic_Lake_Kaindy.jpg",
+    "title": "Lake Kaindy",
+    "alt": {
+      "en": "Lake Kaindy",
+      "zh": "凯恩迪湖"
+    }
+  },
+  "kolsai-3.jpg": {
+    "author": "Jonas Satkauskas",
+    "license": "CC BY-SA 2.5",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.5/",
+    "source": "https://commons.wikimedia.org/wiki/File:IMG_9366-Kaindy-e.jpg",
+    "title": "Lake Kaindy",
+    "alt": {
+      "en": "Lake Kaindy",
+      "zh": "凯恩迪湖"
+    }
+  },
+  "kolsai-4.jpg": {
+    "author": "Katariyakartikey",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Kolsai_lake.jpg",
+    "title": "Kolsay Lake",
+    "alt": {
+      "en": "Kolsay Lake",
+      "zh": "科尔赛湖"
+    }
+  },
+  "turkestan-1.jpg": {
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Mausoleum_of_Khoja_Ahmed_Yasawi_in_Hazrat-e_Turkestan%2C_Kazakhstan.jpg",
+    "title": "Mausoleum of Khoja Ahmed Yasawi",
+    "alt": {
+      "en": "Mausoleum of Khoja Ahmed Yasawi",
+      "zh": "霍贾·艾哈迈德·亚萨维陵墓"
+    }
+  },
+  "turkestan-2.jpg": {
+    "author": "Adam Harangozó",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Mausoleum_of_Khoja_Ahmed_Yasawi_in_Turkistan_9.jpg",
+    "title": "Mausoleum of Khoja Ahmed Yasawi",
+    "alt": {
+      "en": "Mausoleum of Khoja Ahmed Yasawi",
+      "zh": "霍贾·艾哈迈德·亚萨维陵墓"
+    }
+  },
+  "turkestan-3.jpg": {
+    "author": "Petar Milošević",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Mausoleum_of_Khoja_Ahmed_Yasavi_in_Turkestan%2C_Kazakhstan.jpg",
+    "title": "Mausoleum of Khoja Ahmed Yasawi",
+    "alt": {
+      "en": "Mausoleum of Khoja Ahmed Yasawi",
+      "zh": "霍贾·艾哈迈德·亚萨维陵墓"
+    }
+  },
+  "burabay-1.jpg": {
+    "author": "Dots foto",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:%D0%9E%D0%BA%D0%B6%D0%B5%D1%82%D0%BF%D0%B5%D1%81_%D0%91%D0%BE%D1%80%D0%BE%D0%B2%D0%BE%D0%B5.jpg",
+    "title": "Okzhetpes rock, Burabay",
+    "alt": {
+      "en": "Okzhetpes rock, Burabay",
+      "zh": "布拉拜奥日佩斯石"
+    }
+  },
+  "burabay-2.jpg": {
+    "author": "Evgenyem",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:%D0%9A%D0%B0%D0%B7%D0%B0%D1%85%D1%81%D1%82%D0%B0%D0%BD._%D0%91%D0%BE%D1%80%D0%BE%D0%B2%D0%BE%D0%B5._%D0%92%D0%B8%D0%B4_%D0%BD%D0%B0_%D0%BE%D0%B7%D0%B5%D1%80%D0%BE_%D1%81_%D0%BF%D0%BB%D1%8F%D0%B6%D0%B0.jpg",
+    "title": "Lake Burabay from the beach",
+    "alt": {
+      "en": "Lake Burabay from the beach",
+      "zh": "从湖滩看布拉拜湖"
+    }
+  },
+  "burabay-3.jpg": {
+    "author": "alexandrorodrigez",
+    "license": "CC BY-SA 3.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "source": "https://commons.wikimedia.org/wiki/File:Burabay_020000%2C_Kazakhstan_-_panoramio_(2).jpg",
+    "title": "Burabay",
+    "alt": {
+      "en": "Burabay",
+      "zh": "布拉拜"
+    }
+  }
+}
