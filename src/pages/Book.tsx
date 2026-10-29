@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { SeatsLine } from '../components/Availability';
+import { GroupPay } from '../components/GroupPay';
 import { Icon } from '../components/Icon';
+import { QR } from '../components/QR';
+import { WeChatSignIn } from '../components/Share';
 import { PageHead, Stepper, TestModeBanner } from '../components/Layout';
 import { Scope, Tag } from '../components/Tag';
 import { seatsLeft } from '../data/availability';
@@ -40,6 +43,7 @@ export default function Book({ query }: { query: URLSearchParams }) {
   const [agree, setAgree] = useState(false);
   const [decline, setDecline] = useState(false);
   const [status, setStatus] = useState<'form' | 'processing' | 'declined' | 'success'>('form');
+  const [qrPay, setQrPay] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const minDate = minBookDate();
 
@@ -100,6 +104,9 @@ export default function Book({ query }: { query: URLSearchParams }) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+    // Alipay+ / WeChat Pay: the traveler scans a QR with their own wallet app (test mode).
+    if ((draft.method === 'alipay' || draft.method === 'wechat') && !decline && !qrPay) return setQrPay(true);
+    setQrPay(false);
     setStatus('processing');
     window.setTimeout(() => {
       if (decline) {
@@ -262,6 +269,10 @@ export default function Book({ query }: { query: URLSearchParams }) {
               {step === 2 && (
                 <fieldset className="grid gap-5 sm:grid-cols-2">
                   <legend className="sr-only">{t(ui.book.step2)}</legend>
+                  <div className="flex flex-wrap items-center gap-3 sm:col-span-2">
+                    <WeChatSignIn onDemoSignedIn={(n) => setDraft({ name: n, country: draft.country || 'CN', guideLang: draft.guideLang || 'zh' })} />
+                    <span className="text-xs text-muted">{t({ en: 'or fill in the form', zh: '或填写下面的表格' })}</span>
+                  </div>
                   <div className="sm:col-span-2">
                     <label className="label" htmlFor="name">{t(ui.book.name)}</label>
                     <input id="name" className={`input ${errors.name ? 'input-error' : ''}`} value={draft.name} onChange={(e) => setDraft({ name: e.target.value })} autoComplete="name" {...a11y('name')} />
@@ -328,6 +339,15 @@ export default function Book({ query }: { query: URLSearchParams }) {
                     ))}
                   </div>
                   {err('method')}
+                  {draft.travelers > 1 && (
+                    <label className={`flex cursor-pointer items-start gap-3 rounded-[12px] border-2 p-3 text-sm ${draft.split ? 'border-edge bg-sun/40' : 'border-edge/30'}`}>
+                      <input type="checkbox" className="mt-0.5 h-5 w-5 accent-[rgb(var(--teal))]" checked={draft.split} onChange={(e) => setDraft({ split: e.target.checked })} data-testid="split-pay" />
+                      <span>
+                        <span className="font-semibold">{t({ en: `Split the payment: each of the ${draft.travelers} travelers pays ${kzt(Math.round(total / draft.travelers))}`, zh: `分开付款：${draft.travelers} 位旅客每人支付 ${kzt(Math.round(total / draft.travelers))}` })}</span>
+                        <span className="mt-0.5 block text-muted">{t({ en: 'You pay your share now and send pay links to the others. Seats are held for 48 hours.', zh: '您现在支付自己的份额，并把付款链接发给同伴。名额保留 48 小时。' })}</span>
+                      </span>
+                    </label>
+                  )}
                   <label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm ${errors.agree ? 'border-danger' : 'border-line'}`}>
                     <input type="checkbox" className="mt-0.5 h-5 w-5 accent-[rgb(var(--teal))]" checked={agree} onChange={(e) => setAgree(e.target.checked)} {...a11y('agree')} />
                     <span>{t(ui.book.agree)}</span>
@@ -355,7 +375,7 @@ export default function Book({ query }: { query: URLSearchParams }) {
                     </>
                   ) : step === 3 ? (
                     <>
-                      <Icon name="lock" /> {t(ui.book.pay)} · <span className="num">{kzt(total)}</span>
+                      <Icon name="lock" /> {t(ui.book.pay)} · <span className="num">{kzt(draft.split && draft.travelers > 1 ? Math.round(total / draft.travelers) : total)}</span>
                     </>
                   ) : (
                     <>
@@ -370,7 +390,46 @@ export default function Book({ query }: { query: URLSearchParams }) {
 
         <Summary />
       </div>
+      {qrPay && <WalletQr method={draft.method === 'wechat' ? 'wechat' : 'alipay'} total={draft.split && draft.travelers > 1 ? Math.round(total / draft.travelers) : total} onPaid={next} onClose={() => setQrPay(false)} />}
     </>
+  );
+}
+
+/** Test-mode wallet checkout: what Alipay+ / WeChat Pay looks like once the acquirer contract is signed. */
+function WalletQr({ method, total, onPaid, onClose }: { method: 'alipay' | 'wechat'; total: number; onPaid: () => void; onClose: () => void }) {
+  const { t } = useApp();
+  const [left, setLeft] = useState(300);
+  useEffect(() => {
+    const id = window.setInterval(() => setLeft((x) => Math.max(0, x - 1)), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const brand = method === 'alipay' ? { name: 'Alipay+ · 支付宝', color: 'bg-[#1677ff]' } : { name: 'WeChat Pay · 微信支付', color: 'bg-[#07c160]' };
+  return (
+    <div className="fixed inset-0 z-[70] grid place-items-center bg-night/60 p-4" role="dialog" aria-modal="true" aria-label={brand.name} data-testid="wallet-qr">
+      <div className="card rise w-full max-w-sm overflow-hidden">
+        <div className={`flex items-center justify-between gap-2 border-b-2 border-edge px-4 py-3 font-bold text-white ${brand.color}`}>
+          {brand.name}
+          <button type="button" onClick={onClose} className="grid h-8 w-8 place-items-center rounded-[8px] border-2 border-white/70" aria-label={t(ui.nav.close)}><Icon name="x" size={16} /></button>
+        </div>
+        <div className="space-y-3 p-5 text-center">
+          <div className="test-stripes rounded-[8px] p-[3px]"><div className="rounded-[6px] bg-night px-2 py-1 text-xs font-bold text-nightInk">TEST MODE · {t({ en: 'no money moves', zh: '不会真实扣款' })}</div></div>
+          <div className="num text-3xl font-black">{kzt(total)}</div>
+          <div className="text-sm text-muted">{cny(total)} · {t({ en: 'your wallet converts at its own rate', zh: '钱包按其汇率结算' })}</div>
+          <div className="mx-auto w-48 rounded-[10px] border-2 border-edge bg-white p-2">
+            <QR text={`https://diawx-6669.github.io/ZERttex/#/book?testpay=${method}`} label={t({ en: 'Test payment QR', zh: '测试支付二维码' })} />
+          </div>
+          <p className="text-sm font-semibold">{t({ en: `Scan with ${method === 'alipay' ? 'Alipay' : 'WeChat'} · ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`, zh: `请用${method === 'alipay' ? '支付宝' : '微信'}扫码 · ${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}` })}</p>
+          <button type="button" className="btn-primary w-full" onClick={onPaid} data-testid="wallet-paid">{t({ en: 'Simulate successful scan', zh: '模拟扫码成功' })}</button>
+          <p className="text-left text-xs text-muted">
+            {t({
+              en: 'Alipay+ is already accepted in Kazakhstan via Kaspi QR and WeChat Pay at Halyk terminals, but paying online needs a separate acquirer contract. Until it is signed, this screen is a test.',
+              zh: '在哈萨克斯坦，支付宝已可通过 Kaspi QR 使用，微信支付可在 Halyk 终端使用；但线上收款需另签收单合同。签约前此页面仅为测试。',
+            })}{' '}
+            <Tag kind="proposal" />
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -493,6 +552,7 @@ function Success() {
                 </li>
               ))}
             </ol>
+            {booking.split && booking.travelers > 1 && <GroupPay booking={booking} />}
             <div className="flex flex-wrap gap-2">
               <button type="button" className="btn-primary" onClick={() => navigate('/trip')}>
                 <Icon name="map" /> {t(ui.book.goTrip)}

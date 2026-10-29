@@ -40,7 +40,7 @@ export function UpcomingDates({ tour }: { tour: TourId }) {
           const left = seatsLeft(tour, d);
           return (
             <li key={d}>
-              <a href={href(`/book?tour=${tour}&date=${d}`)} className="block rounded-2xl border border-line bg-surface p-3 transition hover:border-teal">
+              <a href={href(`/book?tour=${tour}&date=${d}`)} className="block rounded-[12px] border-2 border-edge bg-surface p-3 shadow-hard-sm transition hover:-translate-y-0.5 hover:bg-sun hover:text-sunInk">
                 <span className="block text-sm font-semibold">{shortDate(d, lang)}</span>
                 <span className={`mt-0.5 block text-sm ${left <= 4 ? 'font-semibold text-warn' : 'text-muted'}`}>
                   {t({ en: `${left} of ${GROUP_SIZE} seats left`, zh: `剩余 ${left} / ${GROUP_SIZE} 个名额` })}

@@ -15,14 +15,14 @@ const M = budgetConfig.model;
 const GATE = M.stageGateMonth;
 const R = defaultResults();
 /** Paid bookings per month the model expects at the stage gate (−30% path ≈21, stress path ≈8). */
-const GO = Math.round(R.down[GATE - 1].travelers);
-const STOP = Math.round(R.stress[GATE - 1].travelers);
+export const GO = Math.round(R.down[GATE - 1].travelers);
+export const STOP = Math.round(R.stress[GATE - 1].travelers);
 const CONTRIBUTION = contributionPerTraveler(M.margin);
 const marketingLine = budget.find((b) => b.group === 'Launch' && b.item.startsWith('Xiaohongshu'))!;
 const MARKETING_PER_MONTH = marketingLine.amount / (marketingLine.end - marketingLine.start + 1);
 
 /** Demo month: month 9 after launch at month 4. 1 paid booking = 1 foreign traveler in the model. */
-const funnel: { step: string; count: number; icon: IconName; how: string }[] = [
+export const funnel: { step: string; count: number; icon: IconName; how: string }[] = [
   { step: 'Visited the site', count: 2400, icon: 'globe', how: 'Page-view event, no cookies, no personal data' },
   { step: 'Asked in the chat', count: 360, icon: 'chat', how: 'First message sent to the concierge' },
   { step: 'Started a booking', count: 96, icon: 'calendar', how: 'Step 1 of the booking form completed' },

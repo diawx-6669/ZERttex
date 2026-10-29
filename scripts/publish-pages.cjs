@@ -8,6 +8,7 @@ const built = path.join(root, 'dist/app.html');
 for (const out of ['dist/index.html', 'index.html', 'docs/index.html']) fs.copyFileSync(built, path.join(root, out));
 for (const out of ['.nojekyll', 'docs/.nojekyll']) fs.writeFileSync(path.join(root, out), '');
 // Demo video + poster (media/ at the root): GitHub Pages may serve /docs, so mirror them there.
-fs.mkdirSync(path.join(root, 'docs/media'), { recursive: true });
-for (const f of fs.readdirSync(path.join(root, 'media'))) fs.copyFileSync(path.join(root, 'media', f), path.join(root, 'docs/media', f));
+fs.cpSync(path.join(root, 'media'), path.join(root, 'docs/media'), { recursive: true });
+// Offline service worker next to every copy of the page.
+for (const out of ['docs/sw.js', 'dist/sw.js']) fs.copyFileSync(path.join(root, 'sw.js'), path.join(root, out));
 console.log('pages files written');

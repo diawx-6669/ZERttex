@@ -13,13 +13,16 @@ import { Tag } from './Tag';
 export function TourCard({ tour, featured = false }: { tour: Tour; featured?: boolean }) {
   const { t, lang } = useApp();
   return (
-    <article className="group relative flex h-full flex-col">
-      <div className={`grain relative overflow-hidden rounded-2xl bg-surface2 ${featured ? 'aspect-[4/3] lg:aspect-auto lg:flex-1' : 'aspect-[4/3]'}`}>
+    <article className="card group relative flex h-full flex-col overflow-hidden transition-[transform,box-shadow] duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
+      <div className={`grain relative overflow-hidden border-b-2 border-edge bg-surface2 ${featured ? 'aspect-[4/3] lg:aspect-auto lg:flex-1' : 'aspect-[4/3]'}`}>
         <div className="h-full w-full transition duration-700 ease-out group-hover:scale-[1.04]">
           <Media tour={tour.id} credit={false} eager={featured} />
         </div>
+        <span className="absolute left-3 top-3 z-[2] rounded-[8px] border-2 border-edge bg-surface px-2 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wider text-ink">
+          {tour.days} {t(ui.tour.days)} · {t(hubName[tour.hub])}
+        </span>
       </div>
-      <div className="mt-4 flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4 px-4 pt-4">
         <div className="min-w-0">
           <h3 className={`font-bold ${featured ? 'text-2xl sm:text-3xl' : 'text-xl'}`}>
             <a href={href(`/tour/${tour.id}`)} className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none group-hover:text-teal">
@@ -32,11 +35,11 @@ export function TourCard({ tour, featured = false }: { tour: Tour; featured?: bo
           {featured && <p className="mt-3 max-w-[48ch] text-[15px]">{t(tour.tagline)}</p>}
         </div>
         <div className="shrink-0 text-right">
-          <div className="num whitespace-nowrap font-semibold">{kzt(tour.priceKzt)}</div>
-          <div className="num text-sm text-muted">{indicative(tour.priceKzt, lang)}</div>
+          <div className="num whitespace-nowrap rounded-[8px] border-2 border-edge bg-sun px-2 py-0.5 font-bold text-sunInk">{kzt(tour.priceKzt)}</div>
+          <div className="num mt-1 text-sm text-muted">{indicative(tour.priceKzt, lang)}</div>
         </div>
       </div>
-      <div className="mt-2">
+      <div className="mt-auto px-4 pb-4 pt-2">
         <Tag kind="demo" />
       </div>
     </article>

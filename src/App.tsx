@@ -20,6 +20,8 @@ import PrintPostcards from './pages/PrintPostcards';
 import Manager from './pages/Manager';
 import Pilot from './pages/Pilot';
 import Partners from './pages/Partners';
+import Talk from './pages/Talk';
+import Pass from './pages/Pass';
 
 export default function App() {
   const route = useRoute();
@@ -70,6 +72,12 @@ export default function App() {
       break;
     case 'partners':
       page = <Partners />;
+      break;
+    case 'talk':
+      page = <Talk />;
+      break;
+    case 'pass':
+      page = <Pass raw={second} />;
       break;
     default:
       page = (

@@ -37,7 +37,7 @@ export default function PrintPostcards() {
             </div>
             {/* Text side: everything inside the 3 mm bleed + 4 mm safe margin. */}
             <div className="absolute flex flex-col" style={{ left: '97mm', right: '7mm', top: '9mm', bottom: '12.5mm' }}>
-              <h1 className="font-display font-extrabold leading-[1.05]" style={{ fontSize: '17pt', fontStretch: '112%' }}>Kazakhstan, booked in three clear steps</h1>
+              <h1 className="font-display font-extrabold leading-[1.05]" style={{ fontSize: '17pt' }}>Kazakhstan, booked in three clear steps</h1>
               <p className="mt-1 font-semibold" lang="zh-CN" style={{ fontSize: '9.5pt' }}>哈萨克斯坦，三步轻松预订</p>
               <div className="mt-auto flex items-end gap-2">
                 <div className="shrink-0 bg-white" style={{ width: '24mm', height: '24mm' }}>

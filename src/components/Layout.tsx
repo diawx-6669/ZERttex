@@ -5,7 +5,7 @@ import { useApp } from '../state';
 import { useChat } from './Chat';
 import { Icon, type IconName } from './Icon';
 import { AiModeBadge, Scope, Tag, allTagKinds } from './Tag';
-import { aiConfigured, setForceScripted, useForceScripted } from '../lib/ai';
+import { setDemoKey, setForceScripted, useAiSource, useForceScripted } from '../lib/ai';
 
 const navItems: { to: string; key: keyof typeof ui.nav; icon: IconName }[] = [
   { to: '/tours', key: 'tours', icon: 'compass' },
@@ -13,25 +13,21 @@ const navItems: { to: string; key: keyof typeof ui.nav; icon: IconName }[] = [
   { to: '/ask', key: 'ask', icon: 'chat' },
   { to: '/trust', key: 'trust', icon: 'shieldCheck' },
   { to: '/trip', key: 'trip', icon: 'map' },
+  { to: '/talk', key: 'talk', icon: 'volume' },
   { to: '/impact', key: 'impact', icon: 'chart' },
 ];
 
 export function Logo({ compact = false, sub = false }: { compact?: boolean; sub?: boolean }) {
   return (
-    <span className="flex items-center gap-2">
-      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden>
-        <circle cx="15" cy="12" r="6.5" fill="#F2B33D" />
-        <path d="M2 21.5h26" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
-        <path d="M6 26h18" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" opacity="0.45" />
-      </svg>
-      {!compact && (
-        <span className="leading-none">
-          <span className="block font-display text-[18px] font-bold" style={{ fontStretch: '112%' }}>
-            Saryarqa Go
-          </span>
-          {sub && <span className="mt-1 block text-xs text-muted">by Saryarqa Routes, Astana</span>}
-        </span>
-      )}
+    <span className="flex items-center gap-2.5">
+      <span className="flex items-center gap-1.5 rounded-[8px] border-2 border-edge bg-sun px-2 py-1 text-sunInk shadow-hard-sm">
+        <svg width="18" height="18" viewBox="0 0 30 30" aria-hidden>
+          <circle cx="15" cy="12" r="7" fill="currentColor" />
+          <path d="M2 23h26" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" />
+        </svg>
+        {!compact && <span className="font-display text-[17px] font-black leading-none tracking-tight">Saryarqa Go</span>}
+      </span>
+      {!compact && sub && <span className="block text-xs leading-tight text-muted">by Saryarqa Routes,<br />Astana</span>}
     </span>
   );
 }
@@ -39,7 +35,7 @@ export function Logo({ compact = false, sub = false }: { compact?: boolean; sub?
 function LangToggle() {
   const { lang, setLang, t } = useApp();
   return (
-    <div role="group" aria-label={t(ui.nav.language)} className="flex rounded-[10px] border border-line bg-surface p-0.5 text-sm">
+    <div role="group" aria-label={t(ui.nav.language)} className="flex rounded-[10px] border-2 border-edge bg-surface p-0.5 text-sm">
       {(['en', 'zh'] as const).map((l) => (
         <button
           key={l}
@@ -64,7 +60,7 @@ function TextToggle() {
       aria-pressed={large}
       title={t(ui.nav.largeText)}
       aria-label={t(ui.nav.largeText)}
-      className={`min-h-[38px] min-w-[38px] rounded-[10px] border px-2.5 font-display text-sm font-bold ${large ? 'border-ink bg-ink text-bg' : 'border-line bg-surface text-ink hover:border-ink/30'}`}
+      className={`min-h-[38px] min-w-[38px] rounded-[10px] border-2 border-edge px-2.5 font-display text-sm font-bold ${large ? 'bg-ink text-bg' : 'bg-surface text-ink hover:bg-sun hover:text-sunInk'}`}
     >
       A+
     </button>
@@ -84,7 +80,7 @@ export function Header({ current }: { current: string }) {
   const active = (to: string) => current === to.slice(1) || (to === '/tours' && current === 'tour');
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
+    <header className="sticky top-0 z-40 border-b-2 border-edge bg-bg/90 backdrop-blur-md">
       <div className="container-x flex h-16 items-center justify-between gap-3">
         <a href={href('/')} className="rounded-lg" aria-label="Saryarqa Go home">
           <Logo />
@@ -95,7 +91,7 @@ export function Header({ current }: { current: string }) {
               key={n.to}
               href={href(n.to)}
               aria-current={active(n.to) ? 'page' : undefined}
-              className={`relative px-3 py-2 text-[15px] font-medium transition-colors after:absolute after:inset-x-3 after:-bottom-[13px] after:h-[2px] after:rounded-full ${active(n.to) ? 'text-ink after:bg-teal' : 'text-muted hover:text-ink after:bg-transparent'}`}
+              className={`rounded-[8px] border-2 px-3 py-1.5 text-[15px] font-semibold transition-colors ${active(n.to) ? 'border-edge bg-sun text-sunInk shadow-hard-sm' : 'border-transparent text-muted hover:text-ink'}`}
             >
               {t(ui.nav[n.key])}
             </a>
@@ -111,7 +107,7 @@ export function Header({ current }: { current: string }) {
           </a>
           <button
             type="button"
-            className="flex min-h-[42px] items-center gap-2 rounded-[10px] border border-line bg-surface px-3.5 text-sm font-semibold lg:hidden"
+            className="flex min-h-[42px] items-center gap-2 rounded-[10px] border-2 border-edge bg-surface px-3.5 text-sm font-semibold lg:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             onClick={() => setOpen(true)}
@@ -154,19 +150,39 @@ export function Header({ current }: { current: string }) {
   );
 }
 
-/** Footer control for the live pitch: force scripted answers even when the AI Worker is configured. */
+/** Footer control for the live pitch: force scripted answers, or connect a demo AI key kept in this browser only. */
 function AiSwitch() {
   const { t } = useApp();
   const forced = useForceScripted();
+  const source = useAiSource();
+  const [key, setKey] = useState('');
   return (
-    <div className="flex flex-wrap items-center gap-2 pt-1 text-sm">
-      <span className="text-muted">{t({ en: 'Answers:', zh: '回答模式：' })}</span>
-      <AiModeBadge />
-      <label className="inline-flex cursor-pointer items-center gap-2">
-        <input type="checkbox" data-testid="force-scripted" className="h-4 w-4 accent-[rgb(var(--teal))]" checked={forced} onChange={(e) => setForceScripted(e.target.checked)} />
-        <span>{t({ en: 'Scripted demo only', zh: '仅用预设脚本' })}</span>
-      </label>
-      {!aiConfigured && <span className="text-xs text-muted">{t({ en: '(no AI server in this build)', zh: '（此版本未连接 AI 服务器）' })}</span>}
+    <div className="space-y-2 pt-1 text-sm">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-muted">{t({ en: 'Answers:', zh: '回答模式：' })}</span>
+        <AiModeBadge />
+        <label className="inline-flex cursor-pointer items-center gap-2">
+          <input type="checkbox" data-testid="force-scripted" className="h-4 w-4 accent-[rgb(var(--teal))]" checked={forced} onChange={(e) => setForceScripted(e.target.checked)} />
+          <span>{t({ en: 'Scripted demo only', zh: '仅用预设脚本' })}</span>
+        </label>
+      </div>
+      {source !== 'server' && (
+        <details className="max-w-sm">
+          <summary className="cursor-pointer text-xs text-muted">
+            {source === 'demo-key' ? t({ en: 'Gemini key saved in this browser', zh: '此浏览器已保存 Gemini 密钥' }) : t({ en: 'Connect a Gemini key (this browser only)', zh: '连接 Gemini 密钥（仅限此浏览器）' })}
+          </summary>
+          {source === 'demo-key' ? (
+            <button type="button" className="btn-ghost btn-sm mt-2" onClick={() => setDemoKey('')}>{t({ en: 'Remove key', zh: '删除密钥' })}</button>
+          ) : (
+            <form className="mt-2 flex gap-2" onSubmit={(e) => { e.preventDefault(); setDemoKey(key); setKey(''); }}>
+              <label htmlFor="ai-key" className="sr-only">Gemini API key</label>
+              <input id="ai-key" type="password" autoComplete="off" className="input !py-1.5 text-sm" placeholder="Gemini API key" value={key} onChange={(e) => setKey(e.target.value)} />
+              <button type="submit" className="btn-dark btn-sm" disabled={!key.trim()}>{t({ en: 'Save', zh: '保存' })}</button>
+            </form>
+          )}
+          <p className="mt-1 text-xs text-muted">{t({ en: 'Stored only on this device, never sent to our servers or published.', zh: '仅保存在本设备，不会上传或公开。' })}</p>
+        </details>
+      )}
     </div>
   );
 }
@@ -183,7 +199,7 @@ export function Footer() {
             <a className="underline-offset-4 hover:underline" href={href('/about')}>{t(ui.nav.about)}</a>
             <a className="underline-offset-4 hover:underline" href={href('/impact')}>{t(ui.nav.impact)}</a>
             <a className="underline-offset-4 hover:underline" href={href('/postcard')}>{t(ui.nav.postcard)}</a>
-            <a className="underline-offset-4 hover:underline" href={href('/manager')}>{t({ en: 'Manager inbox (staff demo)', zh: '经理收件箱（员工演示）' })}</a>
+            <a className="underline-offset-4 hover:underline" href={href('/manager')}>{t({ en: 'Manager cabinet (staff demo)', zh: '经理工作台（员工演示）' })}</a>
             <a className="underline-offset-4 hover:underline" href={href('/pilot')}>{t({ en: 'Pilot dashboard', zh: '试点数据看板' })}</a>
             <a className="underline-offset-4 hover:underline" href={href('/partners')}>{t({ en: 'For hostels & hotels', zh: '青旅与酒店合作' })}</a>
           </div>
@@ -262,7 +278,7 @@ export function LoopStrip({ current, compact = false }: { current?: number; comp
               <span className="relative z-[1] mb-4 hidden h-[23px] w-[23px] place-items-center rounded-full border-2 border-teal bg-bg lg:grid" aria-hidden>
                 <span className="h-2 w-2 rounded-full bg-teal transition group-hover:scale-150" />
               </span>
-              <span className="block font-display text-2xl font-bold transition-colors group-hover:text-teal" style={{ fontStretch: '112%' }}>
+              <span className="block font-display text-2xl font-bold transition-colors group-hover:text-teal">
                 {t(s.label)}
               </span>
               <span className="mt-1 block text-[15px] text-muted">{t(s.text)}</span>

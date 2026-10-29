@@ -24,6 +24,8 @@ export type BotAnswer = {
   ai?: boolean;
   /** Honesty labels of the data the AI used. */
   tags?: TagKind[];
+  /** Price guard: every number in the AI reply was found in verified data, or the reply was blocked. */
+  guard?: 'passed' | 'blocked';
 };
 
 export const detectLang = (text: string, fallback: Lang): Lang => {

@@ -7,9 +7,9 @@
 //   --out <dir> --credits <file>           write somewhere else (used by tests)
 //
 // Each photo is resized to ≤ 1600 px wide and re-encoded as JPEG until it is
-// ≤ 250 KB, saved as src/assets/photos/<tour>-<n>.jpg, and its author / licence
-// is written to src/data/photoCredits.json. photos.ts then bundles it into the
-// single-file build, so the demo shows real photos with no internet.
+// ≤ 250 KB, saved as media/photos/<tour>-<n>.jpg (served from our own host), and its author / licence
+// is written to src/data/photoCredits.json. photos.ts then loads it from there in the
+// app, so the demo shows real photos without Wikimedia (blocked in China).
 // Needs: curl + network to commons.wikimedia.org (download mode), Playwright Chromium (resize).
 
 const fs = require('fs');
@@ -23,7 +23,7 @@ const arg = (name, def) => {
   return i > 0 ? process.argv[i + 1] : def;
 };
 const FROM = arg('--from');
-const OUT = path.resolve(arg('--out', path.join(ROOT, 'src/assets/photos')));
+const OUT = path.resolve(arg('--out', path.join(ROOT, 'media/photos')));
 const CREDITS = path.resolve(arg('--credits', path.join(ROOT, 'src/data/photoCredits.json')));
 const MAX_W = 1600;
 const MAX_BYTES = 250 * 1024;

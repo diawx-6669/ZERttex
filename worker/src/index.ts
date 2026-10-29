@@ -1,12 +1,19 @@
 // Saryarqa Go AI proxy (Cloudflare Worker).
-// POST /chat · /plan · /caption · /manager  →  Claude (claude-haiku-5-5), grounded on grounding.json.
-// The API key lives only here (wrangler secret ANTHROPIC_API_KEY); the browser never sees it.
+// POST /chat · /plan · /caption · /manager  →  Claude (claude-haiku-5-5) or Google Gemini, grounded on grounding.json.
+// The API key lives only here (wrangler secret ANTHROPIC_API_KEY or GEMINI_API_KEY); the browser never sees it.
+// With GEMINI_API_KEY set, Gemini answers; otherwise Claude.
 
 import Anthropic from '@anthropic-ai/sdk';
-import { BUDGETS, COMMON, ENDPOINTS, INTERESTS, LABELS, ROUTES, TOUR_IDS, type EndpointName } from './prompts';
+import { GeminiError, callGemini } from './gemini';
+import { COMMON, ENDPOINTS, isStandalone, type EndpointName } from './prompts';
+import { cleanOutput, userInput } from './shared';
 
 export interface Env {
   ANTHROPIC_API_KEY: string;
+  /** Optional: answer with Google Gemini instead of Claude. */
+  GEMINI_API_KEY?: string;
+  /** Optional: point at a mock Gemini API in tests. */
+  GEMINI_BASE_URL?: string;
   /** Optional comma-separated override of the CORS allow-list. */
   ALLOWED_ORIGINS?: string;
   /** Optional: point at a mock Messages API in tests. */
@@ -55,73 +62,6 @@ async function rateLimited(ip: string, env: Env): Promise<boolean> {
   return list.length > RATE_LIMIT;
 }
 
-const str = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
-const lang = (v: unknown): 'en' | 'zh' => (v === 'zh' ? 'zh' : 'en');
-const pick = <T extends string>(arr: unknown, allowed: readonly T[], max = 10): T[] =>
-  Array.isArray(arr) ? [...new Set(arr.filter((x): x is T => allowed.includes(x as T)))].slice(0, max) : [];
-const strings = (arr: unknown, n: number, maxLen: number) =>
-  Array.isArray(arr) ? arr.filter((x): x is string => typeof x === 'string' && x.trim().length > 0).map((x) => x.trim().slice(0, maxLen)).slice(0, n) : [];
-const CLAIMS = /(\bbest\b|no\.?\s?1|\bofficial\b|guarantee|\bcertified\b|\blicen[cs]ed\b|最好|第一|官方|保证|认证|最便宜)/i;
-
-// ---------- input: what the browser may send ----------
-function userInput(name: EndpointName, body: Record<string, unknown>): Record<string, unknown> | null {
-  switch (name) {
-    case 'chat': {
-      const question = str(body.question, 600);
-      if (!question) return null;
-      const history = Array.isArray(body.history)
-        ? body.history.slice(-6).map((h) => ({ from: (h as { from?: string })?.from === 'user' ? 'user' : 'assistant', text: str((h as { text?: unknown })?.text, 400) }))
-        : [];
-      return { lang: lang(body.lang), question, recentConversation: history, currentTour: pick([body.tourId], TOUR_IDS)[0] ?? null };
-    }
-    case 'plan': {
-      const text = str(body.text, 800);
-      return text ? { lang: lang(body.lang), description: text } : null;
-    }
-    case 'caption': {
-      const tourId = pick([body.tourId], TOUR_IDS)[0];
-      return tourId ? { tourId, travelerMessage: str(body.message, 140) } : null;
-    }
-    case 'manager': {
-      const question = str(body.question, 800);
-      return question ? { travelerLang: lang(body.travelerLang), question, tourId: pick([body.tourId], TOUR_IDS)[0] ?? null } : null;
-    }
-  }
-}
-
-// ---------- output: validate and clean what the model returned ----------
-function cleanOutput(name: EndpointName, raw: unknown): Record<string, unknown> | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const o = raw as Record<string, unknown>;
-  switch (name) {
-    case 'chat': {
-      const answer = str(o.answer, 1200);
-      return answer ? { answer, labels: pick(o.labels, LABELS), actions: pick(o.actions, ROUTES, 3) } : null;
-    }
-    case 'plan': {
-      const int = (v: unknown, lo: number, hi: number) => (Number.isInteger(v) && (v as number) >= lo && (v as number) <= hi ? (v as number) : 0);
-      return {
-        destinations: pick(o.destinations, TOUR_IDS, 4),
-        days: int(o.days, 1, 30),
-        travelers: int(o.travelers, 1, 12),
-        interests: pick(o.interests, INTERESTS, 5),
-        budget: pick([o.budget], BUDGETS)[0] ?? 'unknown',
-        note: str(o.note, 300),
-      };
-    }
-    case 'caption': {
-      const zh = strings(o.zh, 3, 80).filter((c) => !CLAIMS.test(c));
-      const en = strings(o.en, 3, 160).filter((c) => !CLAIMS.test(c));
-      return zh.length && en.length ? { zh, en } : null;
-    }
-    case 'manager': {
-      const summary = str(o.summary_ru, 600);
-      const reply = str(o.reply, 1500);
-      return summary && reply ? { summary_ru: summary, reply, check_ru: strings(o.check_ru, 4, 200), labels: pick(o.labels, LABELS) } : null;
-    }
-  }
-}
-
 async function callModel(env: Env, name: EndpointName, input: Record<string, unknown>) {
   const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, baseURL: env.ANTHROPIC_BASE_URL || undefined, maxRetries: 1, timeout: 7_000 });
   const ep = ENDPOINTS[name];
@@ -130,10 +70,12 @@ async function callModel(env: Env, name: EndpointName, input: Record<string, unk
     max_tokens: MAX_OUTPUT_TOKENS,
     // Short, grounded answers under a hard 600-token cap: thinking off, low effort.
     thinking: { type: 'disabled' },
-    system: [
-      { type: 'text', text: COMMON, cache_control: { type: 'ephemeral' } },
-      { type: 'text', text: ep.task },
-    ],
+    system: isStandalone(name)
+      ? [{ type: 'text', text: ep.task }]
+      : [
+          { type: 'text', text: COMMON, cache_control: { type: 'ephemeral' } },
+          { type: 'text', text: ep.task },
+        ],
     output_config: { effort: 'low', format: { type: 'json_schema', schema: ep.schema as unknown as Record<string, unknown> } },
     messages: [{ role: 'user', content: JSON.stringify(input) }],
   });
@@ -149,13 +91,14 @@ export default {
     const cors = corsFor(origin, env);
 
     if (request.method === 'OPTIONS') return cors ? new Response(null, { status: 204, headers: cors }) : new Response(null, { status: 403 });
-    if (request.method === 'GET' && url.pathname === '/health') return json({ ok: true, model: MODEL }, 200, cors ?? {});
+    const gemini = !!env.GEMINI_API_KEY;
+    if (request.method === 'GET' && url.pathname === '/health') return json({ ok: true, model: gemini ? 'gemini' : MODEL }, 200, cors ?? {});
 
     const name = url.pathname.replace(/^\/+|\/+$/g, '') as EndpointName;
     if (!(name in ENDPOINTS)) return json({ error: 'not_found' }, 404, cors ?? {});
     if (request.method !== 'POST') return json({ error: 'method_not_allowed' }, 405, cors ?? {});
     if (!cors) return json({ error: 'origin_not_allowed' }, 403, {});
-    if (!env.ANTHROPIC_API_KEY) return json({ error: 'not_configured' }, 503, cors);
+    if (!env.ANTHROPIC_API_KEY && !gemini) return json({ error: 'not_configured' }, 503, cors);
 
     if (Number(request.headers.get('content-length') ?? 0) > MAX_BODY_BYTES) return json({ error: 'body_too_large' }, 413, cors);
     const raw = await request.text();
@@ -174,10 +117,18 @@ export default {
     if (!input) return json({ error: 'bad_input' }, 400, cors);
 
     try {
-      const out = cleanOutput(name, await callModel(env, name, input));
+      let raw: unknown;
+      let model: string = MODEL;
+      if (gemini) {
+        const r = await callGemini(env.GEMINI_API_KEY!, name, input, { signal: AbortSignal.timeout(9_000), baseUrl: env.GEMINI_BASE_URL || undefined });
+        raw = r.data;
+        model = r.model;
+      } else raw = await callModel(env, name, input);
+      const out = cleanOutput(name, raw);
       if (!out) return json({ error: 'bad_model_output' }, 502, cors);
-      return json({ ...out, model: MODEL, ai: true }, 200, cors);
+      return json({ ...out, model, ai: true }, 200, cors);
     } catch (e) {
+      if (e instanceof GeminiError) return json({ error: e.status === 429 || e.status === 503 ? 'upstream_rate_limited' : 'upstream_error', status: e.status }, e.status === 429 || e.status === 503 ? 503 : 502, cors);
       if (e instanceof Anthropic.RateLimitError) return json({ error: 'upstream_rate_limited' }, 503, cors);
       if (e instanceof Anthropic.APIError) return json({ error: 'upstream_error', status: e.status }, 502, cors);
       return json({ error: 'model_failed' }, 502, cors);

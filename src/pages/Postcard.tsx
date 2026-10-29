@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { Icon } from '../components/Icon';
 import { Logo, PageHead } from '../components/Layout';
 import { Media } from '../components/Media';
@@ -9,7 +9,9 @@ import { tourById, tours } from '../data/tours';
 import type { TourId } from '../data/types';
 import { copyText } from '../lib/format';
 import { navigate } from '../lib/router';
-import { qrMatrix, referralUrl } from '../lib/qr';
+import { referralUrl } from '../lib/qr';
+import { QR } from '../components/QR';
+import { ShareSheet } from '../components/Share';
 import { downloadPostcard } from '../lib/postcardPng';
 import { useApp } from '../state';
 
@@ -23,18 +25,7 @@ function scriptedCaptions(id: TourId): AiCaptions {
   };
 }
 
-/** Real, scannable QR code (SVG, 2-module quiet zone). */
-export function QR({ text, label }: { text: string; label: string }) {
-  const grid = useMemo(() => qrMatrix(text), [text]);
-  const n = grid.length;
-  const d = grid.flatMap((row, r) => row.map((on, c) => (on ? `M${c} ${r}h1v1h-1z` : ''))).join('');
-  return (
-    <svg viewBox={`-2 -2 ${n + 4} ${n + 4}`} className="h-full w-full" role="img" aria-label={label} data-qr={text} shapeRendering="crispEdges">
-      <rect x="-2" y="-2" width={n + 4} height={n + 4} fill="#fff" />
-      <path d={d} fill="#12213f" />
-    </svg>
-  );
-}
+export { QR } from '../components/QR';
 
 export default function Postcard() {
   const { t, lang, booking, toast } = useApp();
@@ -264,6 +255,7 @@ export default function Postcard() {
           <p className="mt-2 text-center text-xs text-muted" lang={lang === 'zh' ? 'zh-CN' : 'en'}>
             {t({ en: '1080 × 1350 px, made in your browser. Nothing is uploaded.', zh: '1080 × 1350 像素，在浏览器中生成，不会上传。' })}
           </p>
+          <ShareSheet className="mt-4" url={link} title={t(tour.name)} caption={captions?.zh[0] ?? `${tour.name.zh}｜${tour.highlights[0].zh} #哈萨克斯坦`} onSaveImage={savePng} />
         </div>
       </div>
     </>

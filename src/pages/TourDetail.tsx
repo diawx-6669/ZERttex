@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { UpcomingDates } from '../components/Availability';
+import { Reviews } from '../components/Reviews';
+import { ShareSheet } from '../components/Share';
+import { SITE_URL } from '../lib/qr';
 import { tourQuestion, useChat } from '../components/Chat';
 import { Icon } from '../components/Icon';
 import { LoopStrip, ReferralBanner } from '../components/Layout';
@@ -85,14 +88,14 @@ export default function TourDetail({ id, refCode = null }: { id?: string; refCod
           <Icon name="arrowLeft" size={16} /> {t(ui.tour.allTours)}
         </a>
         <div className="mt-4 grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-end lg:gap-12">
-          <h1 className="text-[2.2rem] font-extrabold leading-[1.02] sm:text-6xl" style={{ fontStretch: '112%' }}>
+          <h1 className="text-[2.2rem] font-extrabold leading-[1.02] sm:text-6xl">
             {t(tour.name)}
           </h1>
           <p className="max-w-[46ch] text-lg text-muted lg:pb-2">
             {t(tour.tagline)} {t({ en: 'Good for', zh: '适合' })} {tour.bestFor.map((b) => t(interestText[b]).toLowerCase()).join(', ')}.
           </p>
         </div>
-        <div className="grain relative mt-8 aspect-[4/3] overflow-hidden rounded-2xl bg-surface2 sm:aspect-[21/9]">
+        <div className="grain relative mt-8 aspect-[4/3] overflow-hidden rounded-[18px] border-2 border-edge bg-surface2 shadow-hard-lg sm:aspect-[21/9]">
           <Media tour={tour.id} title={t(tour.name)} eager />
         </div>
       </section>
@@ -108,7 +111,7 @@ export default function TourDetail({ id, refCode = null }: { id?: string; refCod
                 [ui.tour.difficulty, t(tour.difficulty), 'route'],
               ] as [L, string, 'clock' | 'pin' | 'map' | 'route'][]
             ).map(([k, v, ic], i) => (
-              <div key={i} className="rounded-2xl border border-line bg-surface p-3">
+              <div key={i} className="card-flat p-3">
                 <dt className="flex items-center gap-1.5 text-xs text-muted">
                   <Icon name={ic} size={13} className="text-teal" /> {t(k)}
                 </dt>
@@ -121,7 +124,7 @@ export default function TourDetail({ id, refCode = null }: { id?: string; refCod
             <h2 className="mb-3 text-xl font-bold">{t(ui.tour.highlights)}</h2>
             <ul className="grid gap-2 sm:grid-cols-3">
               {tour.highlights.map((h, i) => (
-                <li key={i} className="flex items-start gap-2 rounded-2xl bg-surface2 p-3 text-sm font-medium">
+                <li key={i} className="flex items-start gap-2 rounded-[12px] border-2 border-edge bg-sun/40 p-3 text-sm font-semibold">
                   <Icon name="sparkle" size={16} className="mt-0.5 text-gold" />
                   {t(h)}
                 </li>
@@ -161,6 +164,16 @@ export default function TourDetail({ id, refCode = null }: { id?: string; refCod
           <section id="pack" className="scroll-mt-32">
             <h2 className="mb-3 text-xl font-bold">{t(ui.tour.packing)}</h2>
             <PackingList tour={tour} />
+          </section>
+
+          <Reviews tour={tour.id} />
+
+          <section aria-labelledby="share-h">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <h2 id="share-h" className="text-xl font-bold">{t({ en: 'Send to friends', zh: '分享给朋友' })}</h2>
+              <Scope phase="mvp" />
+            </div>
+            <ShareSheet url={`${SITE_URL}#/tour/${tour.id}`} title={t(tour.name)} caption={`${tour.name.zh}｜${tour.tagline.zh} #哈萨克斯坦旅行`} />
           </section>
         </div>
 

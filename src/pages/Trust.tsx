@@ -48,7 +48,7 @@ function GuideVideo({ guide }: { guide: Guide }) {
   const progress = idx < 0 ? 0 : Math.min(1, (idx + 1) / caps.length);
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-night text-nightInk">
+    <div className="overflow-hidden rounded-[14px] border-2 border-edge bg-night text-nightInk shadow-hard">
       <div className="relative grid aspect-video place-items-center overflow-hidden">
         <svg viewBox="0 0 320 180" className="absolute inset-0 h-full w-full" aria-hidden preserveAspectRatio="xMidYMid slice">
           <defs>

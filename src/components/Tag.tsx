@@ -61,7 +61,7 @@ export function AiModeBadge({ className = '' }: { className?: string }) {
     <span
       data-ai-mode={mode}
       title={t(mode === 'live'
-        ? { en: 'Answers come from Claude via our server, using only verified tour data. If it fails, scripted answers are used.', zh: '回答来自 Claude（经由我们的服务器），只使用已核实的线路数据。失败时自动使用预设回答。' }
+        ? { en: 'Answers come from a live AI model, using only verified tour data. Every number is checked against that data. If it fails, scripted answers are used.', zh: '回答来自实时 AI 模型，只使用已核实的线路数据，每个数字都会核对。失败时自动使用预设回答。' }
         : { en: 'Rules-based answers written by the team. No live AI.', zh: '团队编写的规则回答，非实时 AI。' })}
       className={`inline-flex w-fit shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-px text-[11px] font-semibold leading-tight ${
         mode === 'live' ? 'border-teal/60 bg-teal/10 text-teal' : 'border-line text-muted'

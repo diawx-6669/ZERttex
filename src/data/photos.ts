@@ -2,9 +2,12 @@ import type { L, TourId } from './types';
 import credits from './photoCredits.json';
 import commonsList from './commonsPhotos.json';
 
-// Real destination photos are optional. Files in src/assets/photos named
-// "<tour>-<n>.jpg" are picked up automatically, but ONLY if they have a credit
-// entry in photoCredits.json. Without photos the app falls back to SVG scenes.
+// Real destination photos are optional and always credited (photoCredits.json).
+// China-safe: `npm run photos:offline` (or the "Fetch offline photos" GitHub Action)
+// saves each one to media/photos/<tour>-<n>.jpg, served from our own host next to
+// index.html (copied to docs/media by the build) and loaded lazily, so no request goes
+// to Wikimedia (blocked in mainland China). Files in src/assets/photos are still inlined.
+// Any photo that fails to load falls back to the hand-drawn SVG scene.
 
 export type PhotoCredit = {
   author: string;
@@ -30,8 +33,16 @@ const all: Photo[] = Object.entries(files)
     const tour = file.split('-')[0] as TourId;
     return { src, file, tour, credit: creditMap[file] };
   })
-  .filter((p): p is Photo => !!p.credit && ['charyn', 'kolsai', 'turkestan', 'burabay'].includes(p.tour))
-  .sort((a, b) => a.file.localeCompare(b.file, 'en', { numeric: true }));
+  .filter((p): p is Photo => !!p.credit && ['charyn', 'kolsai', 'turkestan', 'burabay'].includes(p.tour));
+
+// Credited photos saved to media/photos by photos-offline.cjs (not inlined, loaded on demand).
+const inlined = new Set(all.map((p) => p.file));
+for (const [file, credit] of Object.entries(creditMap)) {
+  if (inlined.has(file)) continue;
+  const tour = file.split('-')[0] as TourId;
+  if (['charyn', 'kolsai', 'turkestan', 'burabay'].includes(tour)) all.push({ src: `media/photos/${file}`, file, tour, credit });
+}
+all.sort((a, b) => a.file.localeCompare(b.file, 'en', { numeric: true }));
 
 // The 12 credited Wikimedia Commons photos (src/data/commonsPhotos.json).
 // Offline-safe: `npm run photos:offline` downloads each one into

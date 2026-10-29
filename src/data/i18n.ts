@@ -37,6 +37,7 @@ export const ui = {
     impact: s('Impact', '影响'),
     about: s('About', '关于'),
     postcard: s('Postcard', '明信片'),
+    talk: s('Translate', '翻译'),
     menu: s('Menu', '菜单'),
     close: s('Close', '关闭'),
     largeText: s('Larger text', '放大字体'),

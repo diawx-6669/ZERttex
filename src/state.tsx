@@ -14,6 +14,8 @@ export type BookingDraft = {
   guideLang: 'en' | 'zh' | '';
   method: PayMethod;
   fromPlan: boolean;
+  /** Group booking: every traveler pays their own share. */
+  split: boolean;
 };
 
 export type Booking = BookingDraft & { code: string; total: number; createdAt: string };
@@ -64,6 +66,7 @@ const emptyDraft = (items?: BookingItem[]): BookingDraft => ({
   guideLang: '',
   method: '',
   fromPlan: false,
+  split: false,
 });
 
 export function AppProvider({ children }: { children: ReactNode }) {

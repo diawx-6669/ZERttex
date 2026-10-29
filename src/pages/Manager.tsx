@@ -8,6 +8,9 @@ import { aiLive, callAi, validateManager } from '../lib/ai';
 import { answer, findTour } from '../lib/concierge';
 import { markAnswered, useInbox, type InboxItem } from '../lib/inbox';
 import { useApp } from '../state';
+import { kzt, fmtDate } from '../lib/format';
+import { href } from '../lib/router';
+import { GO, STOP, funnel } from './Pilot';
 
 // Operator side (for Saryarqa Routes staff). Handoff questions from the concierge,
 // an AI summary in Russian and a reply draft in the traveler's language.
@@ -55,7 +58,7 @@ function scriptedDraft(item: InboxItem): Draft {
 const fmtTime = (iso: string, lang: Lang) => new Date(iso).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 export default function Manager() {
-  const { t, lang, toast } = useApp();
+  const { t, lang, toast, booking } = useApp();
   const inbox = useInbox();
   const [selId, setSelId] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
@@ -89,20 +92,115 @@ export default function Manager() {
   };
 
   const newCount = inbox.filter((i) => i.status === 'new').length;
+  const [tab, setTab] = useState<'questions' | 'bookings' | 'funnel'>('questions');
+  const paidMonth = funnel[3].count;
+  // Demo rows plus the booking made in this browser (if any).
+  const bookings = [
+    ...(booking ? [{ code: booking.code, name: booking.name || '—', tour: booking.items[0]?.tourId || 'kolsai', date: booking.items[0]?.date ?? '', n: booking.travelers, total: booking.total, status: booking.split ? 'split' : 'paid', demo: false }] : []),
+    { code: 'SG-H7KD', name: '王丽', tour: 'kolsai', date: '2026-11-21', n: 2, total: 138000, status: 'paid', demo: true },
+    { code: 'SG-2PXR', name: 'Chen Chen', tour: 'charyn', date: '2026-11-14', n: 4, total: 216000, status: 'split', demo: true },
+    { code: 'SG-K4NE', name: '李明', tour: 'turkestan', date: '2026-12-05', n: 1, total: 89000, status: 'paid', demo: true },
+    { code: 'SG-B8HM', name: 'Ji-woo Park', tour: 'burabay', date: '2026-11-28', n: 3, total: 144000, status: 'pending', demo: true },
+  ];
 
   return (
     <>
       <PageHead
         scope="mvp"
         eyebrow={<span data-testid="staff-label">{t({ en: 'For Saryarqa Routes staff · demo', zh: '供 Saryarqa Routes 员工使用 · 演示' })}</span>}
-        title={t({ en: 'Manager inbox', zh: '经理收件箱' })}
-        sub={t({ en: 'Questions the concierge handed to a person. Get a short Russian summary and a reply draft in the traveler’s language, then edit and approve it yourself.', zh: '助手转交给人工的问题。获取俄语摘要和旅客语言的回复草稿，由您修改并确认后再发送。' })}
+        title={t({ en: 'Manager cabinet', zh: '经理工作台' })}
+        sub={t({ en: 'Bookings, questions the concierge handed to a person, and how many travelers reach payment. Questions get a Russian summary and a reply draft you edit and approve yourself.', zh: '预订、助手转交给人工的问题，以及有多少旅客完成付款。问题附俄语摘要和回复草稿，由您修改并确认后发送。' })}
       >
         <AiModeBadge />
         <Tag kind="proposal" extra={t({ en: 'saves manager time on repeat questions, to measure in pilot', zh: '减少重复问题耗时，试点中衡量' })} />
       </PageHead>
 
-      <div className="container-x mt-6 grid gap-5 lg:grid-cols-[340px_1fr]">
+      <div className="container-x mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4" data-testid="mgr-kpis">
+        {[
+          { k: t({ en: 'Open questions', zh: '待处理问题' }), v: String(newCount), s: t({ en: 'from the concierge', zh: '来自智能助手' }) },
+          { k: t({ en: 'Paid bookings this month', zh: '本月已付预订' }), v: String(paidMonth), s: `${t({ en: 'goal', zh: '目标' })} ≈${GO} · ${t({ en: 'stop ads at', zh: '低于则停投' })} ≈${STOP}` },
+          { k: t({ en: 'Reached payment', zh: '进入付款' }), v: `${((funnel[3].count / funnel[2].count) * 100).toFixed(0)}%`, s: t({ en: 'of started bookings paid', zh: '开始预订后完成付款' }) },
+          { k: t({ en: 'From postcards', zh: '来自明信片' }), v: String(funnel[5].count), s: t({ en: 'friend bookings, no ad cost', zh: '朋友预订，无广告费' }) },
+        ].map((x) => (
+          <div key={x.k} className="card p-4">
+            <div className="text-xs text-muted">{x.k}</div>
+            <div className="num mt-1 text-3xl font-black">{x.v}</div>
+            <div className="text-xs text-muted">{x.s}</div>
+          </div>
+        ))}
+      </div>
+      <div className="container-x mt-5">
+        <div className="flex flex-wrap gap-2" role="tablist" aria-label={t({ en: 'Cabinet', zh: '工作台' })}>
+          {(
+            [
+              ['questions', { en: 'Questions', zh: '问题' }],
+              ['bookings', { en: 'Bookings', zh: '预订' }],
+              ['funnel', { en: 'Funnel', zh: '转化漏斗' }],
+            ] as const
+          ).map(([id, l]) => (
+            <button key={id} type="button" role="tab" aria-selected={tab === id} onClick={() => setTab(id)} className={`chip ${tab === id ? '!bg-sun !text-sunInk shadow-hard-sm' : ''}`} data-testid={`mgr-tab-${id}`}>
+              {t(l)}{id === 'questions' && newCount ? ` · ${newCount}` : ''}
+            </button>
+          ))}
+          <Tag kind="demo" className="ml-auto self-center" extra={t({ en: 'counts', zh: '统计数据' })} />
+        </div>
+      </div>
+
+      {tab === 'bookings' && (
+        <div className="container-x mt-4">
+          <div className="card overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm" data-testid="mgr-bookings">
+              <thead>
+                <tr className="border-b-2 border-edge text-left font-mono text-xs uppercase tracking-wider">
+                  <th className="px-4 py-3">{t({ en: 'Code', zh: '编号' })}</th>
+                  <th className="px-4 py-3">{t({ en: 'Lead traveler', zh: '联系人' })}</th>
+                  <th className="px-4 py-3">{t({ en: 'Tour · date', zh: '线路 · 日期' })}</th>
+                  <th className="px-4 py-3 text-right">{t({ en: 'People', zh: '人数' })}</th>
+                  <th className="px-4 py-3 text-right">{t({ en: 'Total', zh: '总额' })}</th>
+                  <th className="px-4 py-3">{t({ en: 'Payment', zh: '付款' })}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookings.map((b) => (
+                  <tr key={b.code} className="border-b border-line last:border-0">
+                    <td className="px-4 py-3 font-mono font-semibold">{b.code}{b.demo ? '' : ' ★'}</td>
+                    <td className="px-4 py-3">{b.name}</td>
+                    <td className="px-4 py-3">{t(tourById(b.tour as Parameters<typeof tourById>[0])?.name ?? { en: b.tour, zh: b.tour })} · <span className="text-muted">{b.date ? fmtDate(b.date, lang) : '—'}</span></td>
+                    <td className="num px-4 py-3 text-right">{b.n}</td>
+                    <td className="num px-4 py-3 text-right">{kzt(b.total)}</td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-[6px] border-2 border-edge px-1.5 py-0.5 text-xs font-bold ${b.status === 'paid' ? 'bg-ok text-white' : b.status === 'split' ? 'bg-sun text-sunInk' : 'bg-surface2'}`}>
+                        {b.status === 'paid' ? t({ en: 'Paid', zh: '已付' }) : b.status === 'split' ? t({ en: 'Split · in progress', zh: '分开付款中' }) : t({ en: 'Waiting', zh: '待付款' })}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-muted">★ {t({ en: 'booking made in this browser. Other rows are Demo data.', zh: '在此浏览器中完成的预订，其余为演示数据。' })}</p>
+        </div>
+      )}
+
+      {tab === 'funnel' && (
+        <div className="container-x mt-4">
+          <div className="card p-5">
+            <ol className="grid gap-2 sm:grid-cols-6">
+              {funnel.map((f, i) => (
+                <li key={f.step} className="rounded-[10px] border-2 border-edge p-3">
+                  <div className="num text-2xl font-black">{f.count.toLocaleString('en-US')}</div>
+                  <div className="text-xs font-semibold">{f.step}</div>
+                  {i > 0 && <div className="num text-xs text-muted">{((f.count / funnel[i - 1].count) * 100).toFixed(0)}%</div>}
+                </li>
+              ))}
+            </ol>
+            <a href={href('/pilot')} className="btn-primary btn-sm mt-4">{t({ en: 'Open the full pilot dashboard', zh: '打开完整试点看板' })} <Icon name="arrow" size={14} /></a>
+          </div>
+        </div>
+      )}
+
+      {tab === 'questions' && (
+      <div className="container-x mt-4 grid gap-5 lg:grid-cols-[340px_1fr]">
         <section aria-labelledby="inbox-h" className="card h-fit overflow-hidden">
           <h2 id="inbox-h" className="flex items-center justify-between border-b border-line px-4 py-3 text-sm font-semibold">
             <span>{t({ en: 'Handoff questions', zh: '转人工问题' })}</span>
@@ -195,6 +293,7 @@ export default function Manager() {
           </section>
         )}
       </div>
+      )}
     </>
   );
 }

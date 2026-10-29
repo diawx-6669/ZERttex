@@ -2,7 +2,10 @@ import { useMemo, useState } from 'react';
 import { Icon, type IconName } from '../components/Icon';
 import { PageHead } from '../components/Layout';
 import { Media } from '../components/Media';
-import { Tag } from '../components/Tag';
+import { GroupPay } from '../components/GroupPay';
+import { QR } from '../components/QR';
+import { Scope, Tag } from '../components/Tag';
+import { passUrl } from './Pass';
 import { ui } from '../data/i18n';
 import { tourById } from '../data/tours';
 import type { L, Tour } from '../data/types';
@@ -77,7 +80,7 @@ export default function Trip() {
   const [alt, setAlt] = useState<string>('');
   const [requested, setRequested] = useState(false);
   const done = now >= stages.length - 1;
-  const shareLink = `https://go.saryarqa.example/family/${code}-${tour.id}`;
+  const shareLink = passUrl({ n: booking?.name.trim().split(/\s+/)[0] || 'Li Wei', c: code, t: tour.id, d: item.date, s: now });
   const altDates = [3, 7, 14].map((n) => addDays(item.date, n));
   const ci = condInfo[cond];
 
@@ -156,7 +159,7 @@ export default function Trip() {
             })}
           </ol>
           {done && (
-            <div className="rise mt-3 flex flex-wrap items-center gap-3 rounded-2xl bg-teal/10 p-4">
+            <div className="rise mt-3 flex flex-wrap items-center gap-3 rounded-[14px] border-2 border-edge bg-teal/10 p-4">
               <Icon name="heart" className="text-gold" />
               <span className="flex-1">{t(ui.trip.tripDone)}</span>
               <button type="button" className="btn-primary btn-sm" onClick={() => navigate('/postcard')}>
@@ -215,7 +218,14 @@ export default function Trip() {
                       <Icon name={copied ? 'check' : 'copy'} size={14} /> {copied ? t(ui.trip.copied) : t(ui.trip.copy)}
                     </button>
                   </div>
-                  <p className="mt-1 text-xs text-muted"><Tag kind="demo" extra={t({ en: 'example domain, not a live link', zh: '示例域名，非真实链接' })} /></p>
+                  <div className="mt-3 flex flex-wrap items-center gap-3">
+                    <div className="w-24 shrink-0 rounded-[8px] border-2 border-edge bg-white p-1"><QR text={shareLink} label="Trip Pass QR" /></div>
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted">{t({ en: 'Family scans it in WeChat and sees where you are and what is next. No app, no account.', zh: '家人用微信扫码即可看到您在哪里、下一步是什么，无需下载应用或注册。' })}</p>
+                      <a className="btn-primary btn-sm" href={shareLink.slice(shareLink.indexOf('#'))} data-testid="open-pass"><Icon name="arrow" size={14} /> {t({ en: 'Open Trip Pass', zh: '打开行程通行证' })}</a>
+                    </div>
+                  </div>
+                  <p className="mt-2 flex flex-wrap gap-1.5 text-xs text-muted"><Scope phase="p2" /><Tag kind="demo" extra={t({ en: 'check-ins simulated', zh: '报平安为模拟' })} /></p>
                 </div>
                 <div className="rounded-xl border border-line p-3">
                   <div className="text-xs text-muted">{t(ui.trip.familySees)}</div>
@@ -236,6 +246,8 @@ export default function Trip() {
               </div>
             )}
           </section>
+
+          {booking?.split && booking.travelers > 1 && <GroupPay booking={booking} />}
 
           <section className="card p-4 sm:p-5" aria-labelledby="wx">
             <div className="flex flex-wrap items-center gap-2">

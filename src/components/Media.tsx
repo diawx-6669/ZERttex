@@ -150,7 +150,7 @@ export function Gallery({ tour }: { tour: TourId }) {
             key={p.file}
             type="button"
             onClick={() => setOpen(i)}
-            className="group relative aspect-[4/3] w-[78%] shrink-0 snap-start overflow-hidden rounded-2xl sm:w-auto"
+            className="group relative aspect-[4/3] w-[78%] shrink-0 snap-start overflow-hidden rounded-[14px] border-2 border-edge sm:w-auto"
             aria-label={`${t({ en: 'Open photo', zh: '打开照片' })} ${i + 1}`}
           >
             <img src={p.src} alt={p.credit.alt ? t(p.credit.alt) : ''} loading="lazy" onError={(e) => ((e.currentTarget.closest('button') as HTMLElement).hidden = true)} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />

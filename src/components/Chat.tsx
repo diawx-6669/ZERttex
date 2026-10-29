@@ -55,7 +55,8 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     if (aiLive()) {
       const history = msgsRef.current.filter((m) => !m.greet && m.text).slice(-6).map((m) => ({ from: m.from, text: m.text }));
       const live = await callAi('chat', { question: q, lang: scripted.lang, tourId: findTour(q)?.id, history }, validateChat);
-      if (live) a = fromAi(live, scripted.lang);
+      if (live?.blocked) a = { ...scripted, guard: 'blocked', actions: [...(scripted.actions ?? []).filter((x) => x.kind !== 'manager'), { kind: 'manager' }] };
+      else if (live) a = fromAi(live, scripted.lang);
     } else {
       await new Promise((r) => window.setTimeout(r, 550));
     }
@@ -104,7 +105,7 @@ function fromAi(r: AiChat, lang: BotAnswer['lang']): BotAnswer {
     if (to === '/trust') return { kind: 'trust' };
     return { kind: 'route', to: to as '/tours' | '/trip' | '/postcard' };
   });
-  return { text: r.answer, lang, actions, intent: 'ai', ai: true, tags: r.tags };
+  return { text: r.answer, lang, actions, intent: 'ai', ai: true, tags: r.tags, guard: 'passed' };
 }
 
 /** Question the concierge auto-asks when opened from a tour. */
@@ -204,10 +205,18 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
               </div>
               <div
                 lang={m.a?.lang === 'zh' ? 'zh-CN' : undefined}
-                className={`whitespace-pre-line rounded-2xl px-4 py-3 text-[15px] ${m.from === 'user' ? 'rounded-br-md bg-teal text-tealInk' : 'rounded-bl-md border border-line bg-surface2'}`}
+                className={`whitespace-pre-line rounded-2xl px-4 py-3 text-[15px] ${m.from === 'user' ? 'rounded-br-md border-2 border-edge bg-teal text-tealInk' : 'rounded-bl-md border-2 border-edge bg-surface2'}`}
               >
                 {m.greet ? t(ui.ask.greeting) : m.text}
               </div>
+              {m.a?.guard && (
+                <div data-guard={m.a.guard} className={`mt-1.5 flex items-start gap-1.5 text-xs ${m.a.guard === 'passed' ? 'text-ok' : 'text-warn'}`}>
+                  <Icon name={m.a.guard === 'passed' ? 'shieldCheck' : 'shield'} size={14} className="mt-px shrink-0" />
+                  {m.a.guard === 'passed'
+                    ? t({ en: 'Price check passed: every number is in our verified data.', zh: '价格核对通过：所有数字均来自已核实数据。' })
+                    : t({ en: 'The AI reply had a number we could not verify, so it was blocked. Checked answer shown; a manager can confirm.', zh: 'AI 回复中有无法核实的数字，已被拦截。以下为核对过的回答，可转人工确认。' })}
+                </div>
+              )}
               {m.a && (m.a.tag || m.a.ai || m.a.actions?.length) ? (
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
                   {m.a.ai && <AiTag />}
@@ -232,7 +241,7 @@ export function ChatPanel({ className = '', onClose }: { className?: string; onC
           </div>
         )}
         {handoff.open && (
-          <form onSubmit={sendHandoff} className="rise rounded-2xl border border-gold/50 bg-gold/10 p-4" noValidate>
+          <form onSubmit={sendHandoff} className="rise rounded-[14px] border-2 border-edge bg-sun/30 p-4" noValidate>
             <div className="mb-1 flex items-center gap-2 font-semibold">
               <Icon name="users" className="text-gold" /> {t(ui.ask.handoffTitle)}
             </div>

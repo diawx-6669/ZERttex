@@ -24,6 +24,8 @@ cd worker
 npm install
 npx wrangler login                      # opens the browser once
 npx wrangler secret put ANTHROPIC_API_KEY   # paste the key when asked; it is stored only in Cloudflare
+# or, to answer with Google Gemini instead of Claude (same prompts, cleaning and price guard):
+npx wrangler secret put GEMINI_API_KEY      # an AI Studio key; with it set, Gemini answers
 npx wrangler deploy                     # prints the URL, e.g. https://saryarqa-ai.<your-subdomain>.workers.dev
 curl https://saryarqa-ai.<your-subdomain>.workers.dev/health   # → {"ok":true,"model":"claude-haiku-5-5"}
 ```

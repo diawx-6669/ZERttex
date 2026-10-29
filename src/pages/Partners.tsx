@@ -180,7 +180,7 @@ export default function Partners() {
           </div>
 
           <div className="mx-auto w-full max-w-[380px]">
-            <div className="overflow-hidden rounded-2xl border border-line bg-white text-[#16191f] shadow-card" style={{ aspectRatio: '105 / 148' }} data-testid="partner-card">
+            <div className="overflow-hidden rounded-[14px] border-2 border-edge bg-white text-[#16191f] shadow-hard-lg" style={{ aspectRatio: '105 / 148' }} data-testid="partner-card">
               <div className="flex items-center gap-2 bg-[#0b6f8c] px-5 py-4 text-white">
                 <span className="h-5 w-5 rounded-full bg-[#f2b33d]" aria-hidden />
                 <span className="font-display text-xl font-bold">Saryarqa Go</span>
@@ -235,7 +235,7 @@ export default function Partners() {
       </Section>
 
       <section className="container-x mt-16" data-reveal>
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-teal/10 p-6 sm:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 card bg-sun p-6 text-sunInk sm:p-8">
           <p className="max-w-[52ch] text-lg font-semibold">
             {t({ en: 'Want to see what your guests will see? Open the tours as a traveler.', zh: '想看看客人会看到什么？以旅客身份浏览线路。' })}
           </p>

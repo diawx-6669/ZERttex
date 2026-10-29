@@ -17,7 +17,8 @@
     "postcards": "node scripts/build-postcards.cjs",
     "grounding": "node scripts/build-grounding.cjs",
     "cost-sheet": "node scripts/build-cost-sheet.cjs",
-    "stage2": "npm run build && npm run cost-sheet && npm run postcards && npm run sync:money"
+    "stage2": "npm run build && npm run cost-sheet && npm run postcards && npm run sync:money",
+    "china-check": "node scripts/china-check.cjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.7",

@@ -336,8 +336,9 @@ const skip = (name, why) => {
   await mp.waitForTimeout(250);
   await mp.screenshot({ path: path.join(SHOTS, '15-mobile-tour.png'), fullPage: true });
 
-  // 11b. Offline-safe photos: with the network disabled, tour pages still show real (bundled) photos.
-  const photoDir = path.join(ROOT, 'src/assets/photos');
+  // 11b. China-safe / offline photos: with the network disabled, tour pages still show real photos
+  // served from our own folder (media/photos next to index.html), never from Wikimedia.
+  const photoDir = path.join(ROOT, 'media/photos');
   const commonsList = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/commonsPhotos.json'), 'utf8'));
   const credits = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/data/photoCredits.json'), 'utf8'));
   const bundled = commonsList.filter((p) => fs.existsSync(path.join(photoDir, p.local)) && credits[p.local]);
@@ -356,9 +357,9 @@ const skip = (name, why) => {
     const off = await browser.newContext({ viewport: { width: 1366, height: 900 }, offline: true });
     const op = await off.newPage();
     for (const tour of ['charyn', 'kolsai', 'turkestan', 'burabay']) {
-      await op.goto(URL + '#/tour/' + tour);
+      await op.goto('file://' + path.join(ROOT, 'index.html') + '#/tour/' + tour);
       await op.waitForTimeout(900);
-      const real = await op.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth > 0 && i.src.startsWith('data:image/')).length);
+      const real = await op.evaluate(() => [...document.images].filter((i) => i.complete && i.naturalWidth > 0 && /media\/photos\//.test(i.src)).length);
       ok(`Offline: real photos on /tour/${tour}`, real >= 1, `${real} loaded`);
     }
     await op.goto(URL + '#/about');
@@ -374,7 +375,7 @@ const skip = (name, why) => {
   await dp.goto(URL + '#/');
   await dp.waitForTimeout(800);
   const bg = await dp.evaluate(() => getComputedStyle(document.body).backgroundColor);
-  ok('Dark mode applies dark background', bg === 'rgb(14, 17, 22)', bg);
+  ok('Dark mode applies dark background', bg === 'rgb(17, 16, 26)', bg);
   await dp.screenshot({ path: path.join(SHOTS, '16-dark-home.png') });
   await dp.goto(URL + '#/book?tour=kolsai');
   await dp.waitForTimeout(300);

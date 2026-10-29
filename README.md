@@ -82,6 +82,20 @@ Every label in the UI is one of exactly five: **Case fact · Verified source · 
 - **Demo video** (48 s) on the home page: `media/saryarqa-go-demo.mp4`, mirrored to `docs/media/` by the build; falls back to the GitHub Pages copy when opened from `dist/`.
 - Stage 2 deliverables in `submission/stage2/`: Cost and Payback Sheet, SLIDES_CONTENT, DEMO_SCRIPT, AI declaration draft, changelog, postcards.
 
+## Final round additions
+
+1. **Live AI concierge in Chinese that cannot invent a price.** Gemini (or Claude through `worker/`) answers only from `worker/src/grounding.json`. Every reply then passes a **price guard in code** (`worker/src/shared.ts`): any number of 100+ that is not a verified price, a total built from verified prices, or its USD/CNY at the demo rate blocks the reply; the traveler sees the checked answer and the manager hand-off. Not in the data → hand-off.
+2. **WeChat and Xiaohongshu.** Share sheet on tours and postcards: WeChat QR, "tap ···" hint inside WeChat's browser, Xiaohongshu caption + picture + open app. "Sign in with WeChat", Official Account and Mini Program are shown as Phase 2 (they need the company's WeChat Open Platform account).
+3. **Alipay+ / WeChat Pay checkout** in TEST MODE (wallet QR, timer). Real money needs an acquirer contract.
+4. **Built to open in China.** No Google Fonts (Inter + JetBrains Mono self-hosted), photos served from `media/photos` instead of Wikimedia, AI only through our own server in production. `npm run build && npm run china-check` opens every page and fails on any request to Google, YouTube, Wikimedia, Meta, X… Hosting inside the mainland firewall still needs a CDN with mainland nodes (ICP filing).
+5. **Translator** `#/talk`: traveler (中文) ↔ guide (Русский), voice or typing, AI translation with pinyin; offline phrasebook (7 topics, audio, big "show" mode). `sw.js` keeps the site usable offline after the first visit.
+6. **Group booking with split payment**: each traveler pays their share by link / QR; seats held 48 h.
+7. **Reviews only from people who went** (booking code, published after the trip date), shown in the reader's language with the original one tap away. The sample reviews are Demo data.
+8. **Trip Pass** `#/pass/…` for family: opens in WeChat on any phone without an account; the link carries only first name, tour and dates.
+9. **Manager cabinet** `#/manager`: KPIs, bookings, hand-off questions with AI drafts, funnel (links to `#/pilot`).
+
+**Turning the AI on for a demo** (no server): open the site once with `#/?aikey=<Gemini key>`. The key is saved in that browser only and removed from the address bar; or paste it in the footer ("Connect a Gemini key"). It is never in the repository or the published files. For everyone (production): deploy `worker/` with `GEMINI_API_KEY` or `ANTHROPIC_API_KEY` and build with `VITE_AI_ENDPOINT`.
+
 ## What production would need
 
 1. **Backend + database** (bookings, tours, availability, guides, users) with an admin panel for managers.
@@ -93,7 +107,7 @@ Every label in the UI is one of exactly five: **Case fact · Verified source · 
 
 ## Design
 
-Cool neutral paper and near-black ink with one accent (the sky blue of the Kazakh flag, deepened for contrast). Archivo for headlines (slightly expanded, like a travel poster), Instrument Sans for text, Phosphor icons. One shape system: controls 10 px, containers 16 px, honesty labels 4 px. No uppercase micro-labels, no decorative dots, no em-dashes; sections use different layouts (editorial list, asymmetric tour grid, big-number row, map split). Light and dark themes follow the system setting.
+One brand with the pitch deck and the demo video: warm paper with a faint print grid, near-black ink, electric blue accent, signal yellow for highlights, pink stickers, 2 px ink edges and hard offset shadows (neo-brutalist print look). Inter for everything, JetBrains Mono for small labels, both self-hosted; Chinese uses the system CJK font. Controls 10 px, containers 14 px. Buttons "land" when pressed. Light and dark themes follow the system setting (dark: cream edges, violet shadows).
 
 ## Photos (offline-safe)
 
@@ -102,7 +116,7 @@ The app shows 12 freely licensed Wikimedia Commons photos (listed with author an
 **Before the live pitch, bundle the photos so they work with no Wi-Fi:**
 
 ```bash
-npm run photos:offline   # downloads the 12 files → src/assets/photos/<tour>-<n>.jpg (≤ 1600 px, ≤ 250 KB) + photoCredits.json
+npm run photos:offline   # downloads the 12 files → media/photos/<tour>-<n>.jpg (≤ 1600 px, ≤ 250 KB) + photoCredits.json
 npm run build            # inlines them into dist/index.html and docs/index.html
 node tests/acceptance.cjs   # "Offline: real photos on /tour/…" checks now run instead of SKIP
 ```

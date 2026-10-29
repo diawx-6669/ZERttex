@@ -155,7 +155,7 @@ export function RouteMap({ highlight, className = '', interactive = true }: { hi
       </div>
 
       {tour && (
-        <div className="rise absolute inset-x-3 bottom-3 flex items-center gap-3 rounded-2xl border border-line bg-surface p-2.5 shadow-card">
+        <div className="rise absolute inset-x-3 bottom-3 flex items-center gap-3 rounded-[14px] border-2 border-edge bg-surface p-2.5 shadow-hard">
           <div className="h-16 w-20 shrink-0 overflow-hidden rounded-xl">
             <Media tour={tour.id} credit={false} />
           </div>
